@@ -1,0 +1,82 @@
+export const SCHEDULE_TARGETS = [
+  { id: 'POST /api/orders', method: 'POST', path: '/api/orders' },
+  { id: 'GET /api/orders', method: 'GET', path: '/api/orders' },
+  { id: 'POST /api/orders/:id/cancel', method: 'POST', path: '/api/orders/:id/cancel' },
+  { id: 'POST /api/inventory/sync', method: 'POST', path: '/api/inventory/sync' },
+]
+
+export const TRIGGER_TYPES = {
+  time: { label: 'Time-based', description: 'Runs on a recurring schedule' },
+  event: { label: 'Event-based', description: 'Runs when an event is published' },
+  dependency: { label: 'Dependency-based', description: 'Runs after another job finishes' },
+}
+
+export const RECURRENCES = [
+  { id: 'once', label: 'Once' },
+  { id: 'hourly', label: 'Every hour' },
+  { id: 'daily', label: 'Every day' },
+  { id: 'weekly', label: 'Every week' },
+]
+
+export const INITIAL_SCHEDULES = [
+  {
+    id: 's1',
+    name: 'inventory-sync',
+    trigger: 'time',
+    recurrence: 'hourly',
+    startAt: '2026-10-31T09:00:00Z',
+    eventName: '',
+    dependsOn: '',
+    target: 'POST /api/inventory/sync',
+    payload: '{\n  "warehouse": "eu-west-1",\n  "full": false\n}',
+    enabled: true,
+    lastStatus: 'success',
+    lastRunAt: '2026-10-31T09:00:00Z',
+    nextRunAt: '2026-10-31T10:00:00Z',
+  },
+  {
+    id: 's2',
+    name: 'nightly-reconciliation',
+    trigger: 'time',
+    recurrence: 'daily',
+    startAt: '2026-10-30T02:00:00Z',
+    eventName: '',
+    dependsOn: '',
+    target: 'GET /api/orders',
+    payload: '{\n  "status": "confirmed"\n}',
+    enabled: true,
+    lastStatus: 'failed',
+    lastRunAt: '2026-10-30T02:00:00Z',
+    nextRunAt: '2026-10-31T02:00:00Z',
+  },
+  {
+    id: 's3',
+    name: 'order-confirmation-replay',
+    trigger: 'event',
+    recurrence: 'once',
+    startAt: '2026-10-31T11:30:00Z',
+    eventName: 'order.confirmed',
+    dependsOn: '',
+    target: 'POST /api/orders/:id/cancel',
+    payload: '{\n  "reason": "replay-test"\n}',
+    enabled: false,
+    lastStatus: 'never',
+    lastRunAt: null,
+    nextRunAt: null,
+  },
+  {
+    id: 's4',
+    name: 'refund-after-sync',
+    trigger: 'dependency',
+    recurrence: 'once',
+    startAt: '2026-10-31T12:00:00Z',
+    eventName: '',
+    dependsOn: 's1',
+    target: 'POST /api/orders/:id/cancel',
+    payload: '{\n  "reason": "post-sync-check"\n}',
+    enabled: true,
+    lastStatus: 'success',
+    lastRunAt: '2026-10-31T09:01:00Z',
+    nextRunAt: null,
+  },
+]
