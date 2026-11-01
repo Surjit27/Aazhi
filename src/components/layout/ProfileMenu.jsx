@@ -2,18 +2,38 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LogOut, Settings, User } from 'lucide-react'
 import { useAppStore } from '../../stores/appStore.js'
+import { useAuthStore } from '../../stores/authStore.js'
 import useClickOutside from '../../hooks/useClickOutside.js'
+import Badge from '../ui/Badge.jsx'
+
+function initials(name, email) {
+  const base = name?.trim() || email || '?'
+  const parts = base.split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  return base.slice(0, 2).toUpperCase()
+}
 
 export default function ProfileMenu() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const pushToast = useAppStore((s) => s.pushToast)
+  const user = useAuthStore((s) => s.user)
+  const logout = useAuthStore((s) => s.logout)
   const ref = useClickOutside(() => setOpen(false), open)
 
+  if (!user) return null
+
   const items = [
-    { label: 'Profile', icon: User, action: () => pushToast({ title: 'Profile', body: 'Signed in as maya.chen@acme.dev' }) },
+    { label: 'Profile', icon: User, action: () => pushToast({ title: 'Profile', body: user.email }) },
     { label: 'Settings', icon: Settings, action: () => navigate('/settings') },
-    { label: 'Sign out', icon: LogOut, action: () => pushToast({ tone: 'warning', title: 'Sign out is disabled in this prototype' }) },
+    {
+      label: 'Sign out',
+      icon: LogOut,
+      action: () => {
+        logout()
+        navigate('/login', { replace: true })
+      },
+    },
   ]
 
   return (
@@ -24,13 +44,16 @@ export default function ProfileMenu() {
         aria-expanded={open}
         className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700 transition-colors hover:bg-primary-50"
       >
-        MC
+        {initials(user.displayName, user.email)}
       </button>
       {open && (
         <div className="animate-slide-up absolute top-full right-0 z-20 mt-2 w-56 rounded-lg border border-line bg-white p-1 shadow-pop">
           <div className="px-2.5 py-2">
-            <p className="text-[13px] font-medium text-ink">Maya Chen</p>
-            <p className="text-xs text-ink-muted">maya.chen@acme.dev</p>
+            <p className="text-[13px] font-medium text-ink">{user.displayName}</p>
+            <p className="text-xs text-ink-muted">{user.email}</p>
+            <Badge tone={user.role === 'admin' ? 'primary' : 'neutral'}>
+              {user.role}
+            </Badge>
           </div>
           <div className="my-1 border-t border-line" />
           {items.map((item) => (
