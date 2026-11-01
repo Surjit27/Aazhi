@@ -1,65 +1,31 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Braces, Search, Server, Workflow, FolderTree, Layers } from 'lucide-react'
-import { useAppStore } from '../../stores/appStore.js'
-import { getBackendCatalog } from '../../data/backendCatalog.js'
-import { backendBasePath } from '../../data/backends.js'
-import { INITIAL_MOCK_SERVERS } from '../../data/mockServers.js'
-import { NAV_ITEMS } from './Sidebar.jsx'
+import { Braces, Search } from 'lucide-react'
+import { ADMIN_NAV } from './Sidebar.jsx'
 import useClickOutside from '../../hooks/useClickOutside.js'
 
-function buildIndex(backends) {
-  const pages = NAV_ITEMS.map((item) => ({ key: item.to, label: item.label, detail: 'Page', to: item.to, icon: item.icon }))
-  const registry = backends.map((b) => ({
-    key: `backend-${b.id}`,
-    label: b.name,
-    detail: 'Configured backend',
-    to: backendBasePath(b.id),
-    icon: Layers,
-  }))
-
-  const explorerItems = backends.flatMap((b) => {
-    const catalog = getBackendCatalog(b.id)
-    const base = backendBasePath(b.id)
-    const functions = catalog.backendFunctions.map((fn) => ({
-      key: `${b.id}-fn-${fn.name}`,
-      label: fn.name,
-      detail: `${b.name} · ${fn.file}`,
-      to: `${base}/explorer?fn=${fn.name}`,
-      icon: FolderTree,
-    }))
-    const endpoints = catalog.backendRoutes.map((r) => ({
-      key: `${b.id}-route-${r.method}-${r.path}`,
-      label: `${r.method} ${r.path}`,
-      detail: b.name,
-      to: `${base}/explorer?tab=routes`,
-      icon: Workflow,
-    }))
-    return [...functions, ...endpoints]
-  })
-
-  const mocks = INITIAL_MOCK_SERVERS.map((sv) => ({
-    key: `mock-${sv.id}`,
-    label: sv.name,
-    detail: `Mock server on :${sv.port}`,
-    to: '/mocks',
-    icon: Server,
-  }))
-  return [...pages, ...registry, ...explorerItems, ...mocks]
-}
-
 export default function GlobalSearch() {
-  const backends = useAppStore((s) => s.backends)
-  const index = useMemo(() => buildIndex(backends), [backends])
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const ref = useClickOutside(() => setOpen(false), open)
 
+  const index = useMemo(
+    () =>
+      ADMIN_NAV.map((item) => ({
+        key: item.to,
+        label: item.label,
+        detail: 'Admin console',
+        to: item.to,
+        icon: item.icon,
+      })),
+    [],
+  )
+
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return []
-    return index.filter((item) => `${item.label} ${item.detail}`.toLowerCase().includes(q)).slice(0, 10)
+    return index.filter((item) => `${item.label} ${item.detail}`.toLowerCase().includes(q)).slice(0, 8)
   }, [query, index])
 
   const go = (to) => {
@@ -82,7 +48,7 @@ export default function GlobalSearch() {
           if (e.key === 'Enter' && results[0]) go(results[0].to)
           if (e.key === 'Escape') setOpen(false)
         }}
-        placeholder="Search backends, functions, routes, pages"
+        placeholder="Search admin pages"
         aria-label="Global search"
         className="h-8 w-full rounded-md border border-line bg-surface pr-3 pl-8 text-[13px] text-ink placeholder:text-ink-subtle focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-50"
       />

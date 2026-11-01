@@ -8,6 +8,8 @@ import { NOW_ISO } from '../../data/executions.js'
 import ProjectSwitcher from './ProjectSwitcher.jsx'
 import GlobalSearch from './GlobalSearch.jsx'
 import ProfileMenu from './ProfileMenu.jsx'
+import { isAdminHost } from '../../lib/appHost.js'
+import { useAuthStore } from '../../stores/authStore.js'
 
 const NOW = Date.parse(NOW_ISO)
 const TONE_DOT = { success: 'bg-success-700', danger: 'bg-danger-700', warning: 'bg-warning-700' }
@@ -18,6 +20,7 @@ export default function TopBar({ onToggleNav }) {
   const setEnvironment = useAppStore((s) => s.setEnvironment)
   const notifications = useAppStore((s) => s.notifications)
   const unread = notifications.filter((n) => !n.read).length
+  const showWorkspaceChrome = !(isAdminHost() && useAuthStore((s) => s.user?.role === 'admin'))
 
   return (
     <header className="relative z-10 flex h-12 shrink-0 items-center gap-3 border-b border-line bg-white px-3 md:px-4">
@@ -29,33 +32,40 @@ export default function TopBar({ onToggleNav }) {
         <Menu size={18} />
       </button>
 
-      <ProjectSwitcher />
+      {showWorkspaceChrome ? <ProjectSwitcher /> : <span className="text-sm font-medium text-ink">Admin console</span>}
 
-      <div className="hidden items-center rounded-md border border-line bg-surface p-0.5 lg:flex" role="radiogroup" aria-label="Environment">
-        {environments.map((env) => {
-          const active = env.id === environmentId
-          return (
-            <button
-              key={env.id}
-              role="radio"
-              aria-checked={active}
-              onClick={() => setEnvironment(env.id)}
-              className={`flex cursor-pointer items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                active ? 'bg-white text-ink shadow-card' : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              <span className={`h-1.5 w-1.5 rounded-full ${env.healthy ? 'bg-success-700' : 'bg-danger-700'}`} />
-              {env.label}
-            </button>
-          )
-        })}
-      </div>
+      {showWorkspaceChrome && (
+        <>
+          <div className="hidden items-center rounded-md border border-line bg-surface p-0.5 lg:flex" role="radiogroup" aria-label="Environment">
+            {environments.map((env) => {
+              const active = env.id === environmentId
+              return (
+                <button
+                  key={env.id}
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setEnvironment(env.id)}
+                  className={`flex cursor-pointer items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                    active ? 'bg-white text-ink shadow-card' : 'text-ink-muted hover:text-ink'
+                  }`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${env.healthy ? 'bg-success-700' : 'bg-danger-700'}`} />
+                  {env.label}
+                </button>
+              )
+            })}
+          </div>
 
-      <div className="ml-auto flex min-w-0 flex-1 justify-center md:max-w-md">
-        <GlobalSearch />
-      </div>
+          <div className="ml-auto flex min-w-0 flex-1 justify-center md:max-w-md">
+            <GlobalSearch />
+          </div>
 
-      <NotificationsButton unread={unread} />
+          <NotificationsButton unread={unread} />
+        </>
+      )}
+
+      {!showWorkspaceChrome && <div className="flex-1" />}
+
       <ProfileMenu />
     </header>
   )
