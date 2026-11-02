@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Braces, Search } from 'lucide-react'
-import { ADMIN_NAV } from './Sidebar.jsx'
+import { getPortal, PORTAL } from '../../lib/portal.js'
+import { ADMIN_NAV, CLIENT_NAV } from '../../routes/index.jsx'
 import useClickOutside from '../../hooks/useClickOutside.js'
 
 export default function GlobalSearch() {
@@ -9,24 +10,30 @@ export default function GlobalSearch() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const ref = useClickOutside(() => setOpen(false), open)
+  const portal = getPortal()
+  const isAdminPortal = portal === PORTAL.ADMIN
 
   const index = useMemo(
     () =>
-      ADMIN_NAV.map((item) => ({
+      (isAdminPortal ? ADMIN_NAV : CLIENT_NAV).map((item) => ({
         key: item.to,
         label: item.label,
-        detail: 'Admin console',
+        detail: isAdminPortal ? 'Admin console' : 'Client workspace',
+        keywords: item.keywords ?? '',
         to: item.to,
         icon: item.icon,
       })),
-    [],
+    [isAdminPortal],
   )
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return []
-    return index.filter((item) => `${item.label} ${item.detail}`.toLowerCase().includes(q)).slice(0, 8)
-  }, [query, index])
+    const pool = index
+    if (!q) return isAdminPortal ? [] : pool
+    return pool
+      .filter((item) => `${item.label} ${item.detail} ${item.keywords} ${item.to}`.toLowerCase().includes(q))
+      .slice(0, 8)
+  }, [query, index, isAdminPortal])
 
   const go = (to) => {
     navigate(to)
@@ -48,11 +55,11 @@ export default function GlobalSearch() {
           if (e.key === 'Enter' && results[0]) go(results[0].to)
           if (e.key === 'Escape') setOpen(false)
         }}
-        placeholder="Search admin pages"
+        placeholder={isAdminPortal ? 'Search admin pages' : 'Search client workspace'}
         aria-label="Global search"
         className="h-8 w-full rounded-md border border-line bg-surface pr-3 pl-8 text-[13px] text-ink placeholder:text-ink-subtle focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-50"
       />
-      {open && query.trim() && (
+      {open && (query.trim() || !isAdminPortal) && (
         <ul className="animate-slide-up absolute top-full right-0 left-0 mt-1.5 max-h-80 overflow-y-auto rounded-lg border border-line bg-white p-1 shadow-pop scrollbar-thin">
           {results.length === 0 && <li className="px-3 py-4 text-center text-xs text-ink-muted">No matches for "{query}"</li>}
           {results.map((item) => {

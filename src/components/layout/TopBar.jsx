@@ -8,7 +8,7 @@ import { NOW_ISO } from '../../data/executions.js'
 import ProjectSwitcher from './ProjectSwitcher.jsx'
 import GlobalSearch from './GlobalSearch.jsx'
 import ProfileMenu from './ProfileMenu.jsx'
-import { isAdminHost } from '../../lib/appHost.js'
+import { getPortal, PORTAL } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
 
 const NOW = Date.parse(NOW_ISO)
@@ -20,7 +20,10 @@ export default function TopBar({ onToggleNav }) {
   const setEnvironment = useAppStore((s) => s.setEnvironment)
   const notifications = useAppStore((s) => s.notifications)
   const unread = notifications.filter((n) => !n.read).length
-  const showWorkspaceChrome = !(isAdminHost() && useAuthStore((s) => s.user?.role === 'admin'))
+  const portal = getPortal()
+  const role = useAuthStore((s) => s.user?.role)
+  const isAdminConsole = portal === PORTAL.ADMIN && role === 'admin'
+  const isClientWorkspace = portal === PORTAL.CLIENT && role === 'client'
 
   return (
     <header className="relative z-10 flex h-12 shrink-0 items-center gap-3 border-b border-line bg-white px-3 md:px-4">
@@ -32,9 +35,11 @@ export default function TopBar({ onToggleNav }) {
         <Menu size={18} />
       </button>
 
-      {showWorkspaceChrome ? <ProjectSwitcher /> : <span className="text-sm font-medium text-ink">Admin console</span>}
+      {isAdminConsole && <span className="text-sm font-medium text-ink">Admin console</span>}
 
-      {showWorkspaceChrome && (
+      {isClientWorkspace && <ProjectSwitcher />}
+
+      {isClientWorkspace && (
         <>
           <div className="hidden items-center rounded-md border border-line bg-surface p-0.5 lg:flex" role="radiogroup" aria-label="Environment">
             {environments.map((env) => {
@@ -64,7 +69,8 @@ export default function TopBar({ onToggleNav }) {
         </>
       )}
 
-      {!showWorkspaceChrome && <div className="flex-1" />}
+      {!isAdminConsole && !isClientWorkspace && <div className="flex-1" />}
+      {isAdminConsole && <div className="flex-1" />}
 
       <ProfileMenu />
     </header>
