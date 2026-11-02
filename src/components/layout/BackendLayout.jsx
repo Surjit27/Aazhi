@@ -1,9 +1,9 @@
-import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
+import { NavLink, Navigate, Outlet, useNavigate, useParams } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { useEffect } from 'react'
 import { BackendExplorerProvider } from '../../context/BackendExplorerContext.jsx'
 import { useAppStore } from '../../stores/appStore.js'
-import { backendBasePath } from '../../data/backends.js'
+import { backendBasePath, isClientBlockedBackend } from '../../data/backends.js'
 
 const TABS = [
   { segment: '', label: 'Overview', end: true },
@@ -19,8 +19,12 @@ export default function BackendLayout() {
   const backend = backends.find((b) => b.id === backendId)
 
   useEffect(() => {
-    if (backendId) setBackend(backendId)
+    if (backendId && !isClientBlockedBackend(backendId)) setBackend(backendId)
   }, [backendId, setBackend])
+
+  if (isClientBlockedBackend(backendId)) {
+    return <Navigate to="/forbidden" replace />
+  }
 
   if (!backend) {
     return (

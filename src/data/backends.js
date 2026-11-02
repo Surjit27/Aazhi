@@ -81,3 +81,14 @@ export function gitProviderLabel(id) {
 export function backendBasePath(backendId) {
   return `/backends/${backendId}`
 }
+
+/** Client portal cannot open the orders service (admin API only). */
+export const CLIENT_BLOCKED_BACKEND_IDS = new Set(['orders'])
+
+export function isClientBlockedBackend(id) {
+  return CLIENT_BLOCKED_BACKEND_IDS.has(id)
+}
+
+export function backendsVisibleToClient(backends) {
+  return backends.filter((b) => !isClientBlockedBackend(b.id))
+}

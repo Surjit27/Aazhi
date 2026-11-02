@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronDown, Check, FolderGit2, Layers } from 'lucide-react'
 import { useAppStore } from '../../stores/appStore.js'
 import useClickOutside from '../../hooks/useClickOutside.js'
-import { backendBasePath } from '../../data/backends.js'
+import { backendsVisibleToClient, backendBasePath } from '../../data/backends.js'
 
 export default function ProjectSwitcher() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
-  const backends = useAppStore((s) => s.backends)
+  const backends = backendsVisibleToClient(useAppStore((s) => s.backends))
   const backendId = useAppStore((s) => s.backendId)
   const setBackend = useAppStore((s) => s.setBackend)
   const pushToast = useAppStore((s) => s.pushToast)

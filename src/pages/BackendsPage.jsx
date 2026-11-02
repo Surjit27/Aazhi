@@ -20,6 +20,7 @@ import {
   GIT_PROVIDERS,
   architectureLabel,
   backendBasePath,
+  backendsVisibleToClient,
   gitProviderLabel,
 } from '../data/backends.js'
 import { useAppStore } from '../stores/appStore.js'
@@ -31,7 +32,7 @@ const STATUS_TONE = { indexed: 'success', pending: 'warning', error: 'danger' }
 
 export default function BackendsPage() {
   const navigate = useNavigate()
-  const backends = useAppStore((s) => s.backends)
+  const backends = backendsVisibleToClient(useAppStore((s) => s.backends))
   const addBackend = useAppStore((s) => s.addBackend)
   const pushToast = useAppStore((s) => s.pushToast)
   const [query, setQuery] = useState('')

@@ -51,8 +51,8 @@ export default function MockServersPage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <PageHeader
-        title="Mock Servers"
-        description="Stand-in APIs your services call during development and testing."
+        title="Mock servers"
+        description="Client home on localhost. This page is not part of the admin console, and the orders service is not available here."
         actions={
           <Tabs tabs={ENV_TABS} value={envTab} onChange={(id) => { setEnvTab(id); selectServer(servers.find((sv) => sv.environment === id)?.id) }} />
         }

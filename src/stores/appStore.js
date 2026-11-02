@@ -7,8 +7,8 @@ export const useAppStore = create((set, get) => ({
   backends: INITIAL_BACKENDS,
   /** @deprecated use backends — kept for components not yet migrated */
   projects: INITIAL_BACKENDS.map(({ id, name, description }) => ({ id, name, description })),
-  backendId: INITIAL_BACKENDS[0].id,
-  projectId: INITIAL_BACKENDS[0].id,
+  backendId: 'payments',
+  projectId: 'payments',
   environments: ENVIRONMENTS,
   environmentId: 'local',
   notifications: INITIAL_NOTIFICATIONS,
