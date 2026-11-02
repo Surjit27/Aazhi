@@ -40,7 +40,16 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  logout: () => {
+  applySession: (token, user) => {
+    set({ user, token, loading: false, error: null })
+  },
+
+  logout: async () => {
+    try {
+      await apiFetch('/api/auth/logout', { method: 'POST' })
+    } catch {
+      /* still clear the local session */
+    }
     setStoredToken(null)
     set({ user: null, token: null, error: null })
   },

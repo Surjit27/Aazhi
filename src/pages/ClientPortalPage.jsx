@@ -16,8 +16,8 @@ export default function ClientPortalPage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
-        title="Overview"
-        description="Your client workspace on localhost."
+        title="Account"
+        description="Client sign-in on localhost — separate from the admin console on admin.localhost."
       />
       <div className="p-6">
         <Panel title="Account" bodyClassName="p-4">

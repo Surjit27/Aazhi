@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../../lib/api.js'
+import { clientAppOrigin } from '../../lib/portal.js'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import { Field, Input } from '../../components/ui/FormControls.jsx'
@@ -19,6 +20,16 @@ export default function ClientUserManagementPage() {
   useEffect(() => {
     load()
   }, [pushToast])
+
+  const openAsClient = async (user) => {
+    try {
+      const { code } = await apiFetch('/api/auth/impersonate', { method: 'POST', body: { userId: user.id } })
+      window.open(`${clientAppOrigin()}/session#${code}`, '_blank', 'noopener')
+      pushToast({ title: 'Client tab opened', body: `${user.email} — one-time link, expires in 60 seconds` })
+    } catch (err) {
+      pushToast({ tone: 'danger', title: 'Could not open client session', body: err.message })
+    }
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -64,7 +75,11 @@ export default function ClientUserManagementPage() {
         </Panel>
 
         <Panel title={`Client users (${users.length})`} bodyClassName="p-0">
-          <UserDirectoryTable users={users} emptyMessage="No client users yet — create one above." />
+          <UserDirectoryTable
+            users={users}
+            emptyMessage="No client users yet — create one above."
+            onImpersonate={openAsClient}
+          />
         </Panel>
       </div>
     </div>

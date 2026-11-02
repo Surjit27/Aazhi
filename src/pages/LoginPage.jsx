@@ -6,11 +6,12 @@ import { Field, Input } from '../components/ui/FormControls.jsx'
 import {
   adminAppOrigin,
   clientAppOrigin,
-  getAppSurface,
+  getPortal,
   homePathForRole,
+  PORTAL,
   redirectToAdmin,
   redirectToClient,
-} from '../lib/appHost.js'
+} from '../lib/portal.js'
 import { useAuthStore } from '../stores/authStore.js'
 
 export default function LoginPage() {
@@ -20,8 +21,8 @@ export default function LoginPage() {
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
   const error = useAuthStore((s) => s.error)
-  const surface = getAppSurface()
-  const isAdminHost = surface === 'admin'
+  const surface = getPortal()
+  const isAdminHost = surface === PORTAL.ADMIN
 
   const [email, setEmail] = useState(isAdminHost ? 'admin@aazhi.local' : '')
   const [password, setPassword] = useState(isAdminHost ? 'Admin123!' : '')
@@ -103,17 +104,15 @@ export default function LoginPage() {
         <p className="mt-4 text-[11px] leading-relaxed text-ink-subtle">
           {isAdminHost ? (
             <>
-              Admin URL: <span className="font-mono">{adminAppOrigin()}</span> · Client URL:{' '}
-              <a className="text-primary-700 hover:underline" href={`${clientAppOrigin()}/login`}>
-                {clientAppOrigin()}/login
-              </a>
+              This sign-in is only for <strong>admin</strong> accounts on{' '}
+              <span className="font-mono">{adminAppOrigin()}</span>. Client users use{' '}
+              <span className="font-mono">{clientAppOrigin()}/login</span> in a separate session (different hostname).
             </>
           ) : (
             <>
-              Client URL: <span className="font-mono">{clientAppOrigin()}</span> · Admin URL:{' '}
-              <a className="text-primary-700 hover:underline" href={`${adminAppOrigin()}/login`}>
-                {adminAppOrigin()}/login
-              </a>
+              This sign-in is only for <strong>client</strong> accounts on{' '}
+              <span className="font-mono">{clientAppOrigin()}</span>. Staff admin access is a separate app at{' '}
+              <span className="font-mono">admin.localhost</span> — not linked from here after you sign in.
             </>
           )}
         </p>

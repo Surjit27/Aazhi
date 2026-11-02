@@ -29,8 +29,8 @@ export default function ProfileMenu() {
     {
       label: 'Sign out',
       icon: LogOut,
-      action: () => {
-        logout()
+      action: async () => {
+        await logout()
         navigate('/login', { replace: true })
       },
     },

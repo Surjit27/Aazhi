@@ -1,8 +1,11 @@
 import Badge from '../../components/ui/Badge.jsx'
+import Button from '../../components/ui/Button.jsx'
 import { thClass, tdClass } from '../explorer/ExplorerInsights.jsx'
 import { formatDateTime } from '../../utils/format.js'
 
-export default function UserDirectoryTable({ users, emptyMessage = 'No users yet.' }) {
+export default function UserDirectoryTable({ users, emptyMessage = 'No users yet.', onImpersonate }) {
+  const columns = onImpersonate ? 5 : 4
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[720px] border-collapse">
@@ -12,6 +15,7 @@ export default function UserDirectoryTable({ users, emptyMessage = 'No users yet
             <th className={thClass}>Display name</th>
             <th className={thClass}>Role</th>
             <th className={thClass}>Created</th>
+            {onImpersonate && <th className={thClass}>Client portal</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-line">
@@ -25,11 +29,18 @@ export default function UserDirectoryTable({ users, emptyMessage = 'No users yet
               <td className={`${tdClass} text-xs text-ink-muted tabular-nums`}>
                 {u.createdAt ? formatDateTime(u.createdAt) : '—'}
               </td>
+              {onImpersonate && (
+                <td className={tdClass}>
+                  <Button type="button" variant="secondary" size="sm" onClick={() => onImpersonate(u)}>
+                    Open as client
+                  </Button>
+                </td>
+              )}
             </tr>
           ))}
           {users.length === 0 && (
             <tr>
-              <td colSpan={4} className={`${tdClass} py-8 text-center text-xs text-ink-muted`}>
+              <td colSpan={columns} className={`${tdClass} py-8 text-center text-xs text-ink-muted`}>
                 {emptyMessage}
               </td>
             </tr>
