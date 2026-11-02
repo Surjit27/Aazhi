@@ -34,7 +34,7 @@ export function redirectToClient(path = '/login') {
 }
 
 export function homePathForRole(role) {
-  return role === 'admin' ? '/overview' : '/client'
+  return role === 'admin' ? '/overview' : '/mocks'
 }
 
 export function loginPathForSurface(surface = getAppSurface()) {

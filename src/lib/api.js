@@ -1,4 +1,4 @@
-import { getAppSurface } from './appHost.js'
+import { getPortal } from './portal.js'
 
 /** Empty = same-origin `/api` via Vite proxy (recommended for localhost + admin.localhost). */
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
@@ -13,7 +13,7 @@ export function setStoredToken(token) {
 }
 
 export async function apiFetch(path, { method = 'GET', body, auth = true } = {}) {
-  const headers = { Accept: 'application/json', 'X-App-Surface': getAppSurface() }
+  const headers = { Accept: 'application/json', 'X-App-Surface': getPortal() }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (auth) {
     const token = getStoredToken()
