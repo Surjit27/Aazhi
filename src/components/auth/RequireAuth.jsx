@@ -19,8 +19,7 @@ export default function RequireAuth({ roles }) {
   }
 
   if (roles?.length && !roles.includes(user.role)) {
-    const fallback = user.role === 'admin' ? '/backends' : '/client'
-    return <Navigate to={fallback} replace />
+    return <Navigate to="/forbidden" replace />
   }
 
   return <Outlet />

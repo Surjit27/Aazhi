@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { getAppSurface, homePathForRole, redirectToAdmin, redirectToClient } from '../../lib/appHost.js'
+import { getPortal, homePathForPortal, portalForRole, redirectToAdmin, redirectToClient } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
 
 export default function HomeRedirect() {
@@ -9,15 +9,17 @@ export default function HomeRedirect() {
   if (loading) return null
   if (!user) return <Navigate to="/login" replace />
 
-  const surface = getAppSurface()
-  if (user.role === 'admin' && surface !== 'admin') {
-    redirectToAdmin(homePathForRole('admin'))
-    return null
-  }
-  if (user.role === 'client' && surface !== 'client') {
-    redirectToClient('/client')
+  const portal = getPortal()
+  const userPortal = portalForRole(user.role)
+
+  if (userPortal !== portal) {
+    if (userPortal === 'admin') {
+      redirectToAdmin(homePathForPortal('admin'))
+    } else {
+      redirectToClient(homePathForPortal('client'))
+    }
     return null
   }
 
-  return <Navigate to={homePathForRole(user.role)} replace />
+  return <Navigate to={homePathForPortal(portal)} replace />
 }

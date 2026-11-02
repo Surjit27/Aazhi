@@ -7,10 +7,10 @@ export default function RoleGate({ allow }) {
   if (!user) return <Navigate to="/login" replace />
 
   if (allow === 'admin' && user.role !== 'admin') {
-    return <Navigate to="/client" replace />
+    return <Navigate to="/forbidden" replace />
   }
   if (allow === 'client' && user.role !== 'client') {
-    return <Navigate to="/overview" replace />
+    return <Navigate to="/forbidden" replace />
   }
 
   return <Outlet />
