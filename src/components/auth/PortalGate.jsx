@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { getPortal, isRoleAllowedOnPortal } from '../../lib/portal.js'
+import { getPortal, portalForUser } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
 
 /**
@@ -10,7 +10,7 @@ export default function PortalGate() {
   const user = useAuthStore((s) => s.user)
   const portal = getPortal()
 
-  if (user && !isRoleAllowedOnPortal(user.role, portal)) {
+  if (user && portalForUser(user) !== portal) {
     return <Navigate to="/forbidden" replace />
   }
 

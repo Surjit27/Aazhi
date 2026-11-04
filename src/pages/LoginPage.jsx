@@ -7,8 +7,10 @@ import {
   adminAppOrigin,
   clientAppOrigin,
   getPortal,
+  homePathForPortal,
   homePathForRole,
   PORTAL,
+  portalForUser,
   redirectToAdmin,
   redirectToClient,
 } from '../lib/portal.js'
@@ -29,15 +31,15 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false)
 
   if (!loading && user) {
-    if (user.role === 'admin' && !isAdminHost) {
+    if (portalForUser(user) === 'admin' && !isAdminHost) {
       redirectToAdmin(homePathForRole('admin'))
       return null
     }
-    if (user.role === 'client' && isAdminHost) {
+    if (portalForUser(user) === 'client' && isAdminHost) {
       redirectToClient(homePathForRole('client'))
       return null
     }
-    return <Navigate to={homePathForRole(user.role)} replace />
+    return <Navigate to={homePathForPortal(portalForUser(user))} replace />
   }
 
   const onSubmit = async (e) => {
@@ -45,11 +47,11 @@ export default function LoginPage() {
     setSubmitting(true)
     try {
       const loggedIn = await login(email, password)
-      if (loggedIn.role === 'admin' && !isAdminHost) {
+      if (portalForUser(loggedIn) === 'admin' && !isAdminHost) {
         redirectToAdmin(homePathForRole('admin'))
         return
       }
-      if (loggedIn.role === 'client' && isAdminHost) {
+      if (portalForUser(loggedIn) === 'client' && isAdminHost) {
         redirectToClient(homePathForRole('client'))
         return
       }
@@ -58,7 +60,7 @@ export default function LoginPage() {
         navigate(from, { replace: true })
         return
       }
-      navigate(homePathForRole(loggedIn.role), { replace: true })
+      navigate(homePathForPortal(portalForUser(loggedIn)), { replace: true })
     } catch {
       /* store holds error */
     } finally {

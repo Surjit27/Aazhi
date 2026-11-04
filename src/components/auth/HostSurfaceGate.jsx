@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom'
-import { getPortal, homePathForPortal, portalForRole, redirectToAdmin, redirectToClient } from '../../lib/portal.js'
+import { getPortal, homePathForPortal, portalForUser, redirectToAdmin, redirectToClient } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
 
 /** After login, send users to the correct origin if role and hostname disagree. */
@@ -8,7 +8,7 @@ export function HostRoleSync() {
   if (!user) return <Outlet />
 
   const portal = getPortal()
-  const userPortal = portalForRole(user.role)
+  const userPortal = portalForUser(user)
 
   if (userPortal !== portal) {
     if (userPortal === 'admin') {

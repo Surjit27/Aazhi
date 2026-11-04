@@ -1,68 +1,128 @@
+import { useEffect, useState } from 'react'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Badge from '../../components/ui/Badge.jsx'
+import Button from '../../components/ui/Button.jsx'
+import Modal from '../../components/ui/Modal.jsx'
+import { Field, Input, Select } from '../../components/ui/FormControls.jsx'
 import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
-import { adminAppOrigin, clientAppOrigin, PORTAL, ROLE } from '../../lib/portal.js'
+import { apiFetch } from '../../lib/api.js'
+import { adminAppOrigin, clientAppOrigin, PORTAL } from '../../lib/portal.js'
+import { useAppStore } from '../../stores/appStore.js'
 
-const ROLES = [
-  {
-    id: ROLE.ADMIN,
-    label: 'Administrator',
-    portal: PORTAL.ADMIN,
-    signInUrl: adminAppOrigin(),
-    description: 'Internal staff console on the admin hostname.',
-    access: 'All routes on admin.localhost (user management, roles overview, settings).',
-  },
-  {
-    id: ROLE.CLIENT,
-    label: 'Client',
-    portal: PORTAL.CLIENT,
-    signInUrl: clientAppOrigin(),
-    description: 'End-user portal on the client hostname.',
-    access: 'Client overview and settings on localhost only.',
-  },
-]
+const EMPTY = { key: '', label: '', portal: PORTAL.CLIENT }
 
 export default function AdminRolesPage() {
+  const pushToast = useAppStore((s) => s.pushToast)
+  const [roles, setRoles] = useState([])
+  const [open, setOpen] = useState(false)
+  const [form, setForm] = useState(EMPTY)
+
+  const load = () =>
+    apiFetch('/api/auth/roles')
+      .then((r) => setRoles(r.roles))
+      .catch((e) => pushToast({ tone: 'danger', title: 'Failed to load roles', body: e.message }))
+
+  useEffect(() => {
+    load()
+  }, [pushToast])
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      await apiFetch('/api/auth/roles', { method: 'POST', body: form })
+      pushToast({ title: 'Role created', body: form.key })
+      setForm(EMPTY)
+      setOpen(false)
+      load()
+    } catch (err) {
+      pushToast({ tone: 'danger', title: 'Could not create role', body: err.message })
+    }
+  }
+
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Roles"
-        description="Two global roles — hostname selects portal; API rejects login when role and portal do not match."
+        actions={
+          <Button variant="primary" onClick={() => setOpen(true)}>
+            Create role
+          </Button>
+        }
       />
 
       <div className="p-4 md:p-6">
-        <Panel title="Role catalog" bodyClassName="p-0">
+        <Panel title={`Roles (${roles.length})`} bodyClassName="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] border-collapse">
+            <table className="w-full min-w-[720px] border-collapse">
               <thead className="bg-surface">
                 <tr className="border-b border-line">
                   <th className={thClass}>Role</th>
-                  <th className={thClass}>Portal (hostname)</th>
+                  <th className={thClass}>Key</th>
+                  <th className={thClass}>Portal</th>
                   <th className={thClass}>Sign-in URL</th>
-                  <th className={thClass}>Access</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {ROLES.map((role) => (
-                  <tr key={role.id} className="align-top hover:bg-surface/80">
-                    <td className={tdClass}>
-                      <Badge tone={role.id === ROLE.ADMIN ? 'primary' : 'neutral'}>{role.label}</Badge>
-                      <p className="mt-1 font-mono text-[11px] text-ink-subtle">{role.id}</p>
+                {roles.map((role) => {
+                  const origin = role.portal === PORTAL.ADMIN ? adminAppOrigin() : clientAppOrigin()
+                  return (
+                    <tr key={role.id} className="hover:bg-surface/80">
+                      <td className={tdClass}>
+                        <Badge tone={role.portal === PORTAL.ADMIN ? 'primary' : 'neutral'}>{role.label}</Badge>
+                      </td>
+                      <td className={`${tdClass} font-mono text-xs`}>{role.key}</td>
+                      <td className={`${tdClass} font-mono text-xs`}>{role.portal}</td>
+                      <td className={`${tdClass} font-mono text-xs`}>
+                        <a href={`${origin}/login`} className="text-primary-700 hover:underline">
+                          {origin}/login
+                        </a>
+                      </td>
+                    </tr>
+                  )
+                })}
+                {roles.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className={`${tdClass} py-8 text-center text-xs text-ink-muted`}>
+                      No roles yet.
                     </td>
-                    <td className={`${tdClass} font-mono text-xs`}>{role.portal}.localhost</td>
-                    <td className={`${tdClass} font-mono text-xs`}>
-                      <a href={`${role.signInUrl}/login`} className="text-primary-700 hover:underline">
-                        {role.signInUrl}/login
-                      </a>
-                    </td>
-                    <td className={`${tdClass} text-xs text-ink-muted`}>{role.access}</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </Panel>
       </div>
+
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Create role"
+        footer={
+          <>
+            <Button type="button" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" form="create-role" variant="primary">
+              Create role
+            </Button>
+          </>
+        }
+      >
+        <form id="create-role" className="flex flex-col gap-4" onSubmit={onSubmit}>
+          <Field label="Key" hint="Lowercase, for example sales_manager">
+            <Input value={form.key} onChange={(e) => setForm((f) => ({ ...f, key: e.target.value }))} required />
+          </Field>
+          <Field label="Label">
+            <Input value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} required />
+          </Field>
+          <Field label="Portal">
+            <Select value={form.portal} onChange={(e) => setForm((f) => ({ ...f, portal: e.target.value }))}>
+              <option value={PORTAL.CLIENT}>Client (localhost)</option>
+              <option value={PORTAL.ADMIN}>Admin (admin.localhost)</option>
+            </Select>
+          </Field>
+        </form>
+      </Modal>
     </div>
   )
 }
