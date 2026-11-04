@@ -1,28 +1,42 @@
 import { create } from 'zustand'
-import { INITIAL_SCHEDULES } from '../data/schedules.js'
-import { uid } from '../utils/format.js'
-import { NOW_ISO } from '../data/executions.js'
+import { apiFetch } from '../lib/api.js'
 
-export const useSchedulerStore = create((set) => ({
-  schedules: INITIAL_SCHEDULES,
+export const useSchedulerStore = create((set, get) => ({
+  schedules: [],
+  runner: 'off',
 
-  addSchedule: (schedule) => set((s) => ({ schedules: [{ ...schedule, id: uid('s') }, ...s.schedules] })),
+  loadSchedules: async () => {
+    const data = await apiFetch('/api/settings/job-triggers')
+    set({ schedules: data.triggers, runner: data.runner })
+    return data.triggers
+  },
 
-  updateSchedule: (id, patch) =>
-    set((s) => ({ schedules: s.schedules.map((sc) => (sc.id === id ? { ...sc, ...patch } : sc)) })),
+  addSchedule: async (schedule) => {
+    const { trigger } = await apiFetch('/api/settings/job-triggers', { method: 'POST', body: schedule })
+    set({ schedules: [trigger, ...get().schedules.filter((item) => item.id !== trigger.id)] })
+    return trigger
+  },
 
-  deleteSchedule: (id) =>
-    set((s) => ({
-      schedules: s.schedules
-        .filter((sc) => sc.id !== id)
-        .map((sc) => (sc.dependsOn === id ? { ...sc, dependsOn: '', enabled: false } : sc)),
-    })),
+  updateSchedule: async (id, patch) => {
+    const { trigger } = await apiFetch(`/api/settings/job-triggers/${id}`, { method: 'PATCH', body: patch })
+    set({ schedules: get().schedules.map((item) => (item.id === id ? trigger : item)) })
+    return trigger
+  },
 
-  toggleSchedule: (id) =>
-    set((s) => ({ schedules: s.schedules.map((sc) => (sc.id === id ? { ...sc, enabled: !sc.enabled } : sc)) })),
+  deleteSchedule: async (id) => {
+    await apiFetch(`/api/settings/job-triggers/${id}`, { method: 'DELETE' })
+    await get().loadSchedules()
+  },
 
-  recordRun: (id, status) =>
-    set((s) => ({
-      schedules: s.schedules.map((sc) => (sc.id === id ? { ...sc, lastStatus: status, lastRunAt: NOW_ISO } : sc)),
-    })),
+  toggleSchedule: async (id) => {
+    const current = get().schedules.find((item) => item.id === id)
+    if (!current) return null
+    return get().updateSchedule(id, { enabled: !current.enabled })
+  },
+
+  runSchedule: async (id) => {
+    const { trigger } = await apiFetch(`/api/settings/job-triggers/${id}/run`, { method: 'POST' })
+    set({ schedules: get().schedules.map((item) => (item.id === id ? trigger : item)) })
+    return trigger
+  },
 }))

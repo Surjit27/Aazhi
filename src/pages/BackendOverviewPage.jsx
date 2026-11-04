@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { Activity, Calendar, FolderTree, GitBranch, Server, Workflow, Zap, CircleCheck, TriangleAlert } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -19,6 +20,11 @@ export default function BackendOverviewPage() {
   const navigate = useNavigate()
   const base = backendBasePath(backendId)
   const schedules = useSchedulerStore((s) => s.schedules)
+  const loadSchedules = useSchedulerStore((s) => s.loadSchedules)
+
+  useEffect(() => {
+    loadSchedules().catch(() => {})
+  }, [loadSchedules])
   const servers = useMockStore((s) => s.servers)
   const environments = useAppStore((s) => s.environments)
   const pushToast = useAppStore((s) => s.pushToast)
