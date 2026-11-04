@@ -31,6 +31,11 @@ export function portalForRole(role) {
   return role === ROLE.ADMIN ? PORTAL.ADMIN : PORTAL.CLIENT
 }
 
+export function portalForUser(user) {
+  if (user?.portal === PORTAL.ADMIN || user?.portal === PORTAL.CLIENT) return user.portal
+  return portalForRole(user?.role)
+}
+
 export function roleForPortal(portal) {
   return portal === PORTAL.ADMIN ? ROLE.ADMIN : ROLE.CLIENT
 }
