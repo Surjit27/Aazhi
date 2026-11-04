@@ -28,7 +28,7 @@ export default function App() {
         <Route element={<HostRoleSync />}>
           <Route element={<PortalGate />}>
             <Route element={<AppLayout />}>
-              {isAdminPortal ? <AdminPortalRoutes /> : <ClientPortalRoutes />}
+              {isAdminPortal ? AdminPortalRoutes() : ClientPortalRoutes()}
             </Route>
           </Route>
         </Route>
