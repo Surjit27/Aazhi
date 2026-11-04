@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Pencil, Play, Plus, Trash } from 'lucide-react'
 import { useSchedulerStore } from '../stores/schedulerStore.js'
 import { useAppStore } from '../stores/appStore.js'
-import { runSchedule } from '../services/mockBackend.js'
 import { PageHeader, Panel } from '../components/ui/Panel.jsx'
 import Button from '../components/ui/Button.jsx'
 import Badge from '../components/ui/Badge.jsx'
@@ -30,22 +29,31 @@ const STATUS_TONE = { success: 'success', failed: 'danger', never: 'neutral' }
 
 export default function EventSchedulerPage() {
   const schedules = useSchedulerStore((s) => s.schedules)
+  const runner = useSchedulerStore((s) => s.runner)
+  const loadSchedules = useSchedulerStore((s) => s.loadSchedules)
   const toggleSchedule = useSchedulerStore((s) => s.toggleSchedule)
   const deleteSchedule = useSchedulerStore((s) => s.deleteSchedule)
-  const recordRun = useSchedulerStore((s) => s.recordRun)
+  const runSchedule = useSchedulerStore((s) => s.runSchedule)
   const pushToast = useAppStore((s) => s.pushToast)
   const [editor, setEditor] = useState(null)
   const [deleting, setDeleting] = useState(null)
   const [running, setRunning] = useState(null)
   const [runError, setRunError] = useState(null)
 
+  useEffect(() => {
+    loadSchedules().catch((err) => pushToast({ tone: 'danger', title: 'Could not load job triggers', body: err.message }))
+  }, [loadSchedules, pushToast])
+
   const runNow = async (schedule) => {
     setRunning(schedule.id)
     setRunError(null)
     try {
-      const status = await runSchedule()
-      recordRun(schedule.id, status)
-      pushToast({ tone: status === 'success' ? 'success' : 'warning', title: `${schedule.name} ${status}`, body: schedule.target })
+      const trigger = await runSchedule(schedule.id)
+      pushToast({
+        tone: trigger.lastStatus === 'success' ? 'success' : 'warning',
+        title: `${schedule.name} ${trigger.lastStatus}`,
+        body: schedule.target,
+      })
     } catch (err) {
       setRunError(err.message)
     } finally {
@@ -57,7 +65,7 @@ export default function EventSchedulerPage() {
     <div className="flex min-h-0 flex-1 flex-col">
       <PageHeader
         title="Event Scheduler"
-        description="Trigger requests on a timer, when an event fires, or after another job finishes."
+        description={runner === 'bullmq' ? 'BullMQ is running these triggers.' : 'Redis is not connected, so triggers are saved but not run.'}
         actions={<Button variant="primary" size="sm" onClick={() => setEditor({ mode: 'create', form: EMPTY_FORM })}><Plus size={13} /> New schedule</Button>}
       />
 
@@ -84,7 +92,7 @@ export default function EventSchedulerPage() {
                       {s.nextRunAt && ` · next ${relativeTime(s.nextRunAt, NOW_MS)}`}
                     </p>
                   </div>
-                  <Switch checked={s.enabled} onChange={() => toggleSchedule(s.id)} label={`Enable ${s.name}`} />
+                  <Switch checked={s.enabled} onChange={() => toggleSchedule(s.id).catch((err) => pushToast({ tone: 'danger', title: 'Could not update trigger', body: err.message }))} label={`Enable ${s.name}`} />
                   <div className="flex items-center gap-1">
                     <Button size="sm" onClick={() => runNow(s)} disabled={running === s.id}>
                       <Play size={12} /> {running === s.id ? 'Running...' : 'Run now'}
@@ -107,8 +115,10 @@ export default function EventSchedulerPage() {
         confirmLabel="Delete schedule"
         onCancel={() => setDeleting(null)}
         onConfirm={() => {
+          const name = deleting.name
           deleteSchedule(deleting.id)
-          pushToast({ tone: 'warning', title: 'Schedule deleted', body: deleting.name })
+            .then(() => pushToast({ tone: 'warning', title: 'Schedule deleted', body: name }))
+            .catch((err) => pushToast({ tone: 'danger', title: 'Could not delete trigger', body: err.message }))
           setDeleting(null)
         }}
       />
@@ -127,7 +137,7 @@ function ScheduleModal({ editor, schedules, onClose }) {
   const current = form ?? editor.form
   const set = (key) => (e) => setForm({ ...current, [key]: e.target.value })
 
-  const save = () => {
+  const save = async () => {
     const next = {}
     if (!current.name.trim()) next.name = 'Name is required'
     if (current.trigger === 'event' && !current.eventName.trim()) next.eventName = 'Enter an event name'
@@ -140,13 +150,28 @@ function ScheduleModal({ editor, schedules, onClose }) {
     setErrors(next)
     if (Object.keys(next).length) return
 
-    const data = { ...current, name: current.name.trim(), nextRunAt: current.trigger === 'time' ? current.startAt || null : null }
-    if (editor.mode === 'create') {
-      addSchedule({ ...data, enabled: true, lastStatus: 'never', lastRunAt: null })
-      pushToast({ title: 'Schedule created', body: data.name })
-    } else {
-      updateSchedule(editor.id, data)
-      pushToast({ title: 'Schedule saved', body: data.name })
+    const data = {
+      name: current.name.trim(),
+      trigger: current.trigger,
+      recurrence: current.recurrence,
+      startAt: current.startAt || null,
+      eventName: current.eventName,
+      dependsOn: current.dependsOn,
+      target: current.target,
+      payload: current.payload,
+      enabled: current.enabled ?? true,
+    }
+    try {
+      if (editor.mode === 'create') {
+        await addSchedule(data)
+        pushToast({ title: 'Schedule created', body: data.name })
+      } else {
+        await updateSchedule(editor.id, data)
+        pushToast({ title: 'Schedule saved', body: data.name })
+      }
+    } catch (err) {
+      pushToast({ tone: 'danger', title: 'Could not save job trigger', body: err.message })
+      return
     }
     setForm(null)
     onClose()
