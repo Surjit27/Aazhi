@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { apiFetch, setStoredToken } from '../lib/api.js'
+import { apiFetch, clearStoredToken, getStoredToken, setStoredToken } from '../lib/api.js'
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -8,7 +8,7 @@ export const useAuthStore = create((set, get) => ({
   error: null,
 
   bootstrap: async () => {
-    const token = localStorage.getItem('aazhi_token')
+    const token = getStoredToken()
     if (!token) {
       set({ user: null, token: null, loading: false })
       return
@@ -18,7 +18,7 @@ export const useAuthStore = create((set, get) => ({
       const { user } = await apiFetch('/api/auth/me')
       set({ user, token, loading: false })
     } catch {
-      setStoredToken(null)
+      clearStoredToken()
       set({ user: null, token: null, loading: false })
     }
   },
@@ -50,7 +50,7 @@ export const useAuthStore = create((set, get) => ({
     } catch {
       /* still clear the local session */
     }
-    setStoredToken(null)
+    clearStoredToken()
     set({ user: null, token: null, error: null })
   },
 

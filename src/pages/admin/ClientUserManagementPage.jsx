@@ -28,7 +28,17 @@ export default function ClientUserManagementPage() {
   const openAsClient = async (user) => {
     try {
       const { code } = await apiFetch('/api/auth/impersonate', { method: 'POST', body: { userId: user.id } })
-      window.open(`${clientAppOrigin()}/session#${code}`, '_blank', 'noopener')
+      const tab = window.open('about:blank', '_blank')
+      if (!tab) {
+        pushToast({ tone: 'danger', title: 'Popup blocked', body: 'Allow popups for the admin console, then try again.' })
+        return
+      }
+      tab.location = `${clientAppOrigin()}/session#${code}`
+      try {
+        tab.opener = null
+      } catch {
+        /* location may already be the other host */
+      }
       pushToast({ title: 'Client tab opened', body: `${user.email} — one-time link, expires in 60 seconds` })
     } catch (err) {
       pushToast({ tone: 'danger', title: 'Could not open client session', body: err.message })

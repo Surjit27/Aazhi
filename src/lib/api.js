@@ -3,13 +3,47 @@ import { getPortal } from './portal.js'
 /** Empty = same-origin `/api` via Vite proxy (recommended for localhost + admin.localhost). */
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
-export function getStoredToken() {
-  return localStorage.getItem('aazhi_token')
+const LEGACY_KEY = 'aazhi_token'
+
+function storageKey() {
+  return getPortal() === 'admin' ? 'aazhi_token_admin' : 'aazhi_token_client'
 }
 
-export function setStoredToken(token) {
-  if (token) localStorage.setItem('aazhi_token', token)
-  else localStorage.removeItem('aazhi_token')
+/** Admin and client keep different tokens. Impersonation stays in this tab only. */
+export function getStoredToken() {
+  const key = storageKey()
+  const isolated = sessionStorage.getItem(key)
+  if (isolated) return isolated
+  const saved = localStorage.getItem(key)
+  if (saved) return saved
+  const legacy = localStorage.getItem(LEGACY_KEY)
+  if (!legacy) return null
+  localStorage.setItem(key, legacy)
+  localStorage.removeItem(LEGACY_KEY)
+  return legacy
+}
+
+export function setStoredToken(token, { isolated = false } = {}) {
+  const key = storageKey()
+  sessionStorage.removeItem(key)
+  if (isolated) {
+    if (token) sessionStorage.setItem(key, token)
+    return
+  }
+  if (token) localStorage.setItem(key, token)
+  else localStorage.removeItem(key)
+  localStorage.removeItem(LEGACY_KEY)
+}
+
+/** Clears the session this tab is using. An impersonation tab does not sign out the real client. */
+export function clearStoredToken() {
+  const key = storageKey()
+  if (sessionStorage.getItem(key)) {
+    sessionStorage.removeItem(key)
+    return
+  }
+  localStorage.removeItem(key)
+  localStorage.removeItem(LEGACY_KEY)
 }
 
 export async function apiFetch(path, { method = 'GET', body, auth = true } = {}) {
