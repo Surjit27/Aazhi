@@ -3,18 +3,25 @@ import { useNavigate } from 'react-router-dom'
 import { apiFetch, setStoredToken } from '../lib/api.js'
 import { useAuthStore } from '../stores/authStore.js'
 
-/** Survives React strict-mode remounts, which would otherwise wipe the hash before exchange. */
-let pendingCode
-let exchangePromise
+const PENDING_IMPERSONATION_KEY = 'aazhi_impersonate_pending'
+
+/** Dedupe exchange + navigate once; survives React Strict Mode double-mount. */
+const exchangeByCode = new Map()
+const navigatedForCode = new Set()
 
 function readImpersonationCode() {
-  if (pendingCode === undefined) {
-    pendingCode = window.location.hash.replace(/^#/, '')
+  let code = window.location.hash.replace(/^#/, '').trim()
+  if (!code) {
+    code = sessionStorage.getItem(PENDING_IMPERSONATION_KEY) ?? ''
+  }
+  if (code) {
+    sessionStorage.setItem(PENDING_IMPERSONATION_KEY, code)
     if (window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      const { pathname, search } = window.location
+      window.history.replaceState(null, '', `${pathname}${search}`)
     }
   }
-  return pendingCode
+  return code
 }
 
 /** One-time code from the admin tab (URL hash is not sent to the API server). */
@@ -29,31 +36,41 @@ export default function ImpersonateSessionPage() {
       setMessage('Missing impersonation code. Start again from the admin console.')
       return
     }
-    if (!exchangePromise) {
-      exchangePromise = apiFetch('/api/auth/impersonate/exchange', {
+
+    let promise = exchangeByCode.get(code)
+    if (!promise) {
+      promise = apiFetch('/api/auth/impersonate/exchange', {
         method: 'POST',
         body: { code },
         auth: false,
       })
+        .then((data) => {
+          sessionStorage.removeItem(PENDING_IMPERSONATION_KEY)
+          return data
+        })
+        .catch((err) => {
+          sessionStorage.removeItem(PENDING_IMPERSONATION_KEY)
+          throw err
+        })
+      exchangeByCode.set(code, promise)
     }
-    let cancelled = false
-    exchangePromise
+
+    promise
       .then(({ token, user }) => {
-        if (cancelled) return
-        pendingCode = ''
-        exchangePromise = undefined
         setStoredToken(token, { isolated: true })
         applySession(token, user)
-        navigate('/mocks', { replace: true })
+        if (!navigatedForCode.has(code)) {
+          navigatedForCode.add(code)
+          navigate('/mocks', { replace: true })
+        }
       })
       .catch((err) => {
-        exchangePromise = undefined
-        pendingCode = undefined
-        if (!cancelled) setMessage(err.message || 'Could not open the client session')
+        setMessage(err.message || 'Could not open the client session')
       })
-    return () => {
-      cancelled = true
-    }
+      .finally(() => {
+        exchangeByCode.delete(code)
+        navigatedForCode.delete(code)
+      })
   }, [applySession, navigate])
 
   return (
