@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { ChevronDown, Database, FolderTree, Workflow } from 'lucide-react'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
+import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
 import { ADMIN_NAV, CLIENT_NAV } from '../../routes/index.jsx'
 import { backendBasePath, isClientBlockedBackend } from '../../data/backends.js'
 
@@ -81,6 +82,7 @@ function AdminSidebarNav({ onNavigate }) {
 }
 
 function ClientSidebarNav({ onNavigate }) {
+  const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
   const nested = useMatch('/backends/:backendId/*')
   const root = useMatch('/backends/:backendId')
   const backendId = nested?.params?.backendId ?? root?.params?.backendId
@@ -95,7 +97,7 @@ function ClientSidebarNav({ onNavigate }) {
 
   return (
     <>
-      {CLIENT_NAV.map(({ to, label, icon: Icon, end }) => (
+      {CLIENT_NAV.filter((item) => isNavEnabled(item.to, item.flagKey)).map(({ to, label, icon: Icon, end }) => (
         <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
           <Icon size={16} strokeWidth={1.75} />
           <span className="truncate">{label}</span>

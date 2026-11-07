@@ -5,7 +5,6 @@ import { useAppStore } from '../../stores/appStore.js'
 import useClickOutside from '../../hooks/useClickOutside.js'
 import { relativeTime } from '../../utils/format.js'
 import { NOW_ISO } from '../../data/executions.js'
-import ProjectSwitcher from './ProjectSwitcher.jsx'
 import GlobalSearch from './GlobalSearch.jsx'
 import ProfileMenu from './ProfileMenu.jsx'
 import { getPortal, PORTAL } from '../../lib/portal.js'
@@ -15,9 +14,6 @@ const NOW = Date.parse(NOW_ISO)
 const TONE_DOT = { success: 'bg-success-700', danger: 'bg-danger-700', warning: 'bg-warning-700' }
 
 export default function TopBar({ onToggleNav }) {
-  const environments = useAppStore((s) => s.environments)
-  const environmentId = useAppStore((s) => s.environmentId)
-  const setEnvironment = useAppStore((s) => s.setEnvironment)
   const notifications = useAppStore((s) => s.notifications)
   const unread = notifications.filter((n) => !n.read).length
   const portal = getPortal()
@@ -37,34 +33,11 @@ export default function TopBar({ onToggleNav }) {
 
       {isAdminConsole && <span className="text-sm font-medium text-ink">Admin console</span>}
 
-      {isClientWorkspace && <ProjectSwitcher />}
-
       {isClientWorkspace && (
         <>
-          <div className="hidden items-center rounded-md border border-line bg-surface p-0.5 lg:flex" role="radiogroup" aria-label="Environment">
-            {environments.map((env) => {
-              const active = env.id === environmentId
-              return (
-                <button
-                  key={env.id}
-                  role="radio"
-                  aria-checked={active}
-                  onClick={() => setEnvironment(env.id)}
-                  className={`flex cursor-pointer items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                    active ? 'bg-white text-ink shadow-card' : 'text-ink-muted hover:text-ink'
-                  }`}
-                >
-                  <span className={`h-1.5 w-1.5 rounded-full ${env.healthy ? 'bg-success-700' : 'bg-danger-700'}`} />
-                  {env.label}
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="ml-auto flex min-w-0 flex-1 justify-center md:max-w-md">
+          <div className="flex min-w-0 flex-1 justify-center px-1 md:max-w-lg">
             <GlobalSearch />
           </div>
-
           <NotificationsButton unread={unread} />
         </>
       )}
