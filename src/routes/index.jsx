@@ -62,7 +62,7 @@ export const CLIENT_NAV = [
   { to: '/monitor', label: 'Execution monitor', icon: Activity, flagKey: 'client.monitor', keywords: 'runs localhost' },
   { to: '/git', label: 'Git integration', icon: GitBranch, flagKey: 'client.git', keywords: 'repository localhost' },
   { to: '/assistant', label: 'AI assistant', icon: Sparkles, flagKey: 'client.assistant', keywords: 'chat localhost' },
-  { to: '/backends', label: 'Other backends', icon: Layers, flagKey: 'client.backends', keywords: 'payments auth registry' },
+  { to: '/backends/auth', label: 'auth-gateway', icon: Layers, flagKey: 'client.backends', keywords: 'auth gateway sessions sso' },
   { to: '/account', label: 'Account', icon: LayoutDashboard, flagKey: 'client.account', keywords: 'profile localhost' },
   { to: '/settings', label: 'Settings', icon: Settings, flagKey: 'client.settings', keywords: 'preferences localhost' },
 ]
@@ -93,7 +93,8 @@ export function ClientPortalRoutes() {
   return (
     <>
       <Route index element={<HomeRedirect />} />
-      <Route path="backends" element={<BackendsPage />} />
+      <Route path="backends" element={<Navigate to="/backends/auth" replace />} />
+      <Route path="backends/registry" element={<BackendsPage />} />
       <Route path="backends/orders" element={<Navigate to="/forbidden" replace />} />
       <Route path="backends/orders/*" element={<Navigate to="/forbidden" replace />} />
       <Route path="backends/:backendId" element={<BackendLayout />}>
