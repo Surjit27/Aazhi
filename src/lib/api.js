@@ -1,6 +1,13 @@
-import { getPortal } from './portal.js'
+import { getPortal, PORTAL } from './portal.js'
 
-/** Empty = same-origin `/api` via Vite proxy (recommended for localhost + admin.localhost). */
+export function apiAppSurface() {
+  const portal = getPortal()
+  if (portal === PORTAL.ADMIN) return PORTAL.ADMIN
+  if (portal === PORTAL.HOME) return PORTAL.HOME
+  return PORTAL.CLIENT
+}
+
+/** Empty = same-origin `/api` via Vite proxy (home / client / admin *.localhost). */
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 const LEGACY_KEY = 'aazhi_token'
@@ -47,7 +54,7 @@ export function clearStoredToken() {
 }
 
 export async function apiFetch(path, { method = 'GET', body, auth = true } = {}) {
-  const headers = { Accept: 'application/json', 'X-App-Surface': getPortal() }
+  const headers = { Accept: 'application/json', 'X-App-Surface': apiAppSurface() }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (auth) {
     const token = getStoredToken()

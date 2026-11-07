@@ -17,13 +17,18 @@ export default function TopBar({ onToggleNav }) {
   const notifications = useAppStore((s) => s.notifications)
   const unread = notifications.filter((n) => !n.read).length
   const portal = getPortal()
-  const role = useAuthStore((s) => s.user?.role)
+  const user = useAuthStore((s) => s.user)
+  const role = user?.role
+  const impersonating = Boolean(user?.impersonation)
   const isAdminConsole = portal === PORTAL.ADMIN && role === 'admin'
   const isClientWorkspace = portal === PORTAL.CLIENT && role === 'client'
   const showSearch = isAdminConsole || isClientWorkspace
+  const impersonationDetail = user
+    ? `Impersonation · Viewing as ${user.email}. Session expires in 2 hours — sign out when finished.`
+    : ''
 
   return (
-    <header className="glass-bar relative z-10 flex h-14 shrink-0 items-center gap-3 px-3 md:px-5">
+    <header className="glass-bar relative z-10 flex h-14 shrink-0 items-center gap-2 px-3 md:gap-3 md:px-5">
       <button
         onClick={onToggleNav}
         aria-label="Toggle navigation"
@@ -43,6 +48,17 @@ export default function TopBar({ onToggleNav }) {
       </div>
 
       {isClientWorkspace && <NotificationsButton unread={unread} />}
+
+      {impersonating && (
+        <p
+          className="glass-inset hidden max-w-[10.5rem] shrink truncate px-2 py-1 text-[10px] leading-snug text-ink-muted sm:block md:max-w-[12rem]"
+          title={impersonationDetail}
+        >
+          <span className="font-semibold text-warning-700">Impersonation</span>
+          <span className="text-ink-subtle"> · </span>
+          <span className="font-medium text-ink">{user.email}</span>
+        </p>
+      )}
 
       <ProfileMenu />
     </header>

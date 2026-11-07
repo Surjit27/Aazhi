@@ -145,7 +145,7 @@ export default function Sidebar({ open, onNavigate }) {
         <div className="min-w-0">
           <span className="block truncate text-sm font-semibold tracking-tight text-ink">{BRAND_NAME}</span>
           <span className="block truncate text-[10px] text-ink-subtle">
-            {isAdminConsole ? 'Admin' : 'Client'} · {isAdminConsole ? 'admin.localhost' : 'localhost'}
+            {isAdminConsole ? 'Admin' : 'Client'} · {isAdminConsole ? 'admin.localhost' : 'client.localhost'}
           </span>
         </div>
       </div>

@@ -1,7 +1,23 @@
+export const HOST = {
+  HOME: 'home.localhost',
+  CLIENT: 'client.localhost',
+  ADMIN: 'admin.localhost',
+}
+
+function isHomeHostname(host) {
+  return host === HOST.HOME || host.startsWith('home.')
+}
+
+function isClientHostname(host) {
+  return host === HOST.CLIENT || host.startsWith('client.')
+}
+
 /** Which UI surface this hostname serves. */
 export function getAppSurface() {
   const host = window.location.hostname.toLowerCase()
-  if (host === 'admin.localhost' || host.startsWith('admin.')) return 'admin'
+  if (host === HOST.ADMIN || host.startsWith('admin.')) return 'admin'
+  if (isHomeHostname(host)) return 'home'
+  if (isClientHostname(host) || host === 'localhost' || host === '127.0.0.1') return 'client'
   return 'client'
 }
 
@@ -18,11 +34,25 @@ function portSuffix() {
 }
 
 export function adminAppOrigin() {
-  return `${window.location.protocol}//admin.localhost${portSuffix()}`
+  return `${window.location.protocol}//${HOST.ADMIN}${portSuffix()}`
 }
 
 export function clientAppOrigin() {
-  return `${window.location.protocol}//localhost${portSuffix()}`
+  return `${window.location.protocol}//${HOST.CLIENT}${portSuffix()}`
+}
+
+export function homeAppOrigin() {
+  return `${window.location.protocol}//${HOST.HOME}${portSuffix()}`
+}
+
+/** Legacy `localhost` / `127.0.0.1` → `client.localhost` (same path). */
+export function redirectBareLocalhostToClient() {
+  const host = window.location.hostname.toLowerCase()
+  if (host !== 'localhost' && host !== '127.0.0.1') return false
+  const { protocol, port, pathname, search, hash } = window.location
+  const portPart = port ? `:${port}` : ''
+  window.location.replace(`${protocol}//${HOST.CLIENT}${portPart}${pathname}${search}${hash}`)
+  return true
 }
 
 export function redirectToAdmin(path = '/login') {
@@ -38,5 +68,7 @@ export function homePathForRole(role) {
 }
 
 export function loginPathForSurface(surface = getAppSurface()) {
-  return surface === 'admin' ? `${adminAppOrigin()}/login` : `${clientAppOrigin()}/login`
+  if (surface === 'admin') return `${adminAppOrigin()}/login`
+  if (surface === 'home') return `${homeAppOrigin()}/login`
+  return `${clientAppOrigin()}/login`
 }

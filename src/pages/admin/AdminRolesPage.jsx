@@ -117,7 +117,7 @@ export default function AdminRolesPage() {
           </Field>
           <Field label="Portal">
             <Select value={form.portal} onChange={(e) => setForm((f) => ({ ...f, portal: e.target.value }))}>
-              <option value={PORTAL.CLIENT}>Client (localhost)</option>
+              <option value={PORTAL.CLIENT}>Client (client.localhost)</option>
               <option value={PORTAL.ADMIN}>Admin (admin.localhost)</option>
             </Select>
           </Field>
