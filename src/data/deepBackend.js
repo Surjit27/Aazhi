@@ -16,36 +16,8 @@ export const CONNECT_METHODS = [
   { id: 'local', label: 'Local connection', description: 'Coming soon — attach a running service' },
 ]
 
-export const MOCK_CONNECTED_BACKENDS = [
-  {
-    id: 'auth-gateway',
-    name: 'auth-gateway',
-    repo: 'platform/auth-gateway',
-    branch: 'main',
-    framework: 'Go · chi',
-    status: 'discovered',
-    stats: {
-      services: 3,
-      apis: 12,
-      functions: 47,
-      executionFlows: 6,
-      databases: 2,
-      events: 4,
-      externals: 5,
-    },
-    discoveredAt: '2026-11-07T10:00:00Z',
-  },
-  {
-    id: 'payments-api',
-    name: 'payments-api',
-    repo: 'acme/payments-api',
-    branch: 'develop',
-    framework: 'Node · NestJS',
-    status: 'idle',
-    stats: null,
-    discoveredAt: null,
-  },
-]
+/** Fallback when API is empty or unreachable (dev offline). */
+export const MOCK_CONNECTED_BACKENDS = []
 
 export const EXECUTION_FLOWS = [
   { id: 'flow-client-reg', name: 'Client Registration Flow', steps: 8 },

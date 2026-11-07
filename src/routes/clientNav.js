@@ -1,17 +1,17 @@
 import {
-  Activity,
   Calendar,
   CalendarClock,
+  Cloud,
   FolderKanban,
   FolderTree,
   GitBranch,
+  Network,
   History,
   LayoutDashboard,
   Mail,
   Settings,
   Shield,
   Users,
-  Workflow,
 } from 'lucide-react'
 
 /** Collapsible **Deep Backend** children. */
@@ -24,6 +24,13 @@ export const CLIENT_DEEP_BACKEND_NAV = [
     keywords: 'backend explorer architecture discovery connect',
   },
   {
+    to: '/deep/orchestration',
+    label: 'Orchestration',
+    icon: Network,
+    flagKey: 'client.account',
+    keywords: 'orchestration airflow simulation data pipeline',
+  },
+  {
     to: '/deep/scheduler',
     label: 'Event Scheduler',
     icon: Calendar,
@@ -31,25 +38,18 @@ export const CLIENT_DEEP_BACKEND_NAV = [
     keywords: 'event scheduler cron trigger',
   },
   {
-    to: '/deep/flow-studio',
-    label: 'Flow Studio',
-    icon: Workflow,
-    flagKey: 'client.account',
-    keywords: 'flow studio execution flow visual',
-  },
-  {
-    to: '/deep/executions',
-    label: 'Execution Activity',
-    icon: Activity,
-    flagKey: 'client.account',
-    keywords: 'execution activity trace replay',
-  },
-  {
     to: '/integrations/github',
     label: 'GitHub connections',
     icon: GitBranch,
     flagKey: 'client.account',
     keywords: 'github oauth token private repository',
+  },
+  {
+    to: '/integrations/cloud',
+    label: 'Cloud deployment',
+    icon: Cloud,
+    flagKey: 'client.account',
+    keywords: 'aws gcp azure cloud scheduler deploy',
   },
 ]
 

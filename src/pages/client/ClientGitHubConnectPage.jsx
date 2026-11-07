@@ -132,6 +132,40 @@ export default function ClientGitHubConnectPage() {
     if (repoModal) openRepos(repoModal)
   }
 
+  const toggleExplorerConnection = async (repo, nextConnected) => {
+    if (!repoModal) return
+    try {
+      await apiFetch('/api/client/git/connected-repos', {
+        method: 'PUT',
+        body: {
+          credentialId: repoModal.id,
+          githubRepoId: repo.id,
+          connected: nextConnected,
+          fullName: repo.fullName,
+          name: repo.name,
+          defaultBranch: repo.defaultBranch || 'main',
+          private: repo.private,
+          htmlUrl: repo.htmlUrl,
+          language: repo.language || '',
+        },
+      })
+      setRepoPayload((p) =>
+        p
+          ? {
+              ...p,
+              repos: p.repos.map((r) => (r.id === repo.id ? { ...r, connectedToExplorer: nextConnected } : r)),
+            }
+          : p,
+      )
+      pushToast({
+        title: nextConnected ? 'Connected to Backend Explorer' : 'Removed from Backend Explorer',
+        body: repo.fullName,
+      })
+    } catch (e) {
+      pushToast({ tone: 'danger', title: 'Could not update connection', body: e.message })
+    }
+  }
+
   useEffect(() => {
     if (repoModal && !repoLoading) {
       openRepos(repoModal)
@@ -293,7 +327,7 @@ export default function ClientGitHubConnectPage() {
           setRepoPayload(null)
         }}
         title={repoModal ? `Repositories · ${repoModal.lastGithubLogin || repoModal.accountEmail}` : 'Repositories'}
-        description="Loaded from this credential’s token (OAuth or PAT)."
+        description="Tick repos to list them under Deep Backend → Backend Explorer → Connected backends."
         footer={
           <div className="flex w-full flex-wrap items-center justify-between gap-2">
             <label className="flex cursor-pointer items-center gap-2 text-xs text-ink-muted">
@@ -335,7 +369,15 @@ export default function ClientGitHubConnectPage() {
                       <p className="truncate text-sm font-medium text-ink">{r.fullName}</p>
                       <p className="truncate text-xs text-ink-muted">{r.description || r.language || '—'}</p>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                      <label className="flex cursor-pointer items-center gap-1.5 text-xs text-ink-muted" title="Show in Backend Explorer">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(r.connectedToExplorer)}
+                          onChange={(e) => toggleExplorerConnection(r, e.target.checked)}
+                        />
+                        Explorer
+                      </label>
                       {r.private && <Badge tone="warning">Private</Badge>}
                       <Badge tone={ACCESS_TONE[r.access] ?? 'neutral'}>{r.access}</Badge>
                       <a href={r.htmlUrl} target="_blank" rel="noreferrer" className="text-xs text-primary-600 hover:underline">

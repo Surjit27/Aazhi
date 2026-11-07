@@ -33,6 +33,8 @@ import ClientAccessPage from '../pages/client/ClientAccessPage.jsx'
 import ClientAccessRolesPage from '../pages/client/ClientAccessRolesPage.jsx'
 import ClientAccessUsersPage from '../pages/client/ClientAccessUsersPage.jsx'
 import ClientGitHubConnectPage from '../pages/client/ClientGitHubConnectPage.jsx'
+import CloudIntegrationsPage from '../pages/client/CloudIntegrationsPage.jsx'
+import DeepOrchestrationPage from '../pages/deep/DeepOrchestrationPage.jsx'
 import ClientUserHistoryPage from '../pages/client/ClientUserHistoryPage.jsx'
 import ClientEmailHistoryPage from '../pages/client/ClientEmailHistoryPage.jsx'
 import ClientJobHistoryPage from '../pages/client/ClientJobHistoryPage.jsx'
@@ -41,7 +43,6 @@ import ProjectsPage from '../pages/deep/ProjectsPage.jsx'
 import DeepBackendExplorerPage from '../pages/deep/BackendExplorerPage.jsx'
 import DeepEventSchedulerPage from '../pages/deep/DeepEventSchedulerPage.jsx'
 import FlowStudioPage from '../pages/deep/FlowStudioPage.jsx'
-import ExecutionActivityPage from '../pages/deep/ExecutionActivityPage.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
 
 export { CLIENT_NAV, CLIENT_ACCESS_NAV, CLIENT_DEEP_BACKEND_NAV, CLIENT_HISTORY_NAV, CLIENT_PAGES_NAV }
@@ -88,9 +89,11 @@ export function ClientPortalRoutes() {
       <Route path="dashboard" element={<DashboardPage />} />
       <Route path="projects" element={<ProjectsPage />} />
       <Route path="deep/explorer" element={<DeepBackendExplorerPage />} />
+      <Route path="deep/explorer/:projectId" element={<DeepBackendExplorerPage />} />
+      <Route path="deep/orchestration" element={<DeepOrchestrationPage />} />
       <Route path="deep/scheduler" element={<DeepEventSchedulerPage />} />
       <Route path="deep/flow-studio" element={<FlowStudioPage />} />
-      <Route path="deep/executions" element={<ExecutionActivityPage />} />
+      <Route path="deep/executions" element={<Navigate to="/deep/orchestration" replace />} />
       <Route path="backends" element={<Navigate to="/dashboard" replace />} />
       <Route path="backends/overview" element={<Navigate to="/dashboard" replace />} />
       <Route path="backends/registry" element={<BackendsPage />} />
@@ -99,6 +102,7 @@ export function ClientPortalRoutes() {
       <Route path="backends/injection" element={<DataInjectionPage />} />
       <Route path="backends/monitor" element={<ExecutionMonitorPage />} />
       <Route path="integrations/github" element={<ClientGitHubConnectPage />} />
+      <Route path="integrations/cloud" element={<CloudIntegrationsPage />} />
       <Route path="backends/git" element={<Navigate to="/integrations/github" replace />} />
       <Route path="backends/assistant" element={<AIAssistantPage />} />
       <Route path="mocks" element={<Navigate to="/backends/mocks" replace />} />
