@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import HomeClientAuthLayout from '../components/auth/HomeClientAuthLayout.jsx'
+import PasswordInput from '../components/auth/PasswordInput.jsx'
 import Button from '../components/ui/Button.jsx'
 import { Field, Input } from '../components/ui/FormControls.jsx'
 import { useAuthStore } from '../stores/authStore.js'
@@ -26,34 +27,44 @@ export default function HomeLoginPage() {
 
   return (
     <HomeClientAuthLayout
-      title="Sign in"
-      subtitle="Access the client workspace for reverse engineering, workflows, triggers, and run monitoring."
+      mode="login"
       alternate={
         <>
           New here?{' '}
           <Link to="/signup" className="font-medium text-primary-600 hover:text-primary-700">
-            Create a client account
+            Sign up for free
           </Link>
         </>
       }
     >
       <form className="flex flex-col gap-4" onSubmit={onSubmit}>
-        <Field label="Email">
-          <Input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </Field>
-        <Field label="Password">
-          <Input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </Field>
+        <div className="home-reveal-stagger" style={{ '--stagger': 0 }}>
+          <Field label="Email">
+            <Input
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </Field>
+        </div>
+        <div className="home-reveal-stagger" style={{ '--stagger': 1 }}>
+          <Field label="Password">
+            <PasswordInput
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </Field>
+        </div>
         {error && <p className="text-xs text-danger-700">{error}</p>}
-        <Button type="submit" variant="primary" disabled={submitting} className="w-full justify-center">
-          {submitting ? 'Signing in…' : 'Sign in'}
-        </Button>
+        <div className="home-reveal-stagger pt-1" style={{ '--stagger': 2 }}>
+          <Button type="submit" variant="primary" disabled={submitting} className="w-full justify-center">
+            {submitting ? 'Signing in…' : 'Sign in'}
+          </Button>
+        </div>
       </form>
     </HomeClientAuthLayout>
   )
