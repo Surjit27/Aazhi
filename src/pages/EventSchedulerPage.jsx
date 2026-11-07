@@ -29,7 +29,6 @@ const STATUS_TONE = { success: 'success', failed: 'danger', never: 'neutral' }
 
 export default function EventSchedulerPage() {
   const schedules = useSchedulerStore((s) => s.schedules)
-  const runner = useSchedulerStore((s) => s.runner)
   const loadSchedules = useSchedulerStore((s) => s.loadSchedules)
   const toggleSchedule = useSchedulerStore((s) => s.toggleSchedule)
   const deleteSchedule = useSchedulerStore((s) => s.deleteSchedule)
@@ -65,7 +64,6 @@ export default function EventSchedulerPage() {
     <div className="flex min-h-0 flex-1 flex-col">
       <PageHeader
         title="Event Scheduler"
-        description={runner === 'bullmq' ? 'BullMQ is running these triggers.' : 'Redis is not connected, so triggers are saved but not run.'}
         actions={<Button variant="primary" size="sm" onClick={() => setEditor({ mode: 'create', form: EMPTY_FORM })}><Plus size={13} /> New schedule</Button>}
       />
 
