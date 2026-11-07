@@ -61,7 +61,7 @@ export default function ImpersonateSessionPage() {
         applySession(token, user)
         if (!navigatedForCode.has(code)) {
           navigatedForCode.add(code)
-          navigate('/backends/overview', { replace: true })
+          navigate('/dashboard', { replace: true })
         }
       })
       .catch((err) => {

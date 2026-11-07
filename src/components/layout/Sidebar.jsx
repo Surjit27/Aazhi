@@ -1,12 +1,18 @@
-import { NavLink, useMatch, useLocation } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { ChevronDown, Database, FolderTree, Workflow } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { BRAND_NAME, BrandIcon } from '../ui/Brand.jsx'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
 import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
-import { ADMIN_NAV, CLIENT_BACKENDS_ACCESS_NAV, CLIENT_NAV } from '../../routes/index.jsx'
-import { backendBasePath, isClientBlockedBackend } from '../../data/backends.js'
+import {
+  ADMIN_NAV,
+  CLIENT_ACCESS_NAV,
+  CLIENT_DEEP_BACKEND_NAV,
+  CLIENT_HISTORY_NAV,
+  CLIENT_NAV,
+  CLIENT_PAGES_NAV,
+} from '../../routes/index.jsx'
 
 const linkClass = ({ isActive }) =>
   `flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] transition-colors ${
@@ -90,45 +96,58 @@ function AdminSidebarNav({ onNavigate }) {
 function ClientSidebarNav({ onNavigate }) {
   const location = useLocation()
   const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
-  const nested = useMatch('/backends/:backendId/*')
-  const root = useMatch('/backends/:backendId')
-  const backendId = nested?.params?.backendId ?? root?.params?.backendId
-  const reserved = new Set(['overview', 'registry', 'events', 'mocks', 'injection', 'monitor', 'git', 'assistant'])
-  const scoped =
-    backendId && !isClientBlockedBackend(backendId) && !reserved.has(backendId)
-      ? [
-          { to: backendBasePath(backendId), label: 'Service overview', icon: Database, end: true },
-          { to: `${backendBasePath(backendId)}/explorer`, label: 'Backend explorer', icon: FolderTree },
-          { to: `${backendBasePath(backendId)}/workflow`, label: 'Visual workflow', icon: Workflow },
-        ]
-      : []
 
-  const overview = CLIENT_NAV.find((item) => item.to === '/backends/overview')
-  const settings = CLIENT_NAV.find((item) => item.to === '/settings')
-  const backendsAccess = CLIENT_BACKENDS_ACCESS_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
-  const backendsOpenByRoute =
-    backendsAccess.some((item) => location.pathname.startsWith(item.to)) || scoped.length > 0
-  const [backendsOpen, setBackendsOpen] = useState(backendsOpenByRoute)
+  const dashboard = CLIENT_NAV.find((item) => item.to === '/dashboard')
+  const projects = CLIENT_NAV.find((item) => item.to === '/projects')
+  const pageItems = CLIENT_PAGES_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+  const deepItems = CLIENT_DEEP_BACKEND_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+  const accessItems = CLIENT_ACCESS_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+  const historyItems = CLIENT_HISTORY_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+
+  const deepOpenByRoute = CLIENT_DEEP_BACKEND_NAV.some((item) => location.pathname.startsWith(item.to))
+  const accessOpenByRoute = CLIENT_ACCESS_NAV.some((item) => location.pathname.startsWith(item.to))
+  const historyOpenByRoute = CLIENT_HISTORY_NAV.some((item) => location.pathname.startsWith(item.to))
+  const [deepOpen, setDeepOpen] = useState(deepOpenByRoute)
+  const [accessOpen, setAccessOpen] = useState(accessOpenByRoute)
+  const [historyOpen, setHistoryOpen] = useState(historyOpenByRoute)
 
   return (
     <>
-      <p className="px-3 pt-2 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Dashboards</p>
-      {overview && isNavEnabled(overview.to, overview.flagKey) && (
-        <NavLink to={overview.to} end={overview.end} onClick={onNavigate} className={linkClass}>
-          <overview.icon size={16} strokeWidth={1.75} />
-          <span className="truncate">{overview.label}</span>
+      {dashboard && isNavEnabled(dashboard.to, dashboard.flagKey) && (
+        <NavLink to={dashboard.to} end={dashboard.end} onClick={onNavigate} className={linkClass}>
+          <dashboard.icon size={16} strokeWidth={1.75} />
+          <span className="truncate">{dashboard.label}</span>
         </NavLink>
       )}
 
-      <NavSection label="Backends" open={backendsOpen} onToggle={() => setBackendsOpen((v) => !v)}>
-        {backendsAccess.map(({ to, label, icon: Icon }) => (
+      {projects && isNavEnabled(projects.to, projects.flagKey) && (
+        <NavLink to={projects.to} onClick={onNavigate} className={linkClass}>
+          <projects.icon size={16} strokeWidth={1.75} />
+          <span className="truncate">{projects.label}</span>
+        </NavLink>
+      )}
+
+      <NavSection label="Deep Backend" open={deepOpen} onToggle={() => setDeepOpen((v) => !v)}>
+        {deepItems.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
             <Icon size={16} strokeWidth={1.75} />
             <span className="truncate">{label}</span>
           </NavLink>
         ))}
-        {scoped.map(({ to, label, icon: Icon, end }) => (
-          <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
+      </NavSection>
+
+      <NavSection label="Access" open={accessOpen} onToggle={() => setAccessOpen((v) => !v)}>
+        {accessItems.map(({ to, label, icon: Icon }) => (
+          <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
+            <Icon size={16} strokeWidth={1.75} />
+            <span className="truncate">{label}</span>
+          </NavLink>
+        ))}
+      </NavSection>
+
+      <NavSection label="History" open={historyOpen} onToggle={() => setHistoryOpen((v) => !v)}>
+        {historyItems.map(({ to, label, icon: Icon }) => (
+          <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
             <Icon size={16} strokeWidth={1.75} />
             <span className="truncate">{label}</span>
           </NavLink>
@@ -136,12 +155,12 @@ function ClientSidebarNav({ onNavigate }) {
       </NavSection>
 
       <p className="mt-3 px-3 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Pages</p>
-      {settings && isNavEnabled(settings.to, settings.flagKey) && (
-        <NavLink to={settings.to} onClick={onNavigate} className={linkClass}>
-          <settings.icon size={16} strokeWidth={1.75} />
-          <span className="truncate">{settings.label}</span>
+      {pageItems.map(({ to, label, icon: Icon }) => (
+        <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
+          <Icon size={16} strokeWidth={1.75} />
+          <span className="truncate">{label}</span>
         </NavLink>
-      )}
+      ))}
     </>
   )
 }

@@ -1,22 +1,17 @@
 import { Navigate, Route } from 'react-router-dom'
+import { CalendarClock, Flag, History, Mail, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react'
 import {
-  CalendarClock,
-  Flag,
-  History,
-  Mail,
-  Layers,
-  LayoutDashboard,
-  Settings,
-  Shield,
-  UserCog,
-  Users,
-} from 'lucide-react'
+  CLIENT_NAV,
+  CLIENT_ACCESS_NAV,
+  CLIENT_DEEP_BACKEND_NAV,
+  CLIENT_HISTORY_NAV,
+  CLIENT_PAGES_NAV,
+} from './clientNav.js'
 import BackendLayout from '../components/layout/BackendLayout.jsx'
 import HomeRedirect from '../components/auth/HomeRedirect.jsx'
 import SettingsPage from '../pages/SettingsPage.jsx'
 import ClientPortalPage from '../pages/ClientPortalPage.jsx'
 import BackendsPage from '../pages/BackendsPage.jsx'
-import BackendsHubOverviewPage from '../pages/BackendsHubOverviewPage.jsx'
 import BackendOverviewPage from '../pages/BackendOverviewPage.jsx'
 import BackendExplorerPage from '../pages/BackendExplorerPage.jsx'
 import WorkflowBuilderPage from '../pages/WorkflowBuilderPage.jsx'
@@ -34,7 +29,21 @@ import UserHistoryPage from '../pages/admin/UserHistoryPage.jsx'
 import EmailHistoryPage from '../pages/admin/EmailHistoryPage.jsx'
 import JobHistoryPage from '../pages/admin/JobHistoryPage.jsx'
 import AdminFeatureFlagsPage from '../pages/admin/AdminFeatureFlagsPage.jsx'
+import ClientAccessPage from '../pages/client/ClientAccessPage.jsx'
+import ClientAccessRolesPage from '../pages/client/ClientAccessRolesPage.jsx'
+import ClientAccessUsersPage from '../pages/client/ClientAccessUsersPage.jsx'
+import ClientUserHistoryPage from '../pages/client/ClientUserHistoryPage.jsx'
+import ClientEmailHistoryPage from '../pages/client/ClientEmailHistoryPage.jsx'
+import ClientJobHistoryPage from '../pages/client/ClientJobHistoryPage.jsx'
+import DashboardPage from '../pages/deep/DashboardPage.jsx'
+import ProjectsPage from '../pages/deep/ProjectsPage.jsx'
+import DeepBackendExplorerPage from '../pages/deep/BackendExplorerPage.jsx'
+import DeepEventSchedulerPage from '../pages/deep/DeepEventSchedulerPage.jsx'
+import FlowStudioPage from '../pages/deep/FlowStudioPage.jsx'
+import ExecutionActivityPage from '../pages/deep/ExecutionActivityPage.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
+
+export { CLIENT_NAV, CLIENT_ACCESS_NAV, CLIENT_DEEP_BACKEND_NAV, CLIENT_HISTORY_NAV, CLIENT_PAGES_NAV }
 
 /** Admin portal sidebar (admin.localhost only). */
 export const ADMIN_NAV = [
@@ -48,18 +57,6 @@ export const ADMIN_NAV = [
   { to: '/admin/history/jobs', label: 'Job history', icon: CalendarClock },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
-
-/** Client portal nav — mirrors admin layout (Dashboards → Overview, Access-style section, Pages). */
-export const CLIENT_NAV = [
-  { to: '/backends/overview', label: 'Overview', icon: LayoutDashboard, end: true, flagKey: 'client.backends', keywords: 'backends dashboard overview' },
-  { to: '/backends/registry', label: 'Registry', icon: Layers, flagKey: 'client.backends', keywords: 'registry git services add backend' },
-  { to: '/settings', label: 'Settings', icon: Settings, flagKey: 'client.settings', keywords: 'preferences localhost' },
-]
-
-/** Items under the collapsible “Backends” section (expand later: events, mocks, git, …). */
-export const CLIENT_BACKENDS_ACCESS_NAV = CLIENT_NAV.filter(
-  (item) => item.to !== '/backends/overview' && item.to !== '/settings',
-)
 
 export function AdminPortalRoutes() {
   return (
@@ -87,8 +84,14 @@ export function ClientPortalRoutes() {
   return (
     <>
       <Route index element={<HomeRedirect />} />
-      <Route path="backends" element={<Navigate to="/backends/overview" replace />} />
-      <Route path="backends/overview" element={<BackendsHubOverviewPage />} />
+      <Route path="dashboard" element={<DashboardPage />} />
+      <Route path="projects" element={<ProjectsPage />} />
+      <Route path="deep/explorer" element={<DeepBackendExplorerPage />} />
+      <Route path="deep/scheduler" element={<DeepEventSchedulerPage />} />
+      <Route path="deep/flow-studio" element={<FlowStudioPage />} />
+      <Route path="deep/executions" element={<ExecutionActivityPage />} />
+      <Route path="backends" element={<Navigate to="/dashboard" replace />} />
+      <Route path="backends/overview" element={<Navigate to="/dashboard" replace />} />
       <Route path="backends/registry" element={<BackendsPage />} />
       <Route path="backends/events" element={<EventSchedulerPage />} />
       <Route path="backends/mocks" element={<MockServersPage />} />
@@ -97,7 +100,7 @@ export function ClientPortalRoutes() {
       <Route path="backends/git" element={<GitIntegrationPage />} />
       <Route path="backends/assistant" element={<AIAssistantPage />} />
       <Route path="mocks" element={<Navigate to="/backends/mocks" replace />} />
-      <Route path="scheduler" element={<Navigate to="/backends/events" replace />} />
+      <Route path="scheduler" element={<Navigate to="/jobs" replace />} />
       <Route path="injection" element={<Navigate to="/backends/injection" replace />} />
       <Route path="monitor" element={<Navigate to="/backends/monitor" replace />} />
       <Route path="git" element={<Navigate to="/backends/git" replace />} />
@@ -109,13 +112,21 @@ export function ClientPortalRoutes() {
         <Route path="explorer" element={<BackendExplorerPage />} />
         <Route path="workflow" element={<WorkflowBuilderPage />} />
       </Route>
+      <Route path="access/roles" element={<ClientAccessRolesPage />} />
+      <Route path="access/users" element={<ClientAccessUsersPage />} />
+      <Route path="roles" element={<Navigate to="/access/roles" replace />} />
+      <Route path="admin/client-users" element={<Navigate to="/access/users" replace />} />
+      <Route path="admin/admin-users" element={<Navigate to="/forbidden" replace />} />
+      <Route path="admin/feature-flags" element={<Navigate to="/forbidden" replace />} />
+      <Route path="jobs" element={<EventSchedulerPage />} />
+      <Route path="access" element={<ClientAccessPage />} />
+      <Route path="history/users" element={<ClientUserHistoryPage />} />
+      <Route path="history/emails" element={<ClientEmailHistoryPage />} />
+      <Route path="history/jobs" element={<ClientJobHistoryPage />} />
       <Route path="account" element={<ClientPortalPage />} />
       <Route path="client" element={<Navigate to="/account" replace />} />
       <Route path="settings" element={<SettingsPage />} />
-      <Route path="overview" element={<Navigate to="/forbidden" replace />} />
-      <Route path="roles" element={<Navigate to="/forbidden" replace />} />
-      <Route path="admin" element={<Navigate to="/forbidden" replace />} />
-      <Route path="admin/*" element={<Navigate to="/forbidden" replace />} />
+      <Route path="overview" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<NotFoundPage />} />
     </>
   )
