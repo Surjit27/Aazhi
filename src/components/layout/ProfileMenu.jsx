@@ -37,12 +37,16 @@ export default function ProfileMenu() {
   ]
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative flex items-center gap-2" ref={ref}>
+      <div className="hidden min-w-0 text-right md:block">
+        <p className="truncate text-[13px] font-medium text-ink">{user.displayName}</p>
+        <p className="truncate text-[11px] text-ink-muted">{user.role}</p>
+      </div>
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Profile menu"
         aria-expanded={open}
-        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700 transition-colors hover:bg-primary-50"
+        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700 ring-2 ring-white transition-colors hover:bg-primary-50"
       >
         {initials(user.displayName, user.email)}
       </button>

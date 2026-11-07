@@ -69,8 +69,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-col items-center justify-center bg-surface p-6">
-      <div className="w-full max-w-md rounded-xl border border-line bg-white p-8 shadow-card">
+    <div className="flex min-h-full flex-col items-center justify-center bg-app-canvas p-6">
+      <div className="glass-card w-full max-w-md p-8 shadow-pop">
         <div className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-white">
             <Database size={20} />

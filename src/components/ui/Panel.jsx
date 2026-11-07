@@ -1,23 +1,28 @@
-export function PageHeader({ title, description, actions }) {
+import Breadcrumbs from './Breadcrumbs.jsx'
+
+export function PageHeader({ title, description, actions, breadcrumbs }) {
   return (
-    <div className="flex flex-col gap-3 border-b border-line bg-white px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 px-6 pt-6 pb-1 lg:flex-row lg:items-start lg:justify-between">
       <div className="min-w-0">
-        <h1 className="text-lg font-semibold text-ink">{title}</h1>
-        {description && <p className="mt-0.5 text-xs text-ink-muted">{description}</p>}
+        <h1 className="text-xl font-semibold tracking-tight text-ink md:text-[22px]">{title}</h1>
+        {description && <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink-muted">{description}</p>}
       </div>
-      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      <div className="flex flex-col items-start gap-3 sm:items-end">
+        {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
+        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      </div>
     </div>
   )
 }
 
 export function Panel({ title, description, actions, children, className = '', bodyClassName = '' }) {
   return (
-    <section className={`flex min-w-0 flex-col rounded-lg border border-line bg-white shadow-card ${className}`}>
+    <section className={`glass-card flex min-w-0 flex-col overflow-hidden ${className}`}>
       {(title || actions) && (
-        <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+        <header className="flex items-center justify-between gap-3 border-b border-line/80 px-5 py-3.5">
           <div className="min-w-0">
             {title && <h2 className="text-[13px] font-semibold text-ink">{title}</h2>}
-            {description && <p className="text-xs text-ink-muted">{description}</p>}
+            {description && <p className="mt-0.5 text-xs text-ink-muted">{description}</p>}
           </div>
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </header>

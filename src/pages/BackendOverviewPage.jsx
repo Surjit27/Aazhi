@@ -47,8 +47,10 @@ export default function BackendOverviewPage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <div className="flex flex-wrap items-center justify-end gap-2 border-b border-line bg-surface/50 px-4 py-2 md:px-6">
-        <Badge tone={backend.status === 'indexed' ? 'success' : 'warning'}>{backend.status}</Badge>
+      <div className="glass-bar flex flex-wrap items-center justify-end gap-2 border-b border-line px-4 py-2 md:px-6">
+        <Badge tone={backend.status === 'indexed' ? 'success' : 'warning'} dot>
+          {backend.status}
+        </Badge>
         <span className="text-xs text-ink-muted">
           {gitProviderLabel(backend.git.provider)} · {backend.git.repository} ·{' '}
           <GitBranch size={11} className="inline" /> {backend.git.branch}
@@ -64,16 +66,22 @@ export default function BackendOverviewPage() {
 
       <div className="flex flex-col gap-5 p-4 md:p-6">
         <div className="grid grid-cols-2 gap-3 xl:grid-cols-5">
-          <StatCard label="Discovered APIs" value={backend.stats.routes} hint={`Routes in ${backend.name}`} icon={FolderTree} />
+          <StatCard label="Discovered APIs" value={backend.stats.routes} hint={`Routes in ${backend.name}`} icon={FolderTree} tone="primary" />
           <StatCard
             label="Backend functions"
             value={backend.stats.functions}
             hint={`Across ${backend.stats.modules} modules`}
             icon={Zap}
-            tone="success"
+            tone="primary"
           />
           <StatCard label="Stack" value={architectureLabel(backend.architecture)} hint="Detected architecture" icon={FolderTree} />
-          <StatCard label="Active mock servers" value={`${runningMocks} / ${servers.length}`} hint="Workspace-wide" icon={Server} tone="warning" />
+          <StatCard
+            label="Active mock servers"
+            value={`${runningMocks} / ${servers.length}`}
+            hint="Workspace-wide"
+            icon={Server}
+            tone="warning"
+          />
           <StatCard
             label="Execution success"
             value={`${successRate}%`}

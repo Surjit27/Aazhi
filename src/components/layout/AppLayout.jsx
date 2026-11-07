@@ -17,20 +17,20 @@ export default function AppLayout() {
   }
 
   return (
-    <div className="flex h-full min-h-0 bg-surface">
+    <div className="flex h-full min-h-0 bg-app-canvas">
       {mobileNavOpen && (
         <div className="fixed inset-0 z-20 bg-ink/20 md:hidden" onClick={() => setMobileNavOpen(false)} />
       )}
       <Sidebar open={mobileNavOpen} onNavigate={() => setMobileNavOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
         {impersonation && (
-          <div className="border-b border-line bg-warning-50 px-4 py-2 text-xs text-ink">
-            Viewing the client portal as <span className="font-medium">{email}</span>. This session expires in 2 hours.
-            Sign out when finished. The admin console stays in the other tab.
+          <div className="glass-bar border-b border-warning-700/15 bg-warning-50/90 px-4 py-2.5 text-xs leading-relaxed text-ink">
+            <span className="font-medium text-warning-700">Impersonation ·</span> Viewing as{' '}
+            <span className="font-medium">{email}</span>. Session expires in 2 hours — sign out when finished.
           </div>
         )}
         <TopBar onToggleNav={() => setMobileNavOpen((o) => !o)} />
-        <main className="flex min-h-0 flex-1 flex-col">
+        <main className="bg-app-canvas flex min-h-0 flex-1 flex-col">
           <Outlet />
         </main>
       </div>

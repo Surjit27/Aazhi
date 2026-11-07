@@ -26,14 +26,15 @@ export default function AdminOverviewPage() {
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Overview"
-        description="Admin console on admin.localhost — users and roles at a glance."
+        description="Users and roles at a glance."
+        breadcrumbs={['Aazhi', 'Dashboards', 'Overview']}
       />
 
-      <div className="flex flex-col gap-5 p-4 md:p-6">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <StatCard label="Total users" value={stats.total} hint="PostgreSQL accounts" icon={Users} />
-          <StatCard label="Administrators" value={stats.admins} hint="admin.localhost access" icon={UserCog} tone="primary" />
-          <StatCard label="Client users" value={stats.clients} hint="localhost access" icon={Shield} tone="success" />
+      <div className="flex flex-col gap-6 px-6 pb-8">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <StatCard label="Total users" value={stats.total} icon={Users} trend={4.2} trendLabel="this month" tone="primary" />
+          <StatCard label="Administrators" value={stats.admins} icon={UserCog} trend={0} trendLabel="unchanged" tone="primary" />
+          <StatCard label="Client users" value={stats.clients} icon={Shield} trend={12.5} trendLabel="this month" tone="success" />
         </div>
 
         <Panel title="All accounts" description="Latest directory (same data as management pages)" bodyClassName="p-0">
