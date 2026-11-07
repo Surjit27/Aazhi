@@ -35,6 +35,7 @@ import ClientAccessUsersPage from '../pages/client/ClientAccessUsersPage.jsx'
 import ClientGitHubConnectPage from '../pages/client/ClientGitHubConnectPage.jsx'
 import CloudIntegrationsPage from '../pages/client/CloudIntegrationsPage.jsx'
 import DeepOrchestrationPage from '../pages/deep/DeepOrchestrationPage.jsx'
+import PagerPage from '../pages/deep/PagerPage.jsx'
 import ClientUserHistoryPage from '../pages/client/ClientUserHistoryPage.jsx'
 import ClientEmailHistoryPage from '../pages/client/ClientEmailHistoryPage.jsx'
 import ClientJobHistoryPage from '../pages/client/ClientJobHistoryPage.jsx'
@@ -91,6 +92,8 @@ export function ClientPortalRoutes() {
       <Route path="deep/explorer" element={<DeepBackendExplorerPage />} />
       <Route path="deep/explorer/:projectId" element={<DeepBackendExplorerPage />} />
       <Route path="deep/orchestration" element={<DeepOrchestrationPage />} />
+      <Route path="deep/pager" element={<PagerPage />} />
+      <Route path="deep/pager/:projectId" element={<PagerPage />} />
       <Route path="deep/scheduler" element={<DeepEventSchedulerPage />} />
       <Route path="deep/flow-studio" element={<FlowStudioPage />} />
       <Route path="deep/executions" element={<Navigate to="/deep/orchestration" replace />} />
