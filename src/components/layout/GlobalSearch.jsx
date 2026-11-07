@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Braces, Search } from 'lucide-react'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 import { ADMIN_NAV, CLIENT_NAV } from '../../routes/index.jsx'
+import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
 import useClickOutside from '../../hooks/useClickOutside.js'
 
 export default function GlobalSearch() {
@@ -12,10 +13,12 @@ export default function GlobalSearch() {
   const ref = useClickOutside(() => setOpen(false), open)
   const portal = getPortal()
   const isAdminPortal = portal === PORTAL.ADMIN
+  const flags = useFeatureFlagsStore((s) => s.flags)
+  const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
 
   const index = useMemo(
     () =>
-      (isAdminPortal ? ADMIN_NAV : CLIENT_NAV).map((item) => ({
+      (isAdminPortal ? ADMIN_NAV : CLIENT_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))).map((item) => ({
         key: item.to,
         label: item.label,
         detail: isAdminPortal ? 'Admin console' : 'Client workspace',
@@ -23,7 +26,7 @@ export default function GlobalSearch() {
         to: item.to,
         icon: item.icon,
       })),
-    [isAdminPortal],
+    [isAdminPortal, flags, isNavEnabled],
   )
 
   const results = useMemo(() => {
@@ -57,7 +60,7 @@ export default function GlobalSearch() {
         }}
         placeholder={isAdminPortal ? 'Search admin pages' : 'Search client workspace'}
         aria-label="Global search"
-        className="h-8 w-full rounded-md border border-line bg-surface pr-3 pl-8 text-[13px] text-ink placeholder:text-ink-subtle focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-50"
+        className="glass-inset h-9 w-full pr-3 pl-8 text-[13px] text-ink placeholder:text-ink-subtle focus:border-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-50"
       />
       {open && (query.trim() || !isAdminPortal) && (
         <ul className="animate-slide-up absolute top-full right-0 left-0 mt-1.5 max-h-80 overflow-y-auto rounded-lg border border-line bg-white p-1 shadow-pop scrollbar-thin">

@@ -1,11 +1,13 @@
 /**
- * Two portals, one app build (Ad-portal pattern, simplified):
- * - admin.localhost → admin portal (role must be `admin`)
- * - localhost       → client portal (role must be `client`)
+ * Three surfaces, one app build (Ad-portal pattern, simplified):
+ * - home.localhost   → public marketing home (client sign-in / sign-up)
+ * - client.localhost → client portal (role must be `client`)
+ * - admin.localhost  → admin portal (role must be `admin`)
  */
 import {
   adminAppOrigin,
   clientAppOrigin,
+  homeAppOrigin,
   getAppSurface,
   homePathForRole,
   redirectToAdmin,
@@ -13,6 +15,7 @@ import {
 } from './appHost.js'
 
 export const PORTAL = {
+  HOME: 'home',
   ADMIN: 'admin',
   CLIENT: 'client',
 }
@@ -41,14 +44,13 @@ export function roleForPortal(portal) {
 }
 
 export function homePathForPortal(portal = getPortal()) {
-  return portal === PORTAL.ADMIN ? '/overview' : '/mocks'
+  return portal === PORTAL.ADMIN ? '/overview' : '/dashboard'
 }
 
 /** Client hostname must not render admin screens or the orders service. */
 export function isClientBlockedPath(pathname) {
   const path = pathname.replace(/\/+$/, '') || '/'
-  if (path === '/overview' || path === '/roles') return true
-  if (path === '/admin' || path.startsWith('/admin/')) return true
+  if (path === '/overview') return true
   if (path === '/backends/orders' || path.startsWith('/backends/orders/')) return true
   return false
 }
@@ -67,6 +69,7 @@ export function isRoleAllowedOnPortal(role, portal = getPortal()) {
 export {
   adminAppOrigin,
   clientAppOrigin,
+  homeAppOrigin,
   getAppSurface,
   homePathForRole,
   redirectToAdmin,

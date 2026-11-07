@@ -36,13 +36,25 @@ export default function ProfileMenu() {
     },
   ]
 
+  const impersonating = Boolean(user.impersonation)
+
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative flex items-center gap-2" ref={ref}>
+      <div className="hidden min-w-0 text-right md:block">
+        <p className="truncate text-[13px] font-medium text-ink">{user.displayName}</p>
+        {impersonating ? (
+          <Badge tone="warning" className="mt-0.5 text-[10px]">
+            Impersonation
+          </Badge>
+        ) : (
+          <p className="truncate text-[11px] capitalize text-ink-muted">{user.role}</p>
+        )}
+      </div>
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Profile menu"
         aria-expanded={open}
-        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700 transition-colors hover:bg-primary-50"
+        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700 ring-2 ring-white transition-colors hover:bg-primary-50"
       >
         {initials(user.displayName, user.email)}
       </button>
@@ -51,9 +63,16 @@ export default function ProfileMenu() {
           <div className="px-2.5 py-2">
             <p className="text-[13px] font-medium text-ink">{user.displayName}</p>
             <p className="text-xs text-ink-muted">{user.email}</p>
-            <Badge tone={user.role === 'admin' ? 'primary' : 'neutral'}>
-              {user.role}
-            </Badge>
+            {impersonating ? (
+              <p className="mt-1.5 rounded-lg border border-warning-700/15 bg-warning-50/80 px-2 py-1.5 text-[10px] leading-snug text-ink-muted">
+                <span className="font-semibold text-warning-700">Impersonation</span>
+                <span> · Viewing as </span>
+                <span className="font-medium text-ink">{user.email}</span>
+                <span>. Session expires in 2 hours — sign out when finished.</span>
+              </p>
+            ) : (
+              <Badge tone={user.role === 'admin' ? 'primary' : 'neutral'}>{user.role}</Badge>
+            )}
           </div>
           <div className="my-1 border-t border-line" />
           {items.map((item) => (

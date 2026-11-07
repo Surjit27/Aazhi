@@ -1,22 +1,12 @@
 import { Navigate, Route } from 'react-router-dom'
+import { CalendarClock, Flag, History, Mail, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react'
 import {
-  Activity,
-  Calendar,
-  CalendarClock,
-  Flag,
-  GitBranch,
-  History,
-  Mail,
-  Layers,
-  LayoutDashboard,
-  Server,
-  Settings,
-  Shield,
-  Sparkles,
-  Upload,
-  UserCog,
-  Users,
-} from 'lucide-react'
+  CLIENT_NAV,
+  CLIENT_ACCESS_NAV,
+  CLIENT_DEEP_BACKEND_NAV,
+  CLIENT_HISTORY_NAV,
+  CLIENT_PAGES_NAV,
+} from './clientNav.js'
 import BackendLayout from '../components/layout/BackendLayout.jsx'
 import HomeRedirect from '../components/auth/HomeRedirect.jsx'
 import SettingsPage from '../pages/SettingsPage.jsx'
@@ -39,7 +29,24 @@ import UserHistoryPage from '../pages/admin/UserHistoryPage.jsx'
 import EmailHistoryPage from '../pages/admin/EmailHistoryPage.jsx'
 import JobHistoryPage from '../pages/admin/JobHistoryPage.jsx'
 import AdminFeatureFlagsPage from '../pages/admin/AdminFeatureFlagsPage.jsx'
+import ClientAccessPage from '../pages/client/ClientAccessPage.jsx'
+import ClientAccessRolesPage from '../pages/client/ClientAccessRolesPage.jsx'
+import ClientAccessUsersPage from '../pages/client/ClientAccessUsersPage.jsx'
+import ClientGitHubConnectPage from '../pages/client/ClientGitHubConnectPage.jsx'
+import CloudIntegrationsPage from '../pages/client/CloudIntegrationsPage.jsx'
+import DeepOrchestrationPage from '../pages/deep/DeepOrchestrationPage.jsx'
+import PagerPage from '../pages/deep/PagerPage.jsx'
+import ClientUserHistoryPage from '../pages/client/ClientUserHistoryPage.jsx'
+import ClientEmailHistoryPage from '../pages/client/ClientEmailHistoryPage.jsx'
+import ClientJobHistoryPage from '../pages/client/ClientJobHistoryPage.jsx'
+import DashboardPage from '../pages/deep/DashboardPage.jsx'
+import ProjectsPage from '../pages/deep/ProjectsPage.jsx'
+import DeepBackendExplorerPage from '../pages/deep/BackendExplorerPage.jsx'
+import DeepEventSchedulerPage from '../pages/deep/DeepEventSchedulerPage.jsx'
+import FlowStudioPage from '../pages/deep/FlowStudioPage.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
+
+export { CLIENT_NAV, CLIENT_ACCESS_NAV, CLIENT_DEEP_BACKEND_NAV, CLIENT_HISTORY_NAV, CLIENT_PAGES_NAV }
 
 /** Admin portal sidebar (admin.localhost only). */
 export const ADMIN_NAV = [
@@ -52,19 +59,6 @@ export const ADMIN_NAV = [
   { to: '/admin/history/emails', label: 'Email history', icon: Mail },
   { to: '/admin/history/jobs', label: 'Job history', icon: CalendarClock },
   { to: '/settings', label: 'Settings', icon: Settings },
-]
-
-/** Client portal. Home is Mock servers. Orders service and admin screens are blocked. */
-export const CLIENT_NAV = [
-  { to: '/mocks', label: 'Mock servers', icon: Server, end: true, flagKey: 'client.mocks', keywords: 'mock mocks localhost' },
-  { to: '/scheduler', label: 'Event scheduler', icon: Calendar, flagKey: 'client.scheduler', keywords: 'schedule jobs localhost' },
-  { to: '/injection', label: 'Data injection', icon: Upload, flagKey: 'client.injection', keywords: 'inject localhost' },
-  { to: '/monitor', label: 'Execution monitor', icon: Activity, flagKey: 'client.monitor', keywords: 'runs localhost' },
-  { to: '/git', label: 'Git integration', icon: GitBranch, flagKey: 'client.git', keywords: 'repository localhost' },
-  { to: '/assistant', label: 'AI assistant', icon: Sparkles, flagKey: 'client.assistant', keywords: 'chat localhost' },
-  { to: '/backends/auth', label: 'auth-gateway', icon: Layers, flagKey: 'client.backends', keywords: 'auth gateway sessions sso' },
-  { to: '/account', label: 'Account', icon: LayoutDashboard, flagKey: 'client.account', keywords: 'profile localhost' },
-  { to: '/settings', label: 'Settings', icon: Settings, flagKey: 'client.settings', keywords: 'preferences localhost' },
 ]
 
 export function AdminPortalRoutes() {
@@ -93,8 +87,33 @@ export function ClientPortalRoutes() {
   return (
     <>
       <Route index element={<HomeRedirect />} />
-      <Route path="backends" element={<Navigate to="/backends/auth" replace />} />
+      <Route path="dashboard" element={<DashboardPage />} />
+      <Route path="projects" element={<ProjectsPage />} />
+      <Route path="deep/explorer" element={<DeepBackendExplorerPage />} />
+      <Route path="deep/explorer/:projectId" element={<DeepBackendExplorerPage />} />
+      <Route path="deep/orchestration" element={<DeepOrchestrationPage />} />
+      <Route path="deep/pager" element={<PagerPage />} />
+      <Route path="deep/pager/:projectId" element={<PagerPage />} />
+      <Route path="deep/scheduler" element={<DeepEventSchedulerPage />} />
+      <Route path="deep/flow-studio" element={<FlowStudioPage />} />
+      <Route path="deep/executions" element={<Navigate to="/deep/orchestration" replace />} />
+      <Route path="backends" element={<Navigate to="/dashboard" replace />} />
+      <Route path="backends/overview" element={<Navigate to="/dashboard" replace />} />
       <Route path="backends/registry" element={<BackendsPage />} />
+      <Route path="backends/events" element={<EventSchedulerPage />} />
+      <Route path="backends/mocks" element={<MockServersPage />} />
+      <Route path="backends/injection" element={<DataInjectionPage />} />
+      <Route path="backends/monitor" element={<ExecutionMonitorPage />} />
+      <Route path="integrations/github" element={<ClientGitHubConnectPage />} />
+      <Route path="integrations/cloud" element={<CloudIntegrationsPage />} />
+      <Route path="backends/git" element={<Navigate to="/integrations/github" replace />} />
+      <Route path="backends/assistant" element={<AIAssistantPage />} />
+      <Route path="mocks" element={<Navigate to="/backends/mocks" replace />} />
+      <Route path="scheduler" element={<Navigate to="/jobs" replace />} />
+      <Route path="injection" element={<Navigate to="/backends/injection" replace />} />
+      <Route path="monitor" element={<Navigate to="/backends/monitor" replace />} />
+      <Route path="git" element={<Navigate to="/backends/git" replace />} />
+      <Route path="assistant" element={<Navigate to="/backends/assistant" replace />} />
       <Route path="backends/orders" element={<Navigate to="/forbidden" replace />} />
       <Route path="backends/orders/*" element={<Navigate to="/forbidden" replace />} />
       <Route path="backends/:backendId" element={<BackendLayout />}>
@@ -102,19 +121,21 @@ export function ClientPortalRoutes() {
         <Route path="explorer" element={<BackendExplorerPage />} />
         <Route path="workflow" element={<WorkflowBuilderPage />} />
       </Route>
-      <Route path="mocks" element={<MockServersPage />} />
-      <Route path="scheduler" element={<EventSchedulerPage />} />
-      <Route path="injection" element={<DataInjectionPage />} />
-      <Route path="monitor" element={<ExecutionMonitorPage />} />
-      <Route path="git" element={<GitIntegrationPage />} />
-      <Route path="assistant" element={<AIAssistantPage />} />
+      <Route path="access/roles" element={<ClientAccessRolesPage />} />
+      <Route path="access/users" element={<ClientAccessUsersPage />} />
+      <Route path="roles" element={<Navigate to="/access/roles" replace />} />
+      <Route path="admin/client-users" element={<Navigate to="/access/users" replace />} />
+      <Route path="admin/admin-users" element={<Navigate to="/forbidden" replace />} />
+      <Route path="admin/feature-flags" element={<Navigate to="/forbidden" replace />} />
+      <Route path="jobs" element={<EventSchedulerPage />} />
+      <Route path="access" element={<ClientAccessPage />} />
+      <Route path="history/users" element={<ClientUserHistoryPage />} />
+      <Route path="history/emails" element={<ClientEmailHistoryPage />} />
+      <Route path="history/jobs" element={<ClientJobHistoryPage />} />
       <Route path="account" element={<ClientPortalPage />} />
       <Route path="client" element={<Navigate to="/account" replace />} />
       <Route path="settings" element={<SettingsPage />} />
-      <Route path="overview" element={<Navigate to="/forbidden" replace />} />
-      <Route path="roles" element={<Navigate to="/forbidden" replace />} />
-      <Route path="admin" element={<Navigate to="/forbidden" replace />} />
-      <Route path="admin/*" element={<Navigate to="/forbidden" replace />} />
+      <Route path="overview" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<NotFoundPage />} />
     </>
   )

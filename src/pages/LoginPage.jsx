@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { Database } from 'lucide-react'
 import Button from '../components/ui/Button.jsx'
+import { BRAND_NAME, BrandLockup } from '../components/ui/Brand.jsx'
 import { Field, Input } from '../components/ui/FormControls.jsx'
 import {
   adminAppOrigin,
@@ -69,19 +69,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-col items-center justify-center bg-surface p-6">
-      <div className="w-full max-w-md rounded-xl border border-line bg-white p-8 shadow-card">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 text-white">
-            <Database size={20} />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold text-ink">Preflight AI</h1>
-            <p className="text-xs text-ink-muted">
-              {isAdminHost ? 'Admin console' : 'Client portal'} ·{' '}
-              <span className="font-mono">{window.location.host}</span>
-            </p>
-          </div>
+    <div className="flex min-h-full flex-col items-center justify-center bg-app-canvas p-6">
+      <div className="glass-card w-full max-w-md p-8 shadow-pop">
+        <div className="mb-6 space-y-3">
+          <BrandLockup className="h-10" />
+          <p className="text-xs text-ink-muted">
+            {isAdminHost ? 'Admin console' : 'Client portal'} · <span className="font-mono">{window.location.host}</span>
+          </p>
+          <p className="sr-only">{BRAND_NAME} sign in</p>
         </div>
 
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
