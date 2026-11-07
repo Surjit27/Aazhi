@@ -1,19 +1,13 @@
 import { Navigate, Route } from 'react-router-dom'
 import {
-  Activity,
-  Calendar,
   CalendarClock,
   Flag,
-  GitBranch,
   History,
   Mail,
   Layers,
   LayoutDashboard,
-  Server,
   Settings,
   Shield,
-  Sparkles,
-  Upload,
   UserCog,
   Users,
 } from 'lucide-react'
@@ -22,6 +16,7 @@ import HomeRedirect from '../components/auth/HomeRedirect.jsx'
 import SettingsPage from '../pages/SettingsPage.jsx'
 import ClientPortalPage from '../pages/ClientPortalPage.jsx'
 import BackendsPage from '../pages/BackendsPage.jsx'
+import BackendsHubOverviewPage from '../pages/BackendsHubOverviewPage.jsx'
 import BackendOverviewPage from '../pages/BackendOverviewPage.jsx'
 import BackendExplorerPage from '../pages/BackendExplorerPage.jsx'
 import WorkflowBuilderPage from '../pages/WorkflowBuilderPage.jsx'
@@ -54,18 +49,17 @@ export const ADMIN_NAV = [
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
 
-/** Client portal. Home is Mock servers. Orders service and admin screens are blocked. */
+/** Client portal nav — mirrors admin layout (Dashboards → Overview, Access-style section, Pages). */
 export const CLIENT_NAV = [
-  { to: '/mocks', label: 'Mock servers', icon: Server, end: true, flagKey: 'client.mocks', keywords: 'mock mocks localhost' },
-  { to: '/scheduler', label: 'Event scheduler', icon: Calendar, flagKey: 'client.scheduler', keywords: 'schedule jobs localhost' },
-  { to: '/injection', label: 'Data injection', icon: Upload, flagKey: 'client.injection', keywords: 'inject localhost' },
-  { to: '/monitor', label: 'Execution monitor', icon: Activity, flagKey: 'client.monitor', keywords: 'runs localhost' },
-  { to: '/git', label: 'Git integration', icon: GitBranch, flagKey: 'client.git', keywords: 'repository localhost' },
-  { to: '/assistant', label: 'AI assistant', icon: Sparkles, flagKey: 'client.assistant', keywords: 'chat localhost' },
-  { to: '/backends/auth', label: 'auth-gateway', icon: Layers, flagKey: 'client.backends', keywords: 'auth gateway sessions sso' },
-  { to: '/account', label: 'Account', icon: LayoutDashboard, flagKey: 'client.account', keywords: 'profile localhost' },
+  { to: '/backends/overview', label: 'Overview', icon: LayoutDashboard, end: true, flagKey: 'client.backends', keywords: 'backends dashboard overview' },
+  { to: '/backends/registry', label: 'Registry', icon: Layers, flagKey: 'client.backends', keywords: 'registry git services add backend' },
   { to: '/settings', label: 'Settings', icon: Settings, flagKey: 'client.settings', keywords: 'preferences localhost' },
 ]
+
+/** Items under the collapsible “Backends” section (expand later: events, mocks, git, …). */
+export const CLIENT_BACKENDS_ACCESS_NAV = CLIENT_NAV.filter(
+  (item) => item.to !== '/backends/overview' && item.to !== '/settings',
+)
 
 export function AdminPortalRoutes() {
   return (
@@ -93,8 +87,21 @@ export function ClientPortalRoutes() {
   return (
     <>
       <Route index element={<HomeRedirect />} />
-      <Route path="backends" element={<Navigate to="/backends/auth" replace />} />
+      <Route path="backends" element={<Navigate to="/backends/overview" replace />} />
+      <Route path="backends/overview" element={<BackendsHubOverviewPage />} />
       <Route path="backends/registry" element={<BackendsPage />} />
+      <Route path="backends/events" element={<EventSchedulerPage />} />
+      <Route path="backends/mocks" element={<MockServersPage />} />
+      <Route path="backends/injection" element={<DataInjectionPage />} />
+      <Route path="backends/monitor" element={<ExecutionMonitorPage />} />
+      <Route path="backends/git" element={<GitIntegrationPage />} />
+      <Route path="backends/assistant" element={<AIAssistantPage />} />
+      <Route path="mocks" element={<Navigate to="/backends/mocks" replace />} />
+      <Route path="scheduler" element={<Navigate to="/backends/events" replace />} />
+      <Route path="injection" element={<Navigate to="/backends/injection" replace />} />
+      <Route path="monitor" element={<Navigate to="/backends/monitor" replace />} />
+      <Route path="git" element={<Navigate to="/backends/git" replace />} />
+      <Route path="assistant" element={<Navigate to="/backends/assistant" replace />} />
       <Route path="backends/orders" element={<Navigate to="/forbidden" replace />} />
       <Route path="backends/orders/*" element={<Navigate to="/forbidden" replace />} />
       <Route path="backends/:backendId" element={<BackendLayout />}>
@@ -102,12 +109,6 @@ export function ClientPortalRoutes() {
         <Route path="explorer" element={<BackendExplorerPage />} />
         <Route path="workflow" element={<WorkflowBuilderPage />} />
       </Route>
-      <Route path="mocks" element={<MockServersPage />} />
-      <Route path="scheduler" element={<EventSchedulerPage />} />
-      <Route path="injection" element={<DataInjectionPage />} />
-      <Route path="monitor" element={<ExecutionMonitorPage />} />
-      <Route path="git" element={<GitIntegrationPage />} />
-      <Route path="assistant" element={<AIAssistantPage />} />
       <Route path="account" element={<ClientPortalPage />} />
       <Route path="client" element={<Navigate to="/account" replace />} />
       <Route path="settings" element={<SettingsPage />} />

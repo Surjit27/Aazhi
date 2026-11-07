@@ -191,7 +191,7 @@ export default function BackendOverviewPage() {
             <Button onClick={() => navigate(`${base}/workflow`)}>
               <Workflow size={14} /> Visual workflow
             </Button>
-            <Button onClick={() => navigate('/scheduler')}>
+            <Button onClick={() => navigate('/backends/events')}>
               <Calendar size={14} /> Schedules
             </Button>
             <Button onClick={() => navigate('/assistant')}>Ask AI assistant</Button>

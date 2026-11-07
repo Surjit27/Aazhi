@@ -5,7 +5,7 @@ import { BRAND_NAME, BrandIcon } from '../ui/Brand.jsx'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
 import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
-import { ADMIN_NAV, CLIENT_NAV } from '../../routes/index.jsx'
+import { ADMIN_NAV, CLIENT_BACKENDS_ACCESS_NAV, CLIENT_NAV } from '../../routes/index.jsx'
 import { backendBasePath, isClientBlockedBackend } from '../../data/backends.js'
 
 const linkClass = ({ isActive }) =>
@@ -88,42 +88,59 @@ function AdminSidebarNav({ onNavigate }) {
 }
 
 function ClientSidebarNav({ onNavigate }) {
-  const flags = useFeatureFlagsStore((s) => s.flags)
-  const flagsLoaded = useFeatureFlagsStore((s) => s.loaded)
+  const location = useLocation()
   const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
-  void flags
-  void flagsLoaded
   const nested = useMatch('/backends/:backendId/*')
   const root = useMatch('/backends/:backendId')
   const backendId = nested?.params?.backendId ?? root?.params?.backendId
+  const reserved = new Set(['overview', 'registry', 'events', 'mocks', 'injection', 'monitor', 'git', 'assistant'])
   const scoped =
-    backendId && !isClientBlockedBackend(backendId)
+    backendId && !isClientBlockedBackend(backendId) && !reserved.has(backendId)
       ? [
-          { to: backendBasePath(backendId), label: 'Overview', icon: Database, end: true },
+          { to: backendBasePath(backendId), label: 'Service overview', icon: Database, end: true },
           { to: `${backendBasePath(backendId)}/explorer`, label: 'Backend explorer', icon: FolderTree },
           { to: `${backendBasePath(backendId)}/workflow`, label: 'Visual workflow', icon: Workflow },
         ]
       : []
 
+  const overview = CLIENT_NAV.find((item) => item.to === '/backends/overview')
+  const settings = CLIENT_NAV.find((item) => item.to === '/settings')
+  const backendsAccess = CLIENT_BACKENDS_ACCESS_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+  const backendsOpenByRoute =
+    backendsAccess.some((item) => location.pathname.startsWith(item.to)) || scoped.length > 0
+  const [backendsOpen, setBackendsOpen] = useState(backendsOpenByRoute)
+
   return (
     <>
-      <p className="px-3 pt-2 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Workspace</p>
-      {CLIENT_NAV.filter((item) => isNavEnabled(item.to, item.flagKey)).map(({ to, label, icon: Icon, end }) => (
-        <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
-          <Icon size={16} strokeWidth={1.75} />
-          <span className="truncate">{label}</span>
+      <p className="px-3 pt-2 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Dashboards</p>
+      {overview && isNavEnabled(overview.to, overview.flagKey) && (
+        <NavLink to={overview.to} end={overview.end} onClick={onNavigate} className={linkClass}>
+          <overview.icon size={16} strokeWidth={1.75} />
+          <span className="truncate">{overview.label}</span>
         </NavLink>
-      ))}
-      {scoped.length > 0 && (
-        <>
-          <p className="mt-3 px-3 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">This backend</p>
-          {scoped.map(({ to, label, icon: Icon, end }) => (
-            <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
-              <Icon size={16} strokeWidth={1.75} />
-              <span className="truncate">{label}</span>
-            </NavLink>
-          ))}
-        </>
+      )}
+
+      <NavSection label="Backends" open={backendsOpen} onToggle={() => setBackendsOpen((v) => !v)}>
+        {backendsAccess.map(({ to, label, icon: Icon }) => (
+          <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
+            <Icon size={16} strokeWidth={1.75} />
+            <span className="truncate">{label}</span>
+          </NavLink>
+        ))}
+        {scoped.map(({ to, label, icon: Icon, end }) => (
+          <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
+            <Icon size={16} strokeWidth={1.75} />
+            <span className="truncate">{label}</span>
+          </NavLink>
+        ))}
+      </NavSection>
+
+      <p className="mt-3 px-3 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Pages</p>
+      {settings && isNavEnabled(settings.to, settings.flagKey) && (
+        <NavLink to={settings.to} onClick={onNavigate} className={linkClass}>
+          <settings.icon size={16} strokeWidth={1.75} />
+          <span className="truncate">{settings.label}</span>
+        </NavLink>
       )}
     </>
   )

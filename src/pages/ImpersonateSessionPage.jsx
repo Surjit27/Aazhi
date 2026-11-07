@@ -61,7 +61,7 @@ export default function ImpersonateSessionPage() {
         applySession(token, user)
         if (!navigatedForCode.has(code)) {
           navigatedForCode.add(code)
-          navigate('/mocks', { replace: true })
+          navigate('/backends/overview', { replace: true })
         }
       })
       .catch((err) => {

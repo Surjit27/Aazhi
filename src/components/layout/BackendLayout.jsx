@@ -31,10 +31,10 @@ export default function BackendLayout() {
         <p className="text-sm font-medium text-ink">Backend not found</p>
         <button
           type="button"
-          onClick={() => navigate('/backends/auth')}
+          onClick={() => navigate('/backends/registry')}
           className="cursor-pointer text-sm text-primary-700 hover:underline"
         >
-          Back to all backends
+          Back to registry
         </button>
       </div>
     )

@@ -44,7 +44,7 @@ export function roleForPortal(portal) {
 }
 
 export function homePathForPortal(portal = getPortal()) {
-  return portal === PORTAL.ADMIN ? '/overview' : '/mocks'
+  return portal === PORTAL.ADMIN ? '/overview' : '/backends/overview'
 }
 
 /** Client hostname must not render admin screens or the orders service. */
