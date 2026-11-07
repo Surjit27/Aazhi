@@ -1,6 +1,8 @@
 import { Navigate } from 'react-router-dom'
-import { getPortal, homePathForPortal, portalForUser, redirectToAdmin, redirectToClient } from '../../lib/portal.js'
+import { getPortal, homePathForPortal, portalForUser, redirectToAdmin, redirectToClient, PORTAL } from '../../lib/portal.js'
+import { CLIENT_NAV } from '../../routes/index.jsx'
 import { useAuthStore } from '../../stores/authStore.js'
+import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
 
 export default function HomeRedirect() {
   const user = useAuthStore((s) => s.user)
@@ -19,6 +21,11 @@ export default function HomeRedirect() {
       redirectToClient(homePathForPortal('client'))
     }
     return null
+  }
+
+  if (portal === PORTAL.CLIENT) {
+    const target = useFeatureFlagsStore.getState().firstEnabledClientPath(CLIENT_NAV)
+    return <Navigate to={target} replace />
   }
 
   return <Navigate to={homePathForPortal(portal)} replace />

@@ -3,6 +3,7 @@ import AppLayout from './components/layout/AppLayout.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import { HostRoleSync } from './components/auth/HostSurfaceGate.jsx'
 import PortalGate from './components/auth/PortalGate.jsx'
+import ClientFeatureGate from './components/auth/ClientFeatureGate.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import ForbiddenPage from './pages/ForbiddenPage.jsx'
@@ -27,8 +28,10 @@ export default function App() {
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route element={<HostRoleSync />}>
           <Route element={<PortalGate />}>
+            <Route element={<ClientFeatureGate />}>
             <Route element={<AppLayout />}>
               {isAdminPortal ? AdminPortalRoutes() : ClientPortalRoutes()}
+            </Route>
             </Route>
           </Route>
         </Route>

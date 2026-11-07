@@ -3,6 +3,7 @@ import {
   Activity,
   Calendar,
   CalendarClock,
+  Flag,
   GitBranch,
   History,
   Mail,
@@ -37,6 +38,7 @@ import AdminUserManagementPage from '../pages/admin/AdminUserManagementPage.jsx'
 import UserHistoryPage from '../pages/admin/UserHistoryPage.jsx'
 import EmailHistoryPage from '../pages/admin/EmailHistoryPage.jsx'
 import JobHistoryPage from '../pages/admin/JobHistoryPage.jsx'
+import AdminFeatureFlagsPage from '../pages/admin/AdminFeatureFlagsPage.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
 
 /** Admin portal sidebar (admin.localhost only). */
@@ -45,6 +47,7 @@ export const ADMIN_NAV = [
   { to: '/roles', label: 'Roles', icon: Shield },
   { to: '/admin/client-users', label: 'Client user management', icon: Users },
   { to: '/admin/admin-users', label: 'Admin user management', icon: UserCog },
+  { to: '/admin/feature-flags', label: 'Feature flags', icon: Flag },
   { to: '/admin/history/users', label: 'User history', icon: History },
   { to: '/admin/history/emails', label: 'Email history', icon: Mail },
   { to: '/admin/history/jobs', label: 'Job history', icon: CalendarClock },
@@ -53,15 +56,15 @@ export const ADMIN_NAV = [
 
 /** Client portal. Home is Mock servers. Orders service and admin screens are blocked. */
 export const CLIENT_NAV = [
-  { to: '/mocks', label: 'Mock servers', icon: Server, end: true, keywords: 'mock mocks localhost' },
-  { to: '/scheduler', label: 'Event scheduler', icon: Calendar, keywords: 'schedule jobs localhost' },
-  { to: '/injection', label: 'Data injection', icon: Upload, keywords: 'inject localhost' },
-  { to: '/monitor', label: 'Execution monitor', icon: Activity, keywords: 'runs localhost' },
-  { to: '/git', label: 'Git integration', icon: GitBranch, keywords: 'repository localhost' },
-  { to: '/assistant', label: 'AI assistant', icon: Sparkles, keywords: 'chat localhost' },
-  { to: '/backends', label: 'Other backends', icon: Layers, keywords: 'payments auth registry' },
-  { to: '/account', label: 'Account', icon: LayoutDashboard, keywords: 'profile localhost' },
-  { to: '/settings', label: 'Settings', icon: Settings, keywords: 'preferences localhost' },
+  { to: '/mocks', label: 'Mock servers', icon: Server, end: true, flagKey: 'client.mocks', keywords: 'mock mocks localhost' },
+  { to: '/scheduler', label: 'Event scheduler', icon: Calendar, flagKey: 'client.scheduler', keywords: 'schedule jobs localhost' },
+  { to: '/injection', label: 'Data injection', icon: Upload, flagKey: 'client.injection', keywords: 'inject localhost' },
+  { to: '/monitor', label: 'Execution monitor', icon: Activity, flagKey: 'client.monitor', keywords: 'runs localhost' },
+  { to: '/git', label: 'Git integration', icon: GitBranch, flagKey: 'client.git', keywords: 'repository localhost' },
+  { to: '/assistant', label: 'AI assistant', icon: Sparkles, flagKey: 'client.assistant', keywords: 'chat localhost' },
+  { to: '/backends', label: 'Other backends', icon: Layers, flagKey: 'client.backends', keywords: 'payments auth registry' },
+  { to: '/account', label: 'Account', icon: LayoutDashboard, flagKey: 'client.account', keywords: 'profile localhost' },
+  { to: '/settings', label: 'Settings', icon: Settings, flagKey: 'client.settings', keywords: 'preferences localhost' },
 ]
 
 export function AdminPortalRoutes() {
@@ -72,6 +75,7 @@ export function AdminPortalRoutes() {
       <Route path="roles" element={<AdminRolesPage />} />
       <Route path="admin/client-users" element={<ClientUserManagementPage />} />
       <Route path="admin/admin-users" element={<AdminUserManagementPage />} />
+      <Route path="admin/feature-flags" element={<AdminFeatureFlagsPage />} />
       <Route path="admin/history/users" element={<UserHistoryPage />} />
       <Route path="admin/history/emails" element={<EmailHistoryPage />} />
       <Route path="admin/history/jobs" element={<JobHistoryPage />} />
