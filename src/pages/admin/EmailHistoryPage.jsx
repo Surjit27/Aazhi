@@ -4,7 +4,7 @@ import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
 
 export default function EmailHistoryPage() {
-  const { events, loading, reload } = useHistoryEvents('/api/admin/history/emails')
+  const { events, loading, error, reload } = useHistoryEvents('/api/admin/history/emails')
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -21,6 +21,7 @@ export default function EmailHistoryPage() {
           <HistoryEventTable
             events={events}
             loading={loading}
+            error={error}
             emptyMessage="No email activity yet. Updates and test sends from Settings will appear here."
           />
         </Panel>

@@ -17,9 +17,12 @@ function actionTone(action) {
   return 'neutral'
 }
 
-export default function HistoryEventTable({ events, loading, emptyMessage }) {
+export default function HistoryEventTable({ events, loading, error, emptyMessage }) {
   if (loading) {
     return <p className="p-4 text-sm text-ink-muted">Loading history…</p>
+  }
+  if (error) {
+    return <p className="p-4 text-sm text-danger-700">{error}</p>
   }
   if (events.length === 0) {
     return <p className="p-4 text-sm text-ink-muted">{emptyMessage}</p>

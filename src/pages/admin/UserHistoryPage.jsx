@@ -4,7 +4,7 @@ import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
 
 export default function UserHistoryPage() {
-  const { events, loading, reload } = useHistoryEvents('/api/admin/history/users')
+  const { events, loading, error, reload } = useHistoryEvents('/api/admin/history/users')
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -21,6 +21,7 @@ export default function UserHistoryPage() {
           <HistoryEventTable
             events={events}
             loading={loading}
+            error={error}
             emptyMessage="No user activity recorded yet. Events appear after sign-in and account changes."
           />
         </Panel>

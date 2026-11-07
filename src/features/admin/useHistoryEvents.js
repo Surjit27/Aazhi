@@ -1,23 +1,53 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { apiFetch } from '../../lib/api.js'
-import { useAppStore } from '../../stores/appStore.js'
+
+function historyErrorMessage(err) {
+  if (err.status === 404) {
+    return 'History API is not on this server yet. Run the API from feature/audit-log-instrumentation (or merge backend PR #7–#8) and apply migrations.'
+  }
+  return err.message || 'Could not load history'
+}
 
 export function useHistoryEvents(apiPath) {
-  const pushToast = useAppStore((s) => s.pushToast)
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true)
+    setError(null)
     return apiFetch(apiPath)
-      .then((r) => setEvents(r.events ?? []))
-      .catch((e) => pushToast({ tone: 'danger', title: 'Could not load history', body: e.message }))
+      .then((r) => {
+        setEvents(r.events ?? [])
+      })
+      .catch((e) => {
+        setEvents([])
+        setError(historyErrorMessage(e))
+      })
       .finally(() => setLoading(false))
-  }
-
-  useEffect(() => {
-    load()
   }, [apiPath])
 
-  return { events, loading, reload: load }
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+    apiFetch(apiPath)
+      .then((r) => {
+        if (cancelled) return
+        setEvents(r.events ?? [])
+      })
+      .catch((e) => {
+        if (cancelled) return
+        setEvents([])
+        setError(historyErrorMessage(e))
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [apiPath])
+
+  return { events, loading, error, reload: load }
 }
