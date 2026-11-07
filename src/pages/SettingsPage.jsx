@@ -141,16 +141,12 @@ function EmailSettings() {
 function JobTriggerSettings() {
   const pushToast = useAppStore((s) => s.pushToast)
   const [triggers, setTriggers] = useState([])
-  const [runner, setRunner] = useState('off')
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(EMPTY_JOB)
 
   const load = () =>
     apiFetch('/api/settings/job-triggers')
-      .then((data) => {
-        setTriggers(data.triggers)
-        setRunner(data.runner)
-      })
+      .then((data) => setTriggers(data.triggers))
       .catch((err) => pushToast({ tone: 'danger', title: 'Could not load job triggers', body: err.message }))
 
   useEffect(() => {
@@ -185,7 +181,6 @@ function JobTriggerSettings() {
   return (
     <Panel
       title="Job triggers"
-      description={runner === 'bullmq' ? 'BullMQ is running these jobs.' : 'Saved in PostgreSQL. Start Redis to run them.'}
       actions={<Button variant="primary" size="sm" onClick={() => setOpen(true)}><Plus size={13} /> New trigger</Button>}
       bodyClassName="p-0"
     >
