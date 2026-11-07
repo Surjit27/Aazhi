@@ -14,6 +14,15 @@ function Bootstrap() {
   useEffect(() => {
     bootstrap().finally(() => loadClientFlags())
   }, [bootstrap, loadClientFlags])
+
+  useEffect(() => {
+    const onFocus = () => loadClientFlags()
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') loadClientFlags()
+    })
+    return () => window.removeEventListener('focus', onFocus)
+  }, [loadClientFlags])
   return <App />
 }
 

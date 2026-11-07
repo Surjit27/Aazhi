@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Braces, Search } from 'lucide-react'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 import { ADMIN_NAV, CLIENT_NAV } from '../../routes/index.jsx'
+import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
 import useClickOutside from '../../hooks/useClickOutside.js'
 
 export default function GlobalSearch() {
@@ -12,10 +13,12 @@ export default function GlobalSearch() {
   const ref = useClickOutside(() => setOpen(false), open)
   const portal = getPortal()
   const isAdminPortal = portal === PORTAL.ADMIN
+  const flags = useFeatureFlagsStore((s) => s.flags)
+  const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
 
   const index = useMemo(
     () =>
-      (isAdminPortal ? ADMIN_NAV : CLIENT_NAV).map((item) => ({
+      (isAdminPortal ? ADMIN_NAV : CLIENT_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))).map((item) => ({
         key: item.to,
         label: item.label,
         detail: isAdminPortal ? 'Admin console' : 'Client workspace',
@@ -23,7 +26,7 @@ export default function GlobalSearch() {
         to: item.to,
         icon: item.icon,
       })),
-    [isAdminPortal],
+    [isAdminPortal, flags, isNavEnabled],
   )
 
   const results = useMemo(() => {

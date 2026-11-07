@@ -5,9 +5,11 @@ import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
 
 export default function ClientFeatureGate() {
   const pathname = useLocation().pathname
+  const flags = useFeatureFlagsStore((s) => s.flags)
   const loaded = useFeatureFlagsStore((s) => s.loaded)
   const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
   const firstEnabledClientPath = useFeatureFlagsStore((s) => s.firstEnabledClientPath)
+  void flags
 
   if (getPortal() !== PORTAL.CLIENT) {
     return <Outlet />

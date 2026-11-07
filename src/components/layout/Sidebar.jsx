@@ -82,7 +82,11 @@ function AdminSidebarNav({ onNavigate }) {
 }
 
 function ClientSidebarNav({ onNavigate }) {
+  const flags = useFeatureFlagsStore((s) => s.flags)
+  const flagsLoaded = useFeatureFlagsStore((s) => s.loaded)
   const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
+  void flags
+  void flagsLoaded
   const nested = useMatch('/backends/:backendId/*')
   const root = useMatch('/backends/:backendId')
   const backendId = nested?.params?.backendId ?? root?.params?.backendId
