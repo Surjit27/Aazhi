@@ -17,13 +17,7 @@ const SPARK_POINTS = {
 function Sparkline({ tone = 'primary' }) {
   const points = SPARK_POINTS[tone] ?? SPARK_POINTS.primary
   return (
-    <svg viewBox="0 0 64 32" className="h-8 w-full" aria-hidden>
-      <defs>
-        <linearGradient id={`spark-fill-${tone}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#4F86F7" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#4F86F7" stopOpacity="0" />
-        </linearGradient>
-      </defs>
+    <svg viewBox="0 0 64 32" className="h-9 w-full" aria-hidden>
       <polyline
         fill="none"
         stroke="#4F86F7"
@@ -42,31 +36,23 @@ export default function StatCard({ label, value, hint, icon: Icon, tone = 'prima
   const trendClass = trendUp ? 'text-success-700' : 'text-danger-700'
 
   return (
-    <div className="glass-card p-4 transition-shadow hover:shadow-pop">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          {Icon && (
-            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconClass}`}>
-              <Icon size={18} strokeWidth={1.75} />
-            </div>
-          )}
-          <div className="min-w-0">
-            <p className="text-xs font-medium text-ink-muted">{label}</p>
-            <p className="mt-0.5 text-2xl font-semibold text-ink tabular-nums leading-8">{value}</p>
-            {typeof trend === 'number' && (
-              <p className={`mt-0.5 text-xs font-medium tabular-nums ${trendClass}`}>
-                {trendUp ? '+' : ''}
-                {trend}%
-                {trendLabel && <span className="ml-1 font-normal text-ink-subtle">{trendLabel}</span>}
-              </p>
-            )}
-            {hint && typeof trend !== 'number' && (
-              <p className="mt-0.5 truncate text-[11px] text-ink-subtle">{hint}</p>
-            )}
-          </div>
+    <div className="glass-card relative p-5 transition-shadow hover:shadow-pop">
+      {Icon && (
+        <div className={`absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full ${iconClass}`}>
+          <Icon size={18} strokeWidth={1.75} />
         </div>
-      </div>
-      <div className="mt-3 border-t border-line/60 pt-2">
+      )}
+      <p className="pr-12 text-sm font-medium text-ink-muted">{label}</p>
+      <p className="mt-1 text-[26px] font-semibold leading-8 text-ink tabular-nums">{value}</p>
+      {typeof trend === 'number' && (
+        <p className={`mt-0.5 text-xs font-medium tabular-nums ${trendClass}`}>
+          {trendUp ? '+' : ''}
+          {trend}%
+          {trendLabel && <span className="ml-1 font-normal text-ink-subtle">{trendLabel}</span>}
+        </p>
+      )}
+      {hint && typeof trend !== 'number' && <p className="mt-0.5 text-xs text-ink-subtle">{hint}</p>}
+      <div className="mt-4 border-t border-line/70 pt-3">
         <Sparkline tone={tone} />
       </div>
     </div>

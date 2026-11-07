@@ -37,8 +37,8 @@
   --color-cyan-500: #22A8C9;
   --color-cyan-800: #0D6E85;
 
-  --color-canvas: #E9EDF6;
-  --color-sidebar: #F3F5F9;
+  --color-canvas: #F3F5F8;
+  --color-sidebar: #FFFFFF;
   --color-surface: #F7F8FA;
   --color-line: #E2E6EE;
   --color-ink: #1A2332;
@@ -83,11 +83,8 @@
 
   .bg-app-canvas {
     background-color: var(--color-canvas);
-    background-image:
-      radial-gradient(ellipse 120% 80% at 10% -20%, rgba(79, 134, 247, 0.12), transparent 50%),
-      radial-gradient(ellipse 90% 60% at 95% 0%, rgba(124, 92, 252, 0.08), transparent 45%),
-      radial-gradient(circle at 1px 1px, rgba(120, 130, 150, 0.22) 1px, transparent 0);
-    background-size: auto, auto, 22px 22px;
+    background-image: radial-gradient(circle at 1px 1px, rgba(148, 158, 175, 0.18) 1px, transparent 0);
+    background-size: 24px 24px;
   }
 
   .bg-sidebar {
@@ -102,10 +99,10 @@
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.78);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 230, 238, 0.95);
     box-shadow: var(--shadow-card);
     border-radius: var(--radius-card);
   }

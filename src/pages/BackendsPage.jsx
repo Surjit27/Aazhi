@@ -67,7 +67,7 @@ export default function BackendsPage() {
       <PageHeader
         title="Backends"
         description="Configure services from Git, then reverse-engineer routes, code and workflows per backend."
-        breadcrumbs={['Aazhi', 'Dashboards', 'Backends']}
+        breadcrumbs={['deepe', 'Dashboards', 'Backends']}
         actions={
           <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={14} /> Add backend
@@ -191,7 +191,7 @@ export default function BackendsPage() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         title="Add backend"
-        description="Connect a repository (GitHub, GitLab or Bitbucket). Preflight will index it for exploration."
+        description="Connect a repository (GitHub, GitLab or Bitbucket). deepe will index it for exploration."
         width="max-w-xl"
         footer={
           <>

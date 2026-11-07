@@ -1,6 +1,7 @@
 import { NavLink, useMatch, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { ChevronDown, Database, FolderTree, Workflow } from 'lucide-react'
+import { BRAND_NAME, BrandIcon } from '../ui/Brand.jsx'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
 import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
@@ -135,16 +136,14 @@ export default function Sidebar({ open, onNavigate }) {
 
   return (
     <aside
-      className={`bg-sidebar fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-line/90 transition-transform duration-200 md:static md:translate-x-0 ${
+      className={`bg-sidebar fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-line shadow-[4px_0_24px_rgba(22,35,58,0.04)] transition-transform duration-200 md:static md:translate-x-0 ${
         open ? 'translate-x-0 shadow-pop' : '-translate-x-full'
       }`}
     >
-      <div className="flex h-14 items-center gap-2.5 border-b border-line/80 bg-white/50 px-4 backdrop-blur-sm">
-        <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-primary-600 text-white shadow-sm">
-          <Database size={15} />
-        </div>
+      <div className="flex h-14 items-center gap-2.5 border-b border-line/80 bg-white px-4">
+        <BrandIcon size={38} className="shrink-0" alt={`${BRAND_NAME} logo`} />
         <div className="min-w-0">
-          <span className="block truncate text-sm font-semibold text-ink">Aazhi</span>
+          <span className="block truncate text-sm font-semibold tracking-tight text-ink">{BRAND_NAME}</span>
           <span className="block truncate text-[10px] text-ink-subtle">
             {isAdminConsole ? 'Admin' : 'Client'} · {isAdminConsole ? 'admin.localhost' : 'localhost'}
           </span>
