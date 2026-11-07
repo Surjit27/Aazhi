@@ -38,16 +38,17 @@ export const useFeatureFlagsStore = create((set, get) => ({
     const { loaded, byPath, flags } = get()
     if (!loaded) return true
 
-    if (path) {
-      if (byPath[path] !== undefined) return byPath[path]
-      const match = Object.keys(byPath).find((base) => path === base || path.startsWith(`${base}/`))
-      if (match) return byPath[match]
-    }
-
     if (flagKey) {
       const row = flags.find((f) => f.key === flagKey)
-      if (row) return row.enabled
+      if (row) {
+        if (row.navPath && path && row.navPath === path && byPath[row.navPath] !== undefined) {
+          return byPath[row.navPath]
+        }
+        return row.enabled !== false
+      }
     }
+
+    if (path && byPath[path] !== undefined) return byPath[path]
 
     return true
   },

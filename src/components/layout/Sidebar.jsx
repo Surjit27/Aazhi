@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { BRAND_NAME, BrandIcon } from '../ui/Brand.jsx'
 import { getPortal, PORTAL } from '../../lib/portal.js'
@@ -99,7 +99,7 @@ function ClientSidebarNav({ onNavigate }) {
 
   const dashboard = CLIENT_NAV.find((item) => item.to === '/dashboard')
   const projects = CLIENT_NAV.find((item) => item.to === '/projects')
-  const pageItems = CLIENT_PAGES_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+  const pageItems = CLIENT_PAGES_NAV.filter((item) => item.alwaysShow || isNavEnabled(item.to, item.flagKey))
   const deepItems = CLIENT_DEEP_BACKEND_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
   const accessItems = CLIENT_ACCESS_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
   const historyItems = CLIENT_HISTORY_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
@@ -110,6 +110,12 @@ function ClientSidebarNav({ onNavigate }) {
   const [deepOpen, setDeepOpen] = useState(deepOpenByRoute)
   const [accessOpen, setAccessOpen] = useState(accessOpenByRoute)
   const [historyOpen, setHistoryOpen] = useState(historyOpenByRoute)
+
+  useEffect(() => {
+    if (deepOpenByRoute) setDeepOpen(true)
+    if (accessOpenByRoute) setAccessOpen(true)
+    if (historyOpenByRoute) setHistoryOpen(true)
+  }, [deepOpenByRoute, accessOpenByRoute, historyOpenByRoute])
 
   return (
     <>
@@ -154,13 +160,17 @@ function ClientSidebarNav({ onNavigate }) {
         ))}
       </NavSection>
 
-      <p className="mt-3 px-3 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Pages</p>
-      {pageItems.map(({ to, label, icon: Icon }) => (
-        <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
-          <Icon size={16} strokeWidth={1.75} />
-          <span className="truncate">{label}</span>
-        </NavLink>
-      ))}
+      {pageItems.length > 0 && (
+        <>
+          <p className="mt-3 px-3 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Pages</p>
+          {pageItems.map(({ to, label, icon: Icon }) => (
+            <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
+              <Icon size={16} strokeWidth={1.75} />
+              <span className="truncate">{label}</span>
+            </NavLink>
+          ))}
+        </>
+      )}
     </>
   )
 }

@@ -32,6 +32,7 @@ import AdminFeatureFlagsPage from '../pages/admin/AdminFeatureFlagsPage.jsx'
 import ClientAccessPage from '../pages/client/ClientAccessPage.jsx'
 import ClientAccessRolesPage from '../pages/client/ClientAccessRolesPage.jsx'
 import ClientAccessUsersPage from '../pages/client/ClientAccessUsersPage.jsx'
+import ClientGitHubConnectPage from '../pages/client/ClientGitHubConnectPage.jsx'
 import ClientUserHistoryPage from '../pages/client/ClientUserHistoryPage.jsx'
 import ClientEmailHistoryPage from '../pages/client/ClientEmailHistoryPage.jsx'
 import ClientJobHistoryPage from '../pages/client/ClientJobHistoryPage.jsx'
@@ -97,7 +98,8 @@ export function ClientPortalRoutes() {
       <Route path="backends/mocks" element={<MockServersPage />} />
       <Route path="backends/injection" element={<DataInjectionPage />} />
       <Route path="backends/monitor" element={<ExecutionMonitorPage />} />
-      <Route path="backends/git" element={<GitIntegrationPage />} />
+      <Route path="integrations/github" element={<ClientGitHubConnectPage />} />
+      <Route path="backends/git" element={<Navigate to="/integrations/github" replace />} />
       <Route path="backends/assistant" element={<AIAssistantPage />} />
       <Route path="mocks" element={<Navigate to="/backends/mocks" replace />} />
       <Route path="scheduler" element={<Navigate to="/jobs" replace />} />

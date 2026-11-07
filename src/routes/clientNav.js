@@ -4,6 +4,7 @@ import {
   CalendarClock,
   FolderKanban,
   FolderTree,
+  GitBranch,
   History,
   LayoutDashboard,
   Mail,
@@ -19,29 +20,36 @@ export const CLIENT_DEEP_BACKEND_NAV = [
     to: '/deep/explorer',
     label: 'Backend Explorer',
     icon: FolderTree,
-    flagKey: 'client.backends',
+    flagKey: 'client.account',
     keywords: 'backend explorer architecture discovery connect',
   },
   {
     to: '/deep/scheduler',
     label: 'Event Scheduler',
     icon: Calendar,
-    flagKey: 'client.scheduler',
+    flagKey: 'client.account',
     keywords: 'event scheduler cron trigger',
   },
   {
     to: '/deep/flow-studio',
     label: 'Flow Studio',
     icon: Workflow,
-    flagKey: 'client.backends',
+    flagKey: 'client.account',
     keywords: 'flow studio execution flow visual',
   },
   {
     to: '/deep/executions',
     label: 'Execution Activity',
     icon: Activity,
-    flagKey: 'client.monitor',
+    flagKey: 'client.account',
     keywords: 'execution activity trace replay',
+  },
+  {
+    to: '/integrations/github',
+    label: 'GitHub connections',
+    icon: GitBranch,
+    flagKey: 'client.account',
+    keywords: 'github oauth token private repository',
   },
 ]
 
@@ -76,26 +84,27 @@ export const CLIENT_HISTORY_NAV = [
     to: '/history/jobs',
     label: 'Job history',
     icon: CalendarClock,
-    flagKey: 'client.scheduler',
-    keywords: 'history jobs scheduler',
+    flagKey: 'client.account',
+    keywords: 'history jobs activity',
+  },
+  {
+    to: '/jobs',
+    label: 'Scheduled jobs',
+    icon: Calendar,
+    flagKey: 'client.account',
+    keywords: 'jobs listing triggers schedule bullmq',
   },
 ]
 
-/** Pages section (admin parity): Jobs + Settings. */
+/** Pages section — Settings stays visible even if feature flags hide other client paths. */
 export const CLIENT_PAGES_NAV = [
-  {
-    to: '/jobs',
-    label: 'Jobs',
-    icon: Calendar,
-    flagKey: 'client.scheduler',
-    keywords: 'jobs triggers schedule bullmq',
-  },
   {
     to: '/settings',
     label: 'Settings',
     icon: Settings,
     flagKey: 'client.settings',
-    keywords: 'settings preferences email',
+    alwaysShow: true,
+    keywords: 'settings preferences account',
   },
 ]
 
@@ -105,14 +114,14 @@ export const CLIENT_NAV = [
     label: 'Dashboard',
     icon: LayoutDashboard,
     end: true,
-    flagKey: 'client.backends',
+    flagKey: 'client.account',
     keywords: 'dashboard overview',
   },
   {
     to: '/projects',
     label: 'Projects',
     icon: FolderKanban,
-    flagKey: 'client.backends',
+    flagKey: 'client.account',
     keywords: 'projects workspace',
   },
   ...CLIENT_DEEP_BACKEND_NAV,

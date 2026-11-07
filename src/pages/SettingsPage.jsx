@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { PageHeader, Panel } from '../components/ui/Panel.jsx'
 import Button from '../components/ui/Button.jsx'
 import Switch from '../components/ui/Switch.jsx'
 import { Field, Input } from '../components/ui/FormControls.jsx'
 import { apiFetch } from '../lib/api.js'
-import { getPortal, PORTAL } from '../lib/portal.js'
+import { clientAppOrigin, getPortal, PORTAL } from '../lib/portal.js'
 import { useAppStore } from '../stores/appStore.js'
+import { useAuthStore } from '../stores/authStore.js'
 
 const EMAIL_TABS = [
   { id: 'configuration', label: 'Configuration' },
@@ -21,7 +23,46 @@ const EMPTY_EMAIL = {
   apiKeySource: 'none',
 }
 
+function ClientSettingsPage() {
+  const user = useAuthStore((s) => s.user)
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <PageHeader
+        title="Settings"
+        description="Workspace preferences on the client portal."
+        breadcrumbs={['deepe', 'Pages', 'Settings']}
+      />
+      <div className="flex flex-col gap-6 px-6 pb-10">
+        <Panel title="Your account">
+          <div className="grid gap-4 p-5 sm:grid-cols-2">
+            <div className="glass-inset p-4">
+              <p className="text-xs font-medium text-ink-muted">Signed in as</p>
+              <p className="mt-1 text-sm font-semibold text-ink">{user?.displayName || '—'}</p>
+              <p className="text-xs text-ink-muted">{user?.email || '—'}</p>
+              <p className="mt-2 text-xs text-ink-muted">
+                Access role: {user?.accessRoleKey === 'super_admin' ? 'Super admin' : user?.accessRoleKey || 'Member'}
+              </p>
+            </div>
+            <div className="glass-inset p-4">
+              <p className="text-xs font-medium text-ink-muted">Client portal</p>
+              <p className="mt-1 font-mono text-xs text-ink">{clientAppOrigin().replace(/^https?:\/\//, '')}</p>
+              <Link to="/account" className="mt-3 inline-block text-xs font-medium text-primary-600 hover:underline">
+                Open full account view →
+              </Link>
+            </div>
+          </div>
+        </Panel>
+      </div>
+    </div>
+  )
+}
+
 export default function SettingsPage() {
+  if (getPortal() === PORTAL.CLIENT) {
+    return <ClientSettingsPage />
+  }
+
   if (getPortal() !== PORTAL.ADMIN) {
     return (
       <div className="flex min-h-0 flex-1 flex-col">
