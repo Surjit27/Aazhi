@@ -44,14 +44,13 @@ export function roleForPortal(portal) {
 }
 
 export function homePathForPortal(portal = getPortal()) {
-  return portal === PORTAL.ADMIN ? '/overview' : '/mocks'
+  return portal === PORTAL.ADMIN ? '/overview' : '/dashboard'
 }
 
 /** Client hostname must not render admin screens or the orders service. */
 export function isClientBlockedPath(pathname) {
   const path = pathname.replace(/\/+$/, '') || '/'
-  if (path === '/overview' || path === '/roles') return true
-  if (path === '/admin' || path.startsWith('/admin/')) return true
+  if (path === '/overview') return true
   if (path === '/backends/orders' || path.startsWith('/backends/orders/')) return true
   return false
 }

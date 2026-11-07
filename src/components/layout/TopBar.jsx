@@ -114,7 +114,7 @@ function NotificationsButton({ unread }) {
                   onClick={() => {
                     markRead(n.id)
                     setOpen(false)
-                    navigate(n.tone === 'danger' ? '/scheduler' : '/monitor')
+                    navigate(n.tone === 'danger' ? '/backends/events' : '/backends/monitor')
                   }}
                   className={`flex w-full cursor-pointer gap-3 px-3.5 py-3 text-left hover:bg-surface ${n.read ? '' : 'bg-primary-50/50'}`}
                 >

@@ -67,7 +67,7 @@ export default function BackendsPage() {
       <PageHeader
         title="Backends"
         description="Configure services from Git, then reverse-engineer routes, code and workflows per backend."
-        breadcrumbs={['deepe', 'Dashboards', 'Backends']}
+        breadcrumbs={['deepe', 'Backends', 'Registry']}
         actions={
           <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={14} /> Add backend
