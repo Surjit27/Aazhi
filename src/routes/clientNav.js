@@ -6,6 +6,7 @@ import {
   FolderTree,
   GitBranch,
   Network,
+  LayoutGrid,
   History,
   LayoutDashboard,
   Mail,
@@ -29,6 +30,13 @@ export const CLIENT_DEEP_BACKEND_NAV = [
     icon: Network,
     flagKey: 'client.account',
     keywords: 'orchestration airflow simulation data pipeline',
+  },
+  {
+    to: '/deep/pager',
+    label: 'Pager',
+    icon: LayoutGrid,
+    flagKey: 'client.account',
+    keywords: 'pager n8n workflow host webhook ai automation',
   },
   {
     to: '/deep/scheduler',
