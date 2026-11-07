@@ -16,7 +16,11 @@ export default function Tabs({ tabs, value, onChange, className = '' }) {
             {tab.icon}
             {tab.label}
             {tab.count != null && (
-              <span className={`rounded px-1.5 text-[11px] ${active ? 'bg-primary-50 text-primary-700' : 'bg-surface text-ink-muted'}`}>
+              <span
+                className={`rounded px-1.5 text-[11px] tabular-nums ${
+                  active ? 'bg-primary-50 text-primary-700' : 'bg-surface text-ink-muted'
+                }`}
+              >
                 {tab.count}
               </span>
             )}

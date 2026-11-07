@@ -12,8 +12,7 @@ const KIND_TONE = {
   utility: 'neutral',
 }
 
-export const thClass = 'px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted'
-export const tdClass = 'px-3 py-2 align-middle text-[13px] text-ink'
+export { thClass, tdClass } from '../../components/ui/DataTable.jsx'
 
 export function dependentsOf(name, backendFunctions) {
   return backendFunctions.filter((f) => f.deps.includes(name))

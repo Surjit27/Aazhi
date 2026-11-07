@@ -26,7 +26,7 @@ import {
 import { useAppStore } from '../stores/appStore.js'
 import { formatDateTime, relativeTime } from '../utils/format.js'
 import { NOW_MS } from '../data/executions.js'
-import { thClass, tdClass } from '../features/explorer/ExplorerInsights.jsx'
+import DataTable from '../components/ui/DataTable.jsx'
 
 const STATUS_TONE = { indexed: 'success', pending: 'warning', error: 'danger' }
 
@@ -67,6 +67,7 @@ export default function BackendsPage() {
       <PageHeader
         title="Backends"
         description="Configure services from Git, then reverse-engineer routes, code and workflows per backend."
+        breadcrumbs={['deepe', 'Dashboards', 'Backends']}
         actions={
           <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={14} /> Add backend
@@ -74,18 +75,22 @@ export default function BackendsPage() {
         }
       />
 
-      <div className="flex flex-col gap-4 p-4 md:p-6">
+      <div className="flex flex-col gap-6 px-6 pb-8">
         <div className="relative max-w-md">
           <Search size={14} className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-ink-subtle" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name, repo or stack"
-            className="h-9 w-full rounded-md border border-line bg-white pr-3 pl-8 text-[13px] focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-50"
+            className="glass-inset h-9 w-full pr-3 pl-8 text-[13px] focus:border-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-50"
           />
         </div>
 
-        <Panel title="Configured backends" description={`${filtered.length} service${filtered.length === 1 ? '' : 's'}`} bodyClassName="p-0">
+        <Panel
+          title="Configured backends"
+          description={`${filtered.length} service${filtered.length === 1 ? '' : 's'}`}
+          bodyClassName="p-0"
+        >
           {filtered.length === 0 ? (
             <EmptyState
               icon={Layers}
@@ -98,71 +103,78 @@ export default function BackendsPage() {
               }
             />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[880px] border-collapse">
-                <thead className="bg-surface">
-                  <tr className="border-b border-line">
-                    <th className={thClass}>Service</th>
-                    <th className={thClass}>Architecture</th>
-                    <th className={thClass}>Repository</th>
-                    <th className={thClass}>Branch</th>
-                    <th className={thClass}>Index</th>
-                    <th className={`${thClass} text-right`}>Routes</th>
-                    <th className={`${thClass} text-right`}>Functions</th>
-                    <th className={thClass}>Last sync</th>
-                    <th className={`${thClass} text-right`} />
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line">
-                  {filtered.map((b) => (
-                    <tr
-                      key={b.id}
-                      onClick={() => navigate(backendBasePath(b.id))}
-                      className="cursor-pointer transition-colors hover:bg-primary-50/40"
-                    >
-                      <td className={tdClass}>
-                        <p className="font-medium text-ink">{b.name}</p>
-                        <p className="text-xs text-ink-muted">{b.description}</p>
-                      </td>
-                      <td className={tdClass}>
-                        <Badge tone="neutral">{architectureLabel(b.architecture)}</Badge>
-                      </td>
-                      <td className={tdClass}>
-                        <span className="inline-flex items-center gap-1.5 font-mono text-xs text-ink">
-                          <FolderGit2 size={12} className="text-ink-subtle" />
-                          {gitProviderLabel(b.git.provider)} · {b.git.repository}
-                        </span>
-                      </td>
-                      <td className={tdClass}>
-                        <span className="inline-flex items-center gap-1 text-xs text-ink-muted">
-                          <GitBranch size={12} /> {b.git.branch}
-                        </span>
-                      </td>
-                      <td className={tdClass}>
-                        <Badge tone={STATUS_TONE[b.status] ?? 'neutral'}>{b.status}</Badge>
-                      </td>
-                      <td className={`${tdClass} text-right tabular-nums`}>{b.stats.routes}</td>
-                      <td className={`${tdClass} text-right tabular-nums`}>{b.stats.functions}</td>
-                      <td className={`${tdClass} text-xs text-ink-muted`}>
-                        {b.git.lastSyncAt ? relativeTime(b.git.lastSyncAt, NOW_MS) : 'Not synced'}
-                      </td>
-                      <td className={`${tdClass} text-right`}>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            navigate(backendBasePath(b.id))
-                          }}
-                        >
-                          Open <ArrowRight size={12} />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable.Root minWidth={880} aria-label="Configured backends">
+              <DataTable.Scroll>
+                <DataTable.Table>
+                  <DataTable.Head sticky={false}>
+                    <DataTable.Th>Service</DataTable.Th>
+                    <DataTable.Th>Architecture</DataTable.Th>
+                    <DataTable.Th>Repository</DataTable.Th>
+                    <DataTable.Th>Branch</DataTable.Th>
+                    <DataTable.Th>Index</DataTable.Th>
+                    <DataTable.Th align="right">Routes</DataTable.Th>
+                    <DataTable.Th align="right">Functions</DataTable.Th>
+                    <DataTable.Th>Last sync</DataTable.Th>
+                    <DataTable.Th align="right">
+                      <span className="sr-only">Actions</span>
+                    </DataTable.Th>
+                  </DataTable.Head>
+                  <DataTable.Body>
+                    {filtered.map((b) => (
+                      <DataTable.Row key={b.id} onClick={() => navigate(backendBasePath(b.id))}>
+                        <DataTable.Td>
+                          <p className="font-medium text-ink">{b.name}</p>
+                          <p className="text-xs text-ink-muted">{b.description}</p>
+                        </DataTable.Td>
+                        <DataTable.Td>
+                          <Badge tone="neutral">{architectureLabel(b.architecture)}</Badge>
+                        </DataTable.Td>
+                        <DataTable.Td>
+                          <span className="inline-flex items-center gap-1.5 font-mono text-xs text-ink">
+                            <FolderGit2 size={12} className="text-ink-subtle" />
+                            {gitProviderLabel(b.git.provider)} · {b.git.repository}
+                          </span>
+                        </DataTable.Td>
+                        <DataTable.Td>
+                          <span className="inline-flex items-center gap-1 text-xs text-ink-muted">
+                            <GitBranch size={12} /> {b.git.branch}
+                          </span>
+                        </DataTable.Td>
+                        <DataTable.Td>
+                          <Badge tone={STATUS_TONE[b.status] ?? 'neutral'}>{b.status}</Badge>
+                        </DataTable.Td>
+                        <DataTable.Td align="right" className="tabular-nums">
+                          {b.stats.routes}
+                        </DataTable.Td>
+                        <DataTable.Td align="right" className="tabular-nums">
+                          {b.stats.functions}
+                        </DataTable.Td>
+                        <DataTable.Td className="text-xs text-ink-muted">
+                          {b.git.lastSyncAt ? relativeTime(b.git.lastSyncAt, NOW_MS) : 'Not synced'}
+                        </DataTable.Td>
+                        <DataTable.Td align="right">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(backendBasePath(b.id))
+                            }}
+                          >
+                            Open <ArrowRight size={12} />
+                          </Button>
+                        </DataTable.Td>
+                      </DataTable.Row>
+                    ))}
+                  </DataTable.Body>
+                </DataTable.Table>
+              </DataTable.Scroll>
+              <DataTable.FooterBar>
+                <span className="font-medium tabular-nums">
+                  {filtered.length} service{filtered.length === 1 ? '' : 's'}
+                </span>
+              </DataTable.FooterBar>
+            </DataTable.Root>
           )}
         </Panel>
 
@@ -179,7 +191,7 @@ export default function BackendsPage() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         title="Add backend"
-        description="Connect a repository (GitHub, GitLab or Bitbucket). Preflight will index it for exploration."
+        description="Connect a repository (GitHub, GitLab or Bitbucket). deepe will index it for exploration."
         width="max-w-xl"
         footer={
           <>

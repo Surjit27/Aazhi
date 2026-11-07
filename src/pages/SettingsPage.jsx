@@ -123,7 +123,7 @@ function EmailConfigurationTab() {
         <Input type="email" value={form.fromEmail} onChange={set('fromEmail')} placeholder="noreply@example.com" required={form.enabled} />
       </Field>
       <Field label="From name">
-        <Input value={form.fromName} onChange={set('fromName')} placeholder="Aazhi" />
+        <Input value={form.fromName} onChange={set('fromName')} placeholder="deepe" />
       </Field>
       <div className="flex justify-end">
         <Button type="submit" variant="primary" disabled={saving}>
