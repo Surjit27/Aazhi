@@ -6,8 +6,26 @@ import {
   MOCK_CONNECTED_BACKENDS,
 } from '../data/deepBackend.js'
 
+function normalizeBackend(b) {
+  return {
+    id: b.id,
+    credentialId: b.credentialId ?? null,
+    githubRepoId: b.githubRepoId ?? null,
+    name: b.name,
+    repo: b.repo,
+    branch: b.branch || 'main',
+    framework: b.framework || '—',
+    status: b.status || 'idle',
+    stats: b.stats ?? null,
+    discoveredAt: b.discoveredAt ?? null,
+    htmlUrl: b.htmlUrl ?? null,
+    private: b.private ?? false,
+  }
+}
+
 export const useDeepExplorerStore = create((set, get) => ({
   backends: [...MOCK_CONNECTED_BACKENDS],
+  backendsLoading: false,
   activeBackendId: MOCK_CONNECTED_BACKENDS[0]?.id ?? null,
   phase: 'home',
   discoveryStep: 0,
@@ -64,6 +82,24 @@ export const useDeepExplorerStore = create((set, get) => ({
 
   openConnect: () => set({ phase: 'connect' }),
   cancelConnect: () => set({ phase: 'home' }),
+
+  setBackendsFromApi: (items) => {
+    const prev = get().backends
+    const discoveryByKey = new Map(
+      prev
+        .filter((b) => b.status === 'discovered' && b.stats)
+        .map((b) => [`${b.repo}:${b.branch}`, { status: b.status, stats: b.stats, discoveredAt: b.discoveredAt }]),
+    )
+    const merged = (items ?? []).map((raw) => {
+      const b = normalizeBackend(raw)
+      const overlay = discoveryByKey.get(`${b.repo}:${b.branch}`)
+      return overlay ? { ...b, ...overlay } : b
+    })
+    set({
+      backends: merged,
+      activeBackendId: merged.some((b) => b.id === get().activeBackendId) ? get().activeBackendId : merged[0]?.id ?? null,
+    })
+  },
 
   addBackend: (payload) => {
     const id = payload.name.toLowerCase().replace(/\s+/g, '-')

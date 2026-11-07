@@ -14,7 +14,7 @@ export default function ExecutionActivityPage() {
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Execution Activity"
-        description="Past and current workflow runs — open a row to replay in Flow Studio."
+        description="Past and current workflow runs — linked to orchestration pipelines and Explorer projects."
         breadcrumbs={['deepe', 'Deep Backend', 'Execution Activity']}
       />
       <div className="p-4 md:p-6">
@@ -36,7 +36,7 @@ export default function ExecutionActivityPage() {
                   <tr
                     key={row.id}
                     className="cursor-pointer hover:bg-primary-50/40"
-                    onClick={() => navigate(`/deep/flow-studio?execution=${encodeURIComponent(row.id)}`)}
+                    onClick={() => navigate(`/deep/orchestration?execution=${encodeURIComponent(row.id)}`)}
                   >
                     <td className={`${tdClass} font-mono text-xs`}>{row.id}</td>
                     <td className={tdClass}>{row.flowName}</td>
