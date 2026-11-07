@@ -13,10 +13,15 @@ const linkClass = ({ isActive }) =>
 
 function AdminSidebarNav({ onNavigate }) {
   const location = useLocation()
-  const accessItems = ADMIN_NAV.filter((item) => item.to !== '/overview' && item.to !== '/settings')
+  const historyItems = ADMIN_NAV.filter((item) => item.to.startsWith('/admin/history/'))
+  const accessItems = ADMIN_NAV.filter(
+    (item) => item.to !== '/overview' && item.to !== '/settings' && !item.to.startsWith('/admin/history/'),
+  )
   const topItems = ADMIN_NAV.filter((item) => item.to === '/overview' || item.to === '/settings')
   const accessOpenByRoute = accessItems.some((item) => location.pathname.startsWith(item.to))
+  const historyOpenByRoute = historyItems.some((item) => location.pathname.startsWith(item.to))
   const [open, setOpen] = useState(accessOpenByRoute)
+  const [historyOpen, setHistoryOpen] = useState(historyOpenByRoute)
 
   return (
     <>
@@ -40,6 +45,23 @@ function AdminSidebarNav({ onNavigate }) {
       </button>
       {open &&
         accessItems.map(({ to, label, icon: Icon }) => (
+          <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
+            <Icon size={16} strokeWidth={1.75} />
+            <span className="truncate">{label}</span>
+          </NavLink>
+        ))}
+
+      <button
+        type="button"
+        onClick={() => setHistoryOpen((v) => !v)}
+        aria-expanded={historyOpen}
+        className="mt-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium text-ink hover:bg-surface"
+      >
+        <ChevronDown size={14} className={`shrink-0 text-ink-subtle transition-transform ${historyOpen ? '' : '-rotate-90'}`} />
+        <span className="truncate">History</span>
+      </button>
+      {historyOpen &&
+        historyItems.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
             <Icon size={16} strokeWidth={1.75} />
             <span className="truncate">{label}</span>
@@ -120,7 +142,7 @@ export default function Sidebar({ open, onNavigate }) {
       </nav>
 
       <div className="border-t border-line p-3 text-[11px] text-ink-subtle">
-        {isAdminConsole ? 'User and role management only' : 'Client workspace — Mock servers is the home page'}
+        {isAdminConsole ? 'Access, history, and settings' : 'Client workspace — Mock servers is the home page'}
       </div>
     </aside>
   )

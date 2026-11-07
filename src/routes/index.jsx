@@ -2,7 +2,10 @@ import { Navigate, Route } from 'react-router-dom'
 import {
   Activity,
   Calendar,
+  CalendarClock,
   GitBranch,
+  History,
+  Mail,
   Layers,
   LayoutDashboard,
   Server,
@@ -31,6 +34,9 @@ import AdminOverviewPage from '../pages/admin/AdminOverviewPage.jsx'
 import AdminRolesPage from '../pages/admin/AdminRolesPage.jsx'
 import ClientUserManagementPage from '../pages/admin/ClientUserManagementPage.jsx'
 import AdminUserManagementPage from '../pages/admin/AdminUserManagementPage.jsx'
+import UserHistoryPage from '../pages/admin/UserHistoryPage.jsx'
+import EmailHistoryPage from '../pages/admin/EmailHistoryPage.jsx'
+import JobHistoryPage from '../pages/admin/JobHistoryPage.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
 
 /** Admin portal sidebar (admin.localhost only). */
@@ -39,6 +45,9 @@ export const ADMIN_NAV = [
   { to: '/roles', label: 'Roles', icon: Shield },
   { to: '/admin/client-users', label: 'Client user management', icon: Users },
   { to: '/admin/admin-users', label: 'Admin user management', icon: UserCog },
+  { to: '/admin/history/users', label: 'User history', icon: History },
+  { to: '/admin/history/emails', label: 'Email history', icon: Mail },
+  { to: '/admin/history/jobs', label: 'Job history', icon: CalendarClock },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
 
@@ -63,6 +72,9 @@ export function AdminPortalRoutes() {
       <Route path="roles" element={<AdminRolesPage />} />
       <Route path="admin/client-users" element={<ClientUserManagementPage />} />
       <Route path="admin/admin-users" element={<AdminUserManagementPage />} />
+      <Route path="admin/history/users" element={<UserHistoryPage />} />
+      <Route path="admin/history/emails" element={<EmailHistoryPage />} />
+      <Route path="admin/history/jobs" element={<JobHistoryPage />} />
       <Route path="admin/users" element={<Navigate to="/admin/client-users" replace />} />
       <Route path="settings" element={<SettingsPage />} />
       <Route path="backends" element={<Navigate to="/overview" replace />} />
