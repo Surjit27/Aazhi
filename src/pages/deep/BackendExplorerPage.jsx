@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
 import { FolderGit2, GitBranch, Upload, Sparkles, CheckCircle2, Circle } from 'lucide-react'
 import Button from '../../components/ui/Button.jsx'
-import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import { Field, Input, Select } from '../../components/ui/FormControls.jsx'
@@ -168,7 +167,10 @@ export default function BackendExplorerPage() {
             <Panel title="Connected backends" bodyClassName="p-0">
               <ul className="divide-y divide-line">
                 {backends.map((b) => (
-                  <li key={b.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+                  <li
+                    key={b.id}
+                    className={`flex flex-wrap items-center justify-between gap-3 p-4 ${activeBackendId === b.id ? 'bg-primary-50/40' : ''}`}
+                  >
                     <div>
                       <p className="text-sm font-semibold text-ink">{b.name}</p>
                       <p className="text-xs text-ink-muted">
@@ -176,16 +178,9 @@ export default function BackendExplorerPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge tone={b.status === 'discovered' ? 'success' : 'warning'}>{b.status}</Badge>
                       <Button
                         size="sm"
-                        variant={activeBackendId === b.id ? 'primary' : 'secondary'}
-                        onClick={() => selectBackend(b.id)}
-                      >
-                        Select
-                      </Button>
-                      <Button
-                        size="sm"
+                        variant="primary"
                         onClick={() => {
                           selectBackend(b.id)
                           startDiscovery()
