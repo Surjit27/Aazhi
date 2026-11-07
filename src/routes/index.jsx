@@ -43,7 +43,6 @@ import ProjectsPage from '../pages/deep/ProjectsPage.jsx'
 import DeepBackendExplorerPage from '../pages/deep/BackendExplorerPage.jsx'
 import DeepEventSchedulerPage from '../pages/deep/DeepEventSchedulerPage.jsx'
 import FlowStudioPage from '../pages/deep/FlowStudioPage.jsx'
-import ExecutionActivityPage from '../pages/deep/ExecutionActivityPage.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
 
 export { CLIENT_NAV, CLIENT_ACCESS_NAV, CLIENT_DEEP_BACKEND_NAV, CLIENT_HISTORY_NAV, CLIENT_PAGES_NAV }
@@ -94,7 +93,7 @@ export function ClientPortalRoutes() {
       <Route path="deep/orchestration" element={<DeepOrchestrationPage />} />
       <Route path="deep/scheduler" element={<DeepEventSchedulerPage />} />
       <Route path="deep/flow-studio" element={<FlowStudioPage />} />
-      <Route path="deep/executions" element={<ExecutionActivityPage />} />
+      <Route path="deep/executions" element={<Navigate to="/deep/orchestration" replace />} />
       <Route path="backends" element={<Navigate to="/dashboard" replace />} />
       <Route path="backends/overview" element={<Navigate to="/dashboard" replace />} />
       <Route path="backends/registry" element={<BackendsPage />} />

@@ -1,5 +1,4 @@
 import {
-  Activity,
   Calendar,
   CalendarClock,
   Cloud,
@@ -37,13 +36,6 @@ export const CLIENT_DEEP_BACKEND_NAV = [
     icon: Calendar,
     flagKey: 'client.account',
     keywords: 'event scheduler cron trigger',
-  },
-  {
-    to: '/deep/executions',
-    label: 'Execution Activity',
-    icon: Activity,
-    flagKey: 'client.account',
-    keywords: 'execution activity trace replay',
   },
   {
     to: '/integrations/github',
