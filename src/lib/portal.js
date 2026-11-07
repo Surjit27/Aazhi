@@ -1,11 +1,13 @@
 /**
- * Two portals, one app build (Ad-portal pattern, simplified):
- * - admin.localhost → admin portal (role must be `admin`)
- * - localhost       → client portal (role must be `client`)
+ * Three surfaces, one app build (Ad-portal pattern, simplified):
+ * - home.localhost   → public marketing home (client sign-in / sign-up)
+ * - client.localhost → client portal (role must be `client`)
+ * - admin.localhost  → admin portal (role must be `admin`)
  */
 import {
   adminAppOrigin,
   clientAppOrigin,
+  homeAppOrigin,
   getAppSurface,
   homePathForRole,
   redirectToAdmin,
@@ -13,6 +15,7 @@ import {
 } from './appHost.js'
 
 export const PORTAL = {
+  HOME: 'home',
   ADMIN: 'admin',
   CLIENT: 'client',
 }
@@ -67,6 +70,7 @@ export function isRoleAllowedOnPortal(role, portal = getPortal()) {
 export {
   adminAppOrigin,
   clientAppOrigin,
+  homeAppOrigin,
   getAppSurface,
   homePathForRole,
   redirectToAdmin,

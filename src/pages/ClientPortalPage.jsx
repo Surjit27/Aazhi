@@ -49,7 +49,7 @@ export default function ClientPortalPage() {
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Account"
-        description="Your client workspace on localhost."
+        description="Your client workspace on client.localhost."
         breadcrumbs={['deepe', 'Workspace', 'Account']}
       />
 
