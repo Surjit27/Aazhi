@@ -5,7 +5,6 @@ import {
   FolderKanban,
   FolderTree,
   GitBranch,
-  Network,
   LayoutGrid,
   History,
   LayoutDashboard,
@@ -23,13 +22,6 @@ export const CLIENT_DEEP_BACKEND_NAV = [
     icon: FolderTree,
     flagKey: 'client.account',
     keywords: 'backend explorer architecture discovery connect',
-  },
-  {
-    to: '/deep/orchestration',
-    label: 'Orchestration',
-    icon: Network,
-    flagKey: 'client.account',
-    keywords: 'orchestration airflow simulation data pipeline',
   },
   {
     to: '/deep/pager',

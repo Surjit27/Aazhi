@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { CLOUD_PROVIDERS } from '../data/orchestration.js'
+import { CLOUD_PROVIDERS } from '../data/cloudProviders.js'
 import { uid } from '../utils/format.js'
 
 const STORAGE_KEY = 'deepe_cloud_profiles_v1'
