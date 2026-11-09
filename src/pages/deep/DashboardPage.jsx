@@ -26,8 +26,8 @@ export default function DashboardPage() {
               <p className="text-xs text-ink-muted">Connect a repo and run Architecture Discovery.</p>
             </Link>
             <Link to="/deep/flow-studio" className="glass-inset rounded-lg p-4 hover:border-primary-100">
-              <p className="text-sm font-semibold text-ink">Flow Studio</p>
-              <p className="text-xs text-ink-muted">Compose Execution Flows from discovered components.</p>
+              <p className="text-sm font-semibold text-ink">Flow playground</p>
+              <p className="text-xs text-ink-muted">2D canvas for repos, files, dependencies, and syntax (link repos in Explorer).</p>
             </Link>
           </div>
         </Panel>

@@ -1,23 +1,20 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bot, GitBranch, Layers, ListTodo, Sparkles, Workflow } from 'lucide-react'
+import { Code2, GitBranch, Layers, ListTodo, Sparkles, Workflow } from 'lucide-react'
 import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import { Field, Input, Select, Textarea } from '../../components/ui/FormControls.jsx'
 import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
-import DeepFlowStudioWorkspace from '../../features/deep/DeepFlowStudioWorkspace.jsx'
-import ArchitectureGraph from '../../features/deep/ArchitectureGraph.jsx'
-import { DISCOVERY_STAGES, TREE_PANEL } from '../../data/deepBackend.js'
+import FlowPlayground from '../../features/codeMap/FlowPlayground.jsx'
+import DeepExplorerCodeWorkspace from '../../features/deep/DeepExplorerCodeWorkspace.jsx'
+import { DISCOVERY_STAGES } from '../../data/deepBackend.js'
 import { useExplorerProjectsStore } from '../../stores/explorerProjectsStore.js'
-import { ReactFlowProvider } from '@xyflow/react'
-
 const TABS = [
   { id: 'overview', label: 'Overview', icon: Layers },
-  { id: 'agent', label: 'Reverse engineer', icon: Bot },
-  { id: 'architecture', label: 'Architecture', icon: Sparkles },
-  { id: 'flows', label: 'Flow Studio', icon: Workflow },
+  { id: 'codebase', label: 'Codebase', icon: Code2 },
+  { id: 'studio', label: 'Flow studio', icon: Workflow },
   { id: 'issues', label: 'Issues', icon: ListTodo },
 ]
 
@@ -53,7 +50,7 @@ export default function BackendExplorerProjectPage({ projectId, connectedRepos }
     setAgentRunning(true)
     setAgentStep(0)
     updateProject(project.id, { agentStatus: 'running' })
-    setTab('agent')
+    setTab('overview')
     let step = 0
     const timer = setInterval(() => {
       step += 1
@@ -62,7 +59,7 @@ export default function BackendExplorerProjectPage({ projectId, connectedRepos }
         clearInterval(timer)
         setAgentRunning(false)
         updateProject(project.id, { agentStatus: 'ready', discoveryComplete: true })
-        setTab('architecture')
+        setTab('studio')
       }
     }, 550)
   }
@@ -161,91 +158,75 @@ export default function BackendExplorerProjectPage({ projectId, connectedRepos }
                 </ul>
               )}
             </Panel>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setTab('codebase')}
+                className="glass-inset cursor-pointer rounded-lg p-4 text-left transition hover:border-primary-100"
+              >
+                <p className="text-sm font-semibold text-ink">Open codebase</p>
+                <p className="mt-1 text-xs text-ink-muted">VS Code-style editor, file tree, terminal, and run tasks in the browser.</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab('studio')}
+                className="glass-inset cursor-pointer rounded-lg p-4 text-left transition hover:border-primary-100"
+              >
+                <p className="text-sm font-semibold text-ink">Flow studio</p>
+                <p className="mt-1 text-xs text-ink-muted">2D playground: repos → files → dependencies → syntax for linked repos.</p>
+              </button>
+            </div>
+
+            <Panel title="Reverse-engineer agent" description="Indexes linked repos for architecture, code map, and flow candidates.">
+              <div className="grid gap-4 p-4 lg:grid-cols-[1fr_280px]">
+                <div>
+                  <p className="mb-3 text-sm text-ink-muted">
+                    Agent scans {repos.length || 'no'} linked {repos.length === 1 ? 'repository' : 'repositories'}.
+                  </p>
+                  <ul className="space-y-2">
+                    {DISCOVERY_STAGES.map((label, idx) => {
+                      const done = !agentRunning && project.discoveryComplete ? true : idx < agentStep
+                      const current = agentRunning && idx === agentStep
+                      return (
+                        <li key={label} className="flex items-center gap-2 text-sm">
+                          <span
+                            className={`h-2 w-2 rounded-full ${done ? 'bg-success-600' : current ? 'bg-primary-500 animate-pulse' : 'bg-line'}`}
+                          />
+                          <span className={done ? 'text-ink' : current ? 'font-medium text-primary-700' : 'text-ink-muted'}>{label}</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+                <div className="glass-inset rounded-lg p-4">
+                  <p className="text-xs font-semibold uppercase text-ink-subtle">AI agent settings (UI)</p>
+                  <dl className="mt-3 space-y-2 text-xs text-ink-muted">
+                    <div className="flex justify-between gap-2">
+                      <dt>Model</dt>
+                      <dd className="font-medium text-ink">Workspace default</dd>
+                    </div>
+                    <div className="flex justify-between gap-2">
+                      <dt>Depth</dt>
+                      <dd className="font-medium text-ink">Standard scan</dd>
+                    </div>
+                    <div className="flex justify-between gap-2">
+                      <dt>Outputs</dt>
+                      <dd className="text-right font-medium text-ink">Graph · flows · issues</dd>
+                    </div>
+                  </dl>
+                  <Button className="mt-4 w-full" size="sm" variant="secondary" disabled>
+                    Configure agent (soon)
+                  </Button>
+                </div>
+              </div>
+            </Panel>
           </>
         )}
 
-        {tab === 'agent' && (
-          <Panel title="Reverse-engineer agent" description="Placeholder pipeline — will call the Python worker to index repos and extract architecture.">
-            <div className="grid gap-4 p-4 lg:grid-cols-[1fr_280px]">
-              <div>
-                <p className="mb-3 text-sm text-ink-muted">
-                  Agent scans {repos.length || 'no'} linked {repos.length === 1 ? 'repository' : 'repositories'} and prepares services, APIs, and execution-flow candidates.
-                </p>
-                <ul className="space-y-2">
-                  {DISCOVERY_STAGES.map((label, idx) => {
-                    const done = !agentRunning && project.discoveryComplete ? true : idx < agentStep
-                    const current = agentRunning && idx === agentStep
-                    return (
-                      <li key={label} className="flex items-center gap-2 text-sm">
-                        <span
-                          className={`h-2 w-2 rounded-full ${done ? 'bg-success-600' : current ? 'bg-primary-500 animate-pulse' : 'bg-line'}`}
-                        />
-                        <span className={done ? 'text-ink' : current ? 'font-medium text-primary-700' : 'text-ink-muted'}>{label}</span>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-              <div className="glass-inset rounded-lg p-4">
-                <p className="text-xs font-semibold uppercase text-ink-subtle">AI agent settings (UI)</p>
-                <dl className="mt-3 space-y-2 text-xs text-ink-muted">
-                  <div className="flex justify-between gap-2">
-                    <dt>Model</dt>
-                    <dd className="font-medium text-ink">Workspace default</dd>
-                  </div>
-                  <div className="flex justify-between gap-2">
-                    <dt>Depth</dt>
-                    <dd className="font-medium text-ink">Standard scan</dd>
-                  </div>
-                  <div className="flex justify-between gap-2">
-                    <dt>Outputs</dt>
-                    <dd className="text-right font-medium text-ink">Graph · flows · issues</dd>
-                  </div>
-                </dl>
-                <Button className="mt-4 w-full" size="sm" variant="secondary" disabled>
-                  Configure agent (soon)
-                </Button>
-              </div>
-            </div>
-          </Panel>
-        )}
+        {tab === 'codebase' && <DeepExplorerCodeWorkspace repos={repos} />}
 
-        {tab === 'architecture' && (
-          <div className="flex min-h-[480px] flex-col overflow-hidden rounded-lg border border-line bg-white">
-            {!project.discoveryComplete ? (
-              <p className="p-6 text-sm text-ink-muted">Run the reverse-engineer agent to generate the architecture graph (mock data shown after first run).</p>
-            ) : (
-              <div className="grid min-h-[480px] flex-1 grid-cols-1 lg:grid-cols-[200px_1fr]">
-                <aside className="hidden border-r border-line bg-surface/50 p-3 lg:block">
-                  {[
-                    ['Services', TREE_PANEL.services],
-                    ['APIs', TREE_PANEL.apis],
-                    ['Functions', TREE_PANEL.functions],
-                    ['Execution Flows', TREE_PANEL.flows],
-                  ].map(([title, items]) => (
-                    <div key={title} className="mb-4">
-                      <p className="mb-1 text-[10px] font-semibold uppercase text-ink-subtle">{title}</p>
-                      <ul className="space-y-0.5">
-                        {items.map((item) => (
-                          <li key={item} className="truncate rounded px-2 py-1 text-xs text-ink-muted">
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </aside>
-                <div className="relative min-h-[360px] min-w-0 flex-1">
-                  <ReactFlowProvider>
-                    <ArchitectureGraph />
-                  </ReactFlowProvider>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {tab === 'flows' && <DeepFlowStudioWorkspace compact showToolbar projectName={project.name} />}
+        {tab === 'studio' && <FlowPlayground linkedRepos={repos} projectName={project.name} />}
 
         {tab === 'issues' && (
           <Panel
