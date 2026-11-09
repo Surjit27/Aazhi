@@ -6,6 +6,7 @@ export default function CodeEditor({
   language = 'javascript',
   readOnly = false,
   height = '100%',
+  theme = 'vs',
   onMount,
   options,
 }) {
@@ -14,7 +15,7 @@ export default function CodeEditor({
       height={height}
       language={language}
       value={value}
-      theme="vs"
+      theme={theme}
       onChange={(next) => onChange?.(next ?? '')}
       onMount={onMount}
       loading={<div className="p-4 text-xs text-ink-muted">Loading editor...</div>}
