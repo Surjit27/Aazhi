@@ -20,10 +20,20 @@ function shortRepoName(repoSlug) {
   return part || repoSlug
 }
 
-/** Map explorer-linked repos to analyzable trees (UI-only until API index exists). */
-export function resolveMappedRepoTrees(linkedRepos) {
+/** Prefer persisted API graphs; fall back to mock index. */
+export function resolveMappedRepoTrees(linkedRepos, apiGraphByRepoId = {}) {
   if (!linkedRepos?.length) return []
   return linkedRepos.map((r, i) => {
+    const apiRoot = apiGraphByRepoId[r.id]
+    if (apiRoot) {
+      return {
+        ...apiRoot,
+        id: apiRoot.id ?? `repo-${r.id}`,
+        kind: 'repo',
+        name: apiRoot.name ?? shortRepoName(r.repo ?? r.fullName ?? ''),
+        path: apiRoot.path ?? (r.repo ?? r.fullName),
+      }
+    }
     const slug = r.repo ?? r.fullName ?? r.name ?? `repo-${r.id}`
     const short = shortRepoName(slug)
     const mock =
@@ -31,7 +41,7 @@ export function resolveMappedRepoTrees(linkedRepos) {
         (m) => slug.includes(m.name) || short === m.name || slug.toLowerCase().includes(m.name.toLowerCase()),
       ) ?? MOCK_CODE_MAP_ROOTS[i % MOCK_CODE_MAP_ROOTS.length]
     const tree = cloneTree(mock)
-    tree.id = `mapped-${r.id ?? i}`
+    tree.id = `repo-${r.id ?? i}`
     tree.kind = 'repo'
     tree.name = short
     tree.path = slug
