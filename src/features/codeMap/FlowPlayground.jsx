@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Minus, Plus, RotateCcw, ZoomIn } from 'lucide-react'
+import { Minus, Plus, RefreshCw, RotateCcw, ZoomIn } from 'lucide-react'
 import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
+import { apiFetch } from '../../lib/api.js'
 import { KIND_STYLES } from './types.js'
 import {
   ZOOM_LAYERS,
@@ -22,7 +23,36 @@ const BOX_TONE = {
 }
 
 export default function FlowPlayground({ linkedRepos = [], projectName }) {
-  const trees = useMemo(() => resolveMappedRepoTrees(linkedRepos), [linkedRepos])
+  const [apiGraphByRepoId, setApiGraphByRepoId] = useState({})
+  const [graphsLoading, setGraphsLoading] = useState(false)
+  const [indexing, setIndexing] = useState(false)
+  const [indexNote, setIndexNote] = useState('')
+
+  const repoIds = useMemo(() => linkedRepos.map((r) => r.id).filter(Boolean), [linkedRepos])
+
+  const loadGraphs = useCallback(() => {
+    if (!repoIds.length) {
+      setApiGraphByRepoId({})
+      return Promise.resolve()
+    }
+    setGraphsLoading(true)
+    return apiFetch(`/api/client/explorer/graphs?ids=${encodeURIComponent(repoIds.join(','))}`)
+      .then((body) => {
+        const next = {}
+        for (const row of body.graphs ?? []) {
+          if (row.graph) next[row.connectedRepoId] = row.graph
+        }
+        setApiGraphByRepoId(next)
+      })
+      .catch(() => setApiGraphByRepoId({}))
+      .finally(() => setGraphsLoading(false))
+  }, [repoIds])
+
+  useEffect(() => {
+    loadGraphs()
+  }, [loadGraphs])
+
+  const trees = useMemo(() => resolveMappedRepoTrees(linkedRepos, apiGraphByRepoId), [linkedRepos, apiGraphByRepoId])
   const [zoomLevel, setZoomLevel] = useState(0)
   const [focusRepoId, setFocusRepoId] = useState(null)
   const [focusFileId, setFocusFileId] = useState(null)
@@ -58,6 +88,26 @@ export default function FlowPlayground({ linkedRepos = [], projectName }) {
   const boxById = useMemo(() => Object.fromEntries(boxes.map((b) => [b.id, b])), [boxes])
 
   const focusRepo = trees.find((t) => t.id === focusRepoId)
+
+  const reindexRepos = async () => {
+    if (!repoIds.length) return
+    setIndexing(true)
+    setIndexNote('')
+    try {
+      let anyAsync = false
+      for (const id of repoIds) {
+        const res = await apiFetch(`/api/client/explorer/repos/${encodeURIComponent(id)}/index`, { method: 'POST' })
+        if (res?.async) anyAsync = true
+      }
+      setIndexNote(anyAsync ? 'Jobs queued — graphs refresh in a few seconds…' : 'Index complete.')
+      await loadGraphs()
+      if (anyAsync) setTimeout(() => loadGraphs(), 4000)
+    } catch (e) {
+      setIndexNote(e?.message ?? 'Indexing failed')
+    } finally {
+      setIndexing(false)
+    }
+  }
 
   const resetView = () => {
     setScale(1)
@@ -157,6 +207,13 @@ export default function FlowPlayground({ linkedRepos = [], projectName }) {
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <Badge tone="neutral">{trees.length} repo{trees.length === 1 ? '' : 's'}</Badge>
+          {graphsLoading ? <span className="text-[10px] text-ink-muted">Loading index…</span> : null}
+          {!graphsLoading && repoIds.length > 0 && Object.keys(apiGraphByRepoId).length === 0 ? (
+            <Badge tone="warning">Mock data — index repos</Badge>
+          ) : null}
+          <Button size="sm" variant="secondary" className="gap-1" disabled={indexing || !repoIds.length} onClick={reindexRepos}>
+            <RefreshCw size={14} className={indexing ? 'animate-spin' : ''} /> Index repos
+          </Button>
           <Button size="sm" variant="ghost" className="gap-1" onClick={() => setScale((s) => Math.min(2, s + 0.1))}>
             <Plus size={14} />
           </Button>
@@ -168,6 +225,8 @@ export default function FlowPlayground({ linkedRepos = [], projectName }) {
           </Button>
         </div>
       </div>
+
+      {indexNote ? <p className="border-b border-line px-4 py-2 text-xs text-ink-muted">{indexNote}</p> : null}
 
       <div className="flex flex-wrap items-center gap-2 border-b border-line px-4 py-2 text-xs text-ink-muted">
         <button type="button" className="cursor-pointer text-primary-600 hover:underline" onClick={() => setZoomLevel(0)}>
