@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bot, GitBranch, Layers, ListTodo, Sparkles, Workflow, Network } from 'lucide-react'
+import { Bot, GitBranch, Layers, ListTodo, Sparkles, Workflow } from 'lucide-react'
 import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
@@ -19,7 +19,6 @@ const TABS = [
   { id: 'architecture', label: 'Architecture', icon: Sparkles },
   { id: 'flows', label: 'Flow Studio', icon: Workflow },
   { id: 'issues', label: 'Issues', icon: ListTodo },
-  { id: 'orchestration', label: 'Simulation', icon: Network },
 ]
 
 const ISSUE_TYPES = [
@@ -247,31 +246,6 @@ export default function BackendExplorerProjectPage({ projectId, connectedRepos }
         )}
 
         {tab === 'flows' && <DeepFlowStudioWorkspace compact showToolbar projectName={project.name} />}
-
-        {tab === 'orchestration' && (
-          <Panel
-            title="Data simulation & orchestration"
-            description="Design Airflow-style pipelines tied to this project — schedule on AWS EventBridge, GCP Cloud Scheduler, or Azure."
-          >
-            <div className="flex flex-col gap-4 p-4">
-              <p className="text-sm text-ink-muted">
-                Pipelines can ingest fixtures, simulate events against discovered APIs, and deploy runs using your cloud profiles.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Link to={`/deep/orchestration?project=${encodeURIComponent(project.id)}`}>
-                  <Button variant="primary">
-                    <Network size={14} /> Open orchestration
-                  </Button>
-                </Link>
-                <Link to="/integrations/cloud">
-                  <Button variant="secondary">
-                    <Workflow size={14} /> Cloud deployment access
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </Panel>
-        )}
 
         {tab === 'issues' && (
           <Panel

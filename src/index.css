@@ -151,6 +151,22 @@
     animation: home-panel-in 0.45s ease-out;
   }
 
+  .home-auth-card-entrance {
+    animation: home-reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards, home-auth-card-float 9s ease-in-out 0.7s infinite;
+  }
+
+  .home-auth-rail-entrance {
+    animation: home-reveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .home-auth-rail-float {
+    animation: home-auth-card-float 11s ease-in-out 1s infinite;
+  }
+
+  .home-auth-split {
+    perspective: 1200px;
+  }
+
   .home-challenge-card {
     animation: home-reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
@@ -235,13 +251,26 @@
   }
 }
 
+@keyframes home-auth-card-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-reveal,
   .home-reveal-stagger,
   .home-auth-form-panel,
   .home-product-slide,
   .home-challenge-card,
-  .home-journey-step {
+  .home-journey-step,
+  .home-auth-card-entrance,
+  .home-auth-rail-entrance,
+  .home-auth-rail-float {
     animation: none;
   }
 

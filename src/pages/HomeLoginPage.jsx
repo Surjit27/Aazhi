@@ -37,7 +37,7 @@ export default function HomeLoginPage() {
         </>
       }
     >
-      <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+      <form className="flex flex-col gap-4 md:gap-5" onSubmit={onSubmit}>
         <div className="home-reveal-stagger" style={{ '--stagger': 0 }}>
           <Field label="Email">
             <Input
@@ -46,6 +46,7 @@ export default function HomeLoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="py-2.5 text-sm"
             />
           </Field>
         </div>
@@ -56,12 +57,18 @@ export default function HomeLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="py-2.5 text-sm"
             />
           </Field>
         </div>
-        {error && <p className="text-xs text-danger-700">{error}</p>}
+        {error && <p className="text-xs text-danger-700 md:text-sm">{error}</p>}
         <div className="home-reveal-stagger pt-1" style={{ '--stagger': 2 }}>
-          <Button type="submit" variant="primary" disabled={submitting} className="w-full justify-center">
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={submitting}
+            className="w-full justify-center py-2.5 text-sm md:text-[15px]"
+          >
             {submitting ? 'Signing in…' : 'Sign in'}
           </Button>
         </div>
