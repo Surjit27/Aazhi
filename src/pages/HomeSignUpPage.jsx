@@ -38,7 +38,7 @@ export default function HomeSignUpPage() {
         </>
       }
     >
-      <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+      <form className="flex flex-col gap-4 md:gap-5" onSubmit={onSubmit}>
         <div className="home-reveal-stagger" style={{ '--stagger': 0 }}>
           <Field label="Display name" hint="Optional">
             <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} autoComplete="name" />
@@ -68,7 +68,12 @@ export default function HomeSignUpPage() {
         </div>
         {error && <p className="text-xs text-danger-700">{error}</p>}
         <div className="home-reveal-stagger pt-1" style={{ '--stagger': 3 }}>
-          <Button type="submit" variant="primary" disabled={submitting} className="w-full justify-center">
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={submitting}
+            className="w-full justify-center py-2.5 text-sm md:text-[15px]"
+          >
             {submitting ? 'Creating account…' : 'Sign up for free'}
           </Button>
         </div>
