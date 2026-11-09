@@ -6,7 +6,7 @@ import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { Field, Input, Select } from '../../components/ui/FormControls.jsx'
 import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
-import { CLOUD_PROVIDERS } from '../../data/orchestration.js'
+import { CLOUD_PROVIDERS } from '../../data/cloudProviders.js'
 import { useCloudProvidersStore } from '../../stores/cloudProvidersStore.js'
 
 const EMPTY = {
@@ -52,7 +52,7 @@ export default function CloudIntegrationsPage() {
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Cloud deployment access"
-        description="Connect AWS, GCP, or Azure so Event Scheduler and orchestration pipelines can deploy workers and fire scheduled simulations."
+        description="Connect AWS, GCP, or Azure so Event Scheduler can deploy workers and fire scheduled runs."
         breadcrumbs={['deepe', 'Integrations', 'Cloud']}
         actions={
           <Button variant="primary" onClick={openCreate}>
@@ -98,7 +98,7 @@ export default function CloudIntegrationsPage() {
           {rows.length === 0 ? (
             <p className="p-5 text-sm text-ink-muted">
               <Cloud size={14} className="mr-1 inline" />
-              No {provider?.shortLabel} profiles. Add IAM role, region, and scheduler target for orchestration runs.
+              No {provider?.shortLabel} profiles. Add IAM role, region, and scheduler target.
             </p>
           ) : (
             <table className="w-full min-w-[720px] border-collapse">
@@ -145,8 +145,8 @@ export default function CloudIntegrationsPage() {
         </Panel>
 
         <p className="text-xs text-ink-muted">
-          Backend path (planned): encrypted keys in client schema, worker assumes role in your VPC, EventBridge / Cloud Scheduler triggers Deepe
-          orchestration runs linked to Explorer projects.
+          Backend path (planned): encrypted keys in client schema, worker assumes role in your VPC, EventBridge / Cloud Scheduler triggers
+          scheduled jobs linked to your APIs.
         </p>
       </div>
 
@@ -224,7 +224,7 @@ export default function CloudIntegrationsPage() {
                 checked={modal.form.defaultForOrchestration}
                 onChange={(e) => setModal((m) => ({ ...m, form: { ...m.form, defaultForOrchestration: e.target.checked } }))}
               />
-              Default profile for new orchestration pipelines
+              Default profile for scheduler deploys
             </label>
           </div>
         ) : null}

@@ -35,6 +35,10 @@ export default function ClientFeatureGate() {
   }
 
   const nav = resolveClientNav(path)
+  if (nav?.alwaysShow) {
+    return <Outlet />
+  }
+
   if (nav && !isNavEnabled(nav.to, nav.flagKey)) {
     const fallback =
       ['/dashboard', '/account', '/projects'].find((p) => {
