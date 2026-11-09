@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { apiFetch, clearStoredToken, getStoredToken, setStoredToken } from '../lib/api.js'
 import { openClientSessionWithHandoff } from '../lib/clientHandoff.js'
 import { getPortal, PORTAL } from '../lib/portal.js'
-import { useFeatureFlagsStore } from './featureFlagsStore.js'
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -20,7 +19,6 @@ export const useAuthStore = create((set, get) => ({
     try {
       const { user } = await apiFetch('/api/auth/me')
       set({ user, token, loading: false })
-      await useFeatureFlagsStore.getState().loadClientFlags()
     } catch {
       clearStoredToken()
       set({ user: null, token: null, loading: false })
@@ -43,7 +41,6 @@ export const useAuthStore = create((set, get) => ({
       }
       setStoredToken(token)
       set({ user, token, loading: false })
-      await useFeatureFlagsStore.getState().loadClientFlags()
       return user
     } catch (err) {
       set({ error: err.message, loading: false })
@@ -72,7 +69,6 @@ export const useAuthStore = create((set, get) => ({
 
   applySession: (token, user) => {
     set({ user, token, loading: false, error: null })
-    void useFeatureFlagsStore.getState().loadClientFlags()
   },
 
   logout: async () => {
