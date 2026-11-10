@@ -44,7 +44,6 @@ export default function PortalAuthLayout({
   footerNote,
 }) {
   const { pathname } = useLocation()
-  const isLogin = mode === 'login'
   const portalCopy = COPY[portal]?.[mode] ?? COPY.client.login
   const railPortal = portal === 'home' ? 'client' : portal
 

@@ -69,7 +69,16 @@ export async function apiFetch(path, { method = 'GET', body, auth = true } = {})
   })
 
   const text = await res.text()
-  const data = text ? JSON.parse(text) : null
+  let data = null
+  if (text) {
+    try {
+      data = JSON.parse(text)
+    } catch {
+      const err = new Error('Server returned invalid JSON')
+      err.status = res.status
+      throw err
+    }
+  }
 
   if (!res.ok) {
     const err = new Error(data?.error ?? res.statusText)
