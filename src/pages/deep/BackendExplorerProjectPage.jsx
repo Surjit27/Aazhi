@@ -14,7 +14,7 @@ import { useExplorerProjectsStore } from '../../stores/explorerProjectsStore.js'
 const TABS = [
   { id: 'overview', label: 'Overview', icon: Layers },
   { id: 'codebase', label: 'Codebase', icon: Code2 },
-  { id: 'studio', label: 'Flow studio', icon: Workflow },
+  { id: 'studio', label: 'Flow playground', icon: Workflow },
   { id: 'issues', label: 'Issues', icon: ListTodo },
 ]
 
@@ -173,7 +173,7 @@ export default function BackendExplorerProjectPage({ projectId, connectedRepos }
                 onClick={() => setTab('studio')}
                 className="glass-inset cursor-pointer rounded-lg p-4 text-left transition hover:border-primary-100"
               >
-                <p className="text-sm font-semibold text-ink">Flow studio</p>
+                <p className="text-sm font-semibold text-ink">Flow playground</p>
                 <p className="mt-1 text-xs text-ink-muted">2D playground: repos → files → dependencies → syntax for linked repos.</p>
               </button>
             </div>

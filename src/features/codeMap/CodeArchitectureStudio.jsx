@@ -14,7 +14,7 @@ const VIEWS = [
   { id: 'treemap', label: 'Code map', icon: LayoutGrid },
   { id: 'architecture', label: 'Architecture', icon: Network },
   { id: 'dependencies', label: 'Dependencies', icon: Boxes },
-  { id: 'flows', label: 'Flow studio', icon: Workflow },
+  { id: 'flows', label: 'Flow playground', icon: Workflow },
 ]
 
 const THEMES = {
