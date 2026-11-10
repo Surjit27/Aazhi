@@ -13,7 +13,7 @@ function withHistory(state, next) {
   }
 }
 
-export const useWorkflowStore = create((set, get) => ({
+export const useWorkflowStore = create((set) => ({
   nodes: INITIAL_WORKFLOW_NODES,
   edges: INITIAL_WORKFLOW_EDGES,
   past: [],
