@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
+import HomeCapabilityMarquee from '../components/home/HomeCapabilityMarquee.jsx'
+import HomeLiveLoop from '../components/home/HomeLiveLoop.jsx'
 import HomePageShell from '../components/home/HomePageShell.jsx'
+import HomePortalStrip from '../components/home/HomePortalStrip.jsx'
 import HomeProductRail from '../components/home/HomeProductRail.jsx'
 import Button from '../components/ui/Button.jsx'
 import { BRAND_NAME, BrandLockup } from '../components/ui/Brand.jsx'
@@ -60,6 +63,8 @@ export default function HomePage() {
         </div>
       </header>
 
+      <HomeCapabilityMarquee className="relative z-[1]" />
+
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 md:px-8">
         {/* Hero — Postman-style lead + proof panel */}
         <section className="grid items-center gap-10 border-b border-line py-14 md:py-20 lg:grid-cols-2 lg:gap-16">
@@ -85,7 +90,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="home-reveal lg:min-h-[360px]" style={{ animationDelay: '160ms' }}>
-            <HomeProductRail className="min-h-[320px] shadow-card" />
+            <HomeProductRail className="home-auth-rail-float min-h-[320px] shadow-card" />
           </div>
         </section>
 
@@ -118,6 +123,12 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        <section className="border-b border-line py-14 md:py-18">
+          <HomeLiveLoop />
+        </section>
+
+        <HomePortalStrip className="border-b border-line py-14 md:py-18" />
 
         {/* Journey — platform stages */}
         <section className="py-14 md:py-18">
