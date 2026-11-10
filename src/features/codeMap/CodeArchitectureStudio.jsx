@@ -157,7 +157,7 @@ export default function CodeArchitectureStudio({ projectName, repos = [], discov
             </ReactFlowProvider>
           )}
           {view === 'flows' && (
-            <motionSafeWorkspace projectName={projectName} />
+            <MotionSafeWorkspace projectName={projectName} />
           )}
         </div>
         {view !== 'flows' && (
@@ -171,7 +171,7 @@ export default function CodeArchitectureStudio({ projectName, repos = [], discov
   )
 }
 
-function motionSafeWorkspace({ projectName }) {
+function MotionSafeWorkspace({ projectName }) {
   return (
     <div className="h-[480px] overflow-hidden rounded-xl border border-line">
       <DeepFlowStudioWorkspace compact showToolbar projectName={projectName} />
