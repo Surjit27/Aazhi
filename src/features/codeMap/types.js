@@ -1,12 +1,4 @@
-/** Shared IR for repo → treemap / flow / inspector (analyzer fills this later). */
-
-export const SCOPE_LEVELS = [
-  { id: 0, key: 'repo', label: 'Repository', shows: 'repos' },
-  { id: 1, key: 'package', label: 'Packages / dirs', shows: 'dirs' },
-  { id: 2, key: 'file', label: 'Files', shows: 'files' },
-  { id: 3, key: 'symbol', label: 'Functions & types', shows: 'symbols' },
-  { id: 4, key: 'member', label: 'Vars & constants', shows: 'members' },
-]
+/** Shared IR for Flow playground symbol nodes (API graph + demo fallbacks). */
 
 export const KIND_STYLES = {
   repo: { label: 'Repo', tone: 'violet' },
