@@ -24,7 +24,7 @@ import {
   gitProviderLabel,
 } from '../data/backends.js'
 import { useAppStore } from '../stores/appStore.js'
-import { formatDateTime, relativeTime } from '../utils/format.js'
+import { relativeTime } from '../utils/format.js'
 import { NOW_MS } from '../data/executions.js'
 import DataTable from '../components/ui/DataTable.jsx'
 

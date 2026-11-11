@@ -10,7 +10,7 @@ export default function FlowStudioPage() {
       <PageHeader
         title="Flow playground"
         description="2D zoom canvas for repos linked in Backend Explorer — files, dependencies, and syntax symbols."
-        breadcrumbs={['deepe', 'Deep Backend', 'Flow studio']}
+        breadcrumbs={['deepe', 'Deep Backend', 'Flow playground']}
         actions={
           <Link to="/deep/explorer">
             <Button variant="primary" size="sm">
