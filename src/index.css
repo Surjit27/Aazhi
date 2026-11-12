@@ -170,6 +170,7 @@
   .home-challenge-card {
     animation: home-reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
+    will-change: transform;
   }
 
   .home-challenge-card:hover {
@@ -207,6 +208,8 @@
     border-radius: 9999px;
     border: 1px dashed rgba(79, 134, 247, 0.35);
     transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   .home-loop-satellite {
@@ -270,6 +273,11 @@
 
   .home-marquee-inner {
     animation: home-marquee-scroll 42s linear infinite;
+    will-change: transform;
+  }
+
+  .home-marquee--paused .home-marquee-inner {
+    animation-play-state: paused;
   }
 
   .home-marquee-pill {
@@ -319,6 +327,10 @@
     position: absolute;
     border-radius: 9999px;
     filter: blur(72px);
+    contain: layout paint;
+  }
+
+  .home-bg-animated--running .home-bg-orb {
     will-change: transform;
   }
 
@@ -383,7 +395,10 @@
   .home-product-slide--active,
   .home-auth-card-entrance,
   .home-auth-rail-entrance,
-  .home-auth-rail-float {
+  .home-auth-rail-float,
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-in-right {
     animation: none;
   }
 
@@ -391,6 +406,22 @@
   .home-bg-orb,
   .home-bg-grid-drift {
     animation: none !important;
+  }
+
+  .glass-bar,
+  .glass-card,
+  .glass-inset {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .home-challenge-card,
+  .home-portal-card {
+    will-change: auto;
+  }
+
+  .home-marquee-inner {
+    animation-play-state: paused;
   }
 }
 

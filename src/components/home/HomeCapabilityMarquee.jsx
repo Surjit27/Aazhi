@@ -1,3 +1,5 @@
+import { useInView } from '../../hooks/useInView.js'
+
 const ITEMS = [
   'Git-backed backend index',
   'Route & repo explorer',
@@ -25,9 +27,12 @@ function Track({ duplicate }) {
 }
 
 export default function HomeCapabilityMarquee({ className = '' }) {
+  const [ref, inView] = useInView()
+
   return (
     <div
-      className={`home-marquee glass-inset overflow-hidden border-y border-line/80 py-3 ${className}`}
+      ref={ref}
+      className={`home-marquee glass-inset overflow-hidden border-y border-line/80 py-3 ${inView ? '' : 'home-marquee--paused'} ${className}`}
       aria-label="Platform capabilities"
     >
       <div className="home-marquee-inner flex w-max">

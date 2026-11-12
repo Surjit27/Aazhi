@@ -14,7 +14,7 @@ import {
 } from '../../routes/index.jsx'
 
 const linkClass = ({ isActive }) =>
-  `flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] transition-colors ${
+  `flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] transition-colors duration-150 ${
     isActive
       ? 'bg-primary-50 font-medium text-primary-600'
       : 'text-ink-muted hover:bg-white/70 hover:text-ink'
@@ -29,7 +29,7 @@ function NavSection({ label, open, onToggle, children }) {
         aria-expanded={open}
         className="mt-3 flex w-full cursor-pointer items-center gap-1.5 px-3 py-1 text-left text-[11px] font-semibold tracking-wide text-ink-subtle uppercase"
       >
-        <ChevronDown size={12} className={`transition-transform ${open ? '' : '-rotate-90'}`} />
+        <ChevronDown size={12} className={`transition-transform duration-200 ${open ? '' : '-rotate-90'}`} />
         {label}
       </button>
       {open && <div className="mt-0.5 flex flex-col gap-0.5">{children}</div>}

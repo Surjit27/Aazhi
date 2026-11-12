@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Activity, Flag, ScanSearch, Shield, Users, Workflow } from 'lucide-react'
+import { useDocumentVisible } from '../../hooks/useDocumentVisible.js'
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 
 const SLIDES_CLIENT = [
   {
@@ -78,15 +80,18 @@ export default function HomeProductRail({ portal = 'client', className = '' }) {
   const [index, setIndex] = useState(0)
   const slide = slides[index]
   const Icon = slide.icon
+  const docVisible = useDocumentVisible()
+  const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
     setIndex(0)
   }, [portal])
 
   useEffect(() => {
+    if (!docVisible || reducedMotion) return undefined
     const id = setInterval(() => setIndex((i) => (i + 1) % slides.length), 7000)
     return () => clearInterval(id)
-  }, [slides.length])
+  }, [slides.length, docVisible, reducedMotion])
 
   return (
     <div
@@ -114,7 +119,7 @@ export default function HomeProductRail({ portal = 'client', className = '' }) {
             type="button"
             aria-label={`Show ${s.eyebrow}`}
             onClick={() => setIndex(i)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
+            className={`h-1.5 rounded-full transition-[width,background-color] duration-300 ${
               i === index ? 'w-8 bg-primary-500' : 'w-2 bg-line hover:bg-primary-200'
             }`}
           />

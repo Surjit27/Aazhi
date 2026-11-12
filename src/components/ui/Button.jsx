@@ -15,7 +15,7 @@ export default function Button({ variant = 'secondary', size = 'md', className =
   return (
     <button
       type={type}
-      className={`inline-flex cursor-pointer items-center justify-center rounded-md border font-medium whitespace-nowrap transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`inline-flex cursor-pointer items-center justify-center rounded-md border font-medium whitespace-nowrap transition-[background-color,border-color,box-shadow] duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...props}
     />
   )
