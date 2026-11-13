@@ -33,7 +33,7 @@ export default function HomeLiveLoop({ className = '' }) {
           <div className="home-loop-orbit" style={{ transform: `rotate(${active * 72}deg)` }}>
             <span className="home-loop-satellite" />
           </div>
-          <div className="home-loop-core glass-inset flex h-full w-full flex-col items-center justify-center rounded-full border border-line/80 text-center">
+          <div className="home-loop-core flex h-full w-full flex-col items-center justify-center border border-line/80 text-center">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-primary-600">Live loop</p>
             <p className="mt-1 text-lg font-semibold text-ink">{stage.label}</p>
           </div>
@@ -55,9 +55,10 @@ export default function HomeLiveLoop({ className = '' }) {
       <div className="min-w-0 flex-1 space-y-4">
         <p className="home-section-eyebrow text-ink-subtle">Continuous automation</p>
         <h2 className="text-xl font-semibold text-ink md:text-2xl">The loop never sleeps — only the stage changes</h2>
-        <p className="text-sm leading-relaxed text-ink-muted" key={stage.id}>
-          <span className="font-medium text-ink">{stage.label}.</span> {stage.detail}. {BRAND_NAME} keeps each stage
-          wired to the same glass workspace your team signs into on client.localhost.
+        <p className="text-pretty text-sm leading-relaxed text-ink-muted" key={stage.id}>
+          <span className="font-medium text-ink">{stage.label}.</span> {stage.detail}.{' '}
+          <span className="font-medium lowercase text-ink">{BRAND_NAME}</span> keeps every stage in the same glass
+          workspace your team uses on <span className="whitespace-nowrap">client.localhost</span>.
         </p>
         <div className="flex flex-wrap items-center gap-2 pt-1">
           {STAGES.map((s, i) => (

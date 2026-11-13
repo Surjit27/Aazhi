@@ -34,9 +34,9 @@ const PORTALS = [
   },
 ]
 
-export default function HomePortalStrip({ className = '' }) {
+export default function HomePortalStrip({ className = '', id }) {
   return (
-    <section className={className}>
+    <section id={id} className={className}>
       <p className="home-section-eyebrow text-ink-subtle">Three hosts · one product</p>
       <h2 className="home-reveal mt-3 text-2xl font-semibold text-ink">Purpose-built surfaces per hostname</h2>
       <p className="home-reveal mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">
