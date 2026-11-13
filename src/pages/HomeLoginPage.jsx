@@ -5,6 +5,14 @@ import PasswordInput from '../components/auth/PasswordInput.jsx'
 import Button from '../components/ui/Button.jsx'
 import { Field, Input } from '../components/ui/FormControls.jsx'
 import { useAuthStore } from '../stores/authStore.js'
+import {
+  AUTH_BUTTON_CLASS,
+  AUTH_ERROR_CLASS,
+  AUTH_FIELDS_CLASS,
+  AUTH_FORM_CLASS,
+  AUTH_INPUT_CLASS,
+  AUTH_SUBMIT_WRAP_CLASS,
+} from '../components/auth/authFormStyles.js'
 
 export default function HomeLoginPage() {
   const login = useAuthStore((s) => s.login)
@@ -37,7 +45,8 @@ export default function HomeLoginPage() {
         </>
       }
     >
-      <form className="flex flex-col gap-4 md:gap-5" onSubmit={onSubmit}>
+      <form className={AUTH_FORM_CLASS} onSubmit={onSubmit}>
+        <div className={AUTH_FIELDS_CLASS}>
         <div className="home-reveal-stagger" style={{ '--stagger': 0 }}>
           <Field label="Email">
             <Input
@@ -46,7 +55,7 @@ export default function HomeLoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="py-2.5 text-sm"
+              className={AUTH_INPUT_CLASS}
             />
           </Field>
         </div>
@@ -57,18 +66,14 @@ export default function HomeLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="py-2.5 text-sm"
+              className={AUTH_INPUT_CLASS}
             />
           </Field>
         </div>
-        {error && <p className="text-xs text-danger-700 md:text-sm">{error}</p>}
-        <div className="home-reveal-stagger pt-1" style={{ '--stagger': 2 }}>
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={submitting}
-            className="w-full justify-center py-2.5 text-sm md:text-[15px]"
-          >
+        </div>
+        {error && <p className={AUTH_ERROR_CLASS}>{error}</p>}
+        <div className={`home-reveal-stagger ${AUTH_SUBMIT_WRAP_CLASS}`} style={{ '--stagger': 2 }}>
+          <Button type="submit" variant="primary" disabled={submitting} className={AUTH_BUTTON_CLASS}>
             {submitting ? 'Signing in…' : 'Sign in'}
           </Button>
         </div>

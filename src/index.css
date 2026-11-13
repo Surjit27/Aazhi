@@ -48,6 +48,21 @@
   --shadow-card: 0 1px 2px rgba(22, 35, 58, 0.04), 0 6px 20px rgba(22, 35, 58, 0.05);
   --shadow-pop: 0 12px 40px rgba(22, 35, 58, 0.1);
   --radius-card: 12px;
+
+  --home-auth-min-h: 26rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    /* Tall enough for sign-up fields; login reuses the same footprint. */
+    --home-auth-min-h: 44rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --home-auth-min-h: 44rem;
+  }
 }
 
 @layer base {
@@ -165,6 +180,99 @@
 
   .home-auth-split {
     perspective: 1200px;
+    align-items: stretch;
+    grid-auto-rows: 1fr;
+  }
+
+  .home-auth-split > .home-auth-card,
+  .home-auth-split > .home-auth-rail-slot {
+    min-height: var(--home-auth-min-h);
+    height: 100%;
+  }
+
+  @media (min-width: 768px) {
+    .home-auth-split > .home-auth-card,
+    .home-auth-split > .home-auth-rail-slot {
+      height: var(--home-auth-min-h);
+    }
+  }
+
+  .home-auth-panel-height {
+    min-height: var(--home-auth-min-h);
+  }
+
+  .home-auth-card {
+    display: flex;
+    flex-direction: column;
+    min-height: var(--home-auth-min-h);
+    padding: 2.25rem;
+    border-top: 3px solid var(--color-primary-500);
+  }
+
+  .home-auth-card--compact {
+    min-height: auto;
+    height: auto;
+  }
+
+  .home-auth-rail-slot {
+    display: none;
+    min-height: var(--home-auth-min-h);
+  }
+
+  @media (min-width: 768px) {
+    .home-auth-rail-slot {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .home-auth-rail {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 100%;
+    height: 100%;
+    padding: 2.25rem;
+    border-top: 3px solid var(--color-primary-500);
+    border-radius: var(--radius-card);
+  }
+
+  .home-auth-intro {
+    flex-shrink: 0;
+  }
+
+  .home-auth-body {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  .home-content-shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 68rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-auth-card,
+    .home-auth-rail {
+      padding: 2.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .home-auth-card,
+    .home-auth-rail {
+      padding: 2.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-auth-card,
+    .home-auth-rail {
+      padding: 3rem;
+    }
   }
 
   .home-challenge-card {
@@ -196,10 +304,22 @@
     animation: home-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
 
-  .home-loop-ring {
+  .home-loop-ring-wrap {
+    --home-loop-r: 5.75rem;
     position: relative;
+    flex-shrink: 0;
+    height: 15rem;
+    width: 15rem;
+    overflow: visible;
+  }
+
+  .home-loop-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
     height: 11.5rem;
     width: 11.5rem;
+    transform: translate(-50%, -50%);
   }
 
   .home-loop-orbit {
@@ -226,15 +346,22 @@
 
   .home-loop-core {
     position: absolute;
-    inset: 1.35rem;
+    inset: 1.65rem;
+    z-index: 1;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .home-loop-labels {
     position: absolute;
-    inset: -0.75rem;
+    inset: 0;
+    z-index: 2;
     list-style: none;
     margin: 0;
     padding: 0;
+    pointer-events: none;
   }
 
   .home-loop-label {
@@ -245,7 +372,8 @@
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    transform: rotate(calc(var(--i) * 72deg)) translateY(calc(-1 * (5.75rem + 18px))) rotate(calc(var(--i) * -72deg));
+    transform: rotate(calc(var(--i) * 72deg)) translateY(calc(-1 * (var(--home-loop-r) + 1.65rem)))
+      rotate(calc(var(--i) * -72deg));
     opacity: 0.55;
     transition: opacity 0.3s ease;
   }

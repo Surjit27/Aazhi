@@ -95,7 +95,7 @@ export default function HomeProductRail({ portal = 'client', className = '' }) {
 
   return (
     <div
-      className={`home-product-rail home-auth-rail-float glass-inset flex h-full flex-col rounded-[var(--radius-card)] border-t-[3px] border-t-primary-500 p-8 md:p-10 lg:p-11 ${className}`}
+      className={`home-product-rail home-auth-rail home-auth-rail-float glass-inset flex h-full flex-col ${className}`}
     >
       <div className="home-product-slide home-product-slide--active flex flex-1 flex-col" key={slide.id}>
         <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-primary-600">

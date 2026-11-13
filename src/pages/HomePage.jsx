@@ -50,7 +50,7 @@ export default function HomePage() {
   return (
     <HomePageShell>
       <header className="glass-bar sticky top-0 z-20 border-b border-line/80 px-4 py-3 md:px-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+        <div className="home-content-shell flex items-center justify-between gap-4">
           <BrandLockup className="h-9" iconSize={36} />
           <nav className="flex items-center gap-3">
             <Link to="/login" className="text-sm font-medium text-ink-muted hover:text-ink">
@@ -65,7 +65,7 @@ export default function HomePage() {
 
       <HomeCapabilityMarquee className="relative z-[1]" />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 md:px-8">
+      <main className="home-content-shell flex-1 px-4 md:px-8">
         {/* Hero — Postman-style lead + proof panel */}
         <section className="grid items-center gap-10 border-b border-line py-14 md:py-20 lg:grid-cols-2 lg:gap-16">
           <div className="space-y-6">
@@ -89,8 +89,8 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="home-reveal lg:min-h-[360px]" style={{ animationDelay: '160ms' }}>
-            <HomeProductRail className="home-auth-rail-float min-h-[320px] shadow-card" />
+          <div className="home-reveal home-auth-panel-height flex w-full" style={{ animationDelay: '160ms' }}>
+            <HomeProductRail className="home-auth-rail-float h-full w-full shadow-pop" />
           </div>
         </section>
 
