@@ -1,6 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
 import HomePageShell from '../home/HomePageShell.jsx'
-import HomeProductRail from '../home/HomeProductRail.jsx'
 import { BrandLockup } from '../ui/Brand.jsx'
 import { adminAppOrigin, clientAppOrigin } from '../../lib/portal.js'
 
@@ -45,8 +44,6 @@ export default function PortalAuthLayout({
 }) {
   const { pathname } = useLocation()
   const portalCopy = COPY[portal]?.[mode] ?? COPY.client.login
-  const railPortal = portal === 'home' ? 'client' : portal
-
   return (
     <HomePageShell>
       <header className="glass-bar border-b border-line/80 px-4 py-4 md:px-10">
@@ -67,8 +64,8 @@ export default function PortalAuthLayout({
       </header>
 
       <div className="home-content-shell flex flex-1 items-center px-4 py-12 sm:py-14 md:px-10 md:py-16 lg:min-h-[calc(100vh-5rem)] lg:py-20">
-        <div className="home-auth-split grid w-full gap-8 md:grid-cols-2 md:gap-10 lg:gap-12">
-          <div className="glass-card home-auth-card home-reveal home-auth-card-entrance shadow-pop">
+        <div className="mx-auto w-full max-w-xl">
+          <div className="glass-card home-auth-card home-auth-card--compact home-reveal home-auth-card-entrance shadow-pop">
             <div key={pathname} className="home-auth-form-panel flex h-full min-h-0 flex-1 flex-col">
               <div className="home-auth-intro">
                 <p className="home-section-eyebrow text-primary-600">{portalCopy.eyebrow}</p>
@@ -91,13 +88,6 @@ export default function PortalAuthLayout({
                 ) : null}
               </div>
             </div>
-          </div>
-
-          <div
-            className="home-auth-rail-slot home-reveal home-auth-rail-entrance"
-            style={{ animationDelay: '120ms' }}
-          >
-            <HomeProductRail portal={railPortal} className="h-full w-full" />
           </div>
         </div>
       </div>

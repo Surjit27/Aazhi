@@ -431,6 +431,38 @@
     overflow-x: clip;
   }
 
+  .home-hero-band {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    min-height: min(62vh, 720px);
+  }
+
+  @media (min-width: 1024px) {
+    .home-hero-band {
+      min-height: min(68vh, 780px);
+    }
+  }
+
+  .home-hero-gridscan {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    z-index: 0;
+    width: 100vw;
+    max-width: 100vw;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .home-hero-gridscan .grid-scan {
+    height: 100%;
+    width: 100%;
+  }
+
   .home-bg-animated {
     position: absolute;
     inset: 0;

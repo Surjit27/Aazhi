@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Activity, Flag, ScanSearch, Shield, Users, Workflow } from 'lucide-react'
+import { Activity, Flag, ScanSearch, Shield, Users } from 'lucide-react'
 import { useDocumentVisible } from '../../hooks/useDocumentVisible.js'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 
@@ -13,17 +13,6 @@ const SLIDES_CLIENT = [
       'Index backends from Git into isolated workspaces',
       'Map routes, explorers, and microarchitecture surfaces',
       'Ground every workflow in how services actually run',
-    ],
-  },
-  {
-    id: 'workflow',
-    icon: Workflow,
-    eyebrow: 'Visual automation',
-    title: 'Design flows on a live canvas',
-    bullets: [
-      'Wire graph steps to registered backends',
-      'Attach schedules, webhooks, and manual triggers',
-      'Reuse the same workspace chrome as the rest of deepe',
     ],
   },
   {

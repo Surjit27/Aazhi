@@ -4,9 +4,11 @@ import HomeCapabilityMarquee from '../components/home/HomeCapabilityMarquee.jsx'
 import HomeLiveLoop from '../components/home/HomeLiveLoop.jsx'
 import HomePageShell from '../components/home/HomePageShell.jsx'
 import HomePortalStrip from '../components/home/HomePortalStrip.jsx'
-import HomeProductRail from '../components/home/HomeProductRail.jsx'
+import GridScan from '../components/gridScan/GridScan.jsx'
+import { GRID_SCAN_LIGHT } from '../components/gridScan/gridScanPresets.js'
 import Button from '../components/ui/Button.jsx'
 import { BRAND_NAME, BrandLockup } from '../components/ui/Brand.jsx'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion.js'
 
 const CHALLENGES = [
   {
@@ -47,6 +49,8 @@ const JOURNEY = [
 ]
 
 export default function HomePage() {
+  const reducedMotion = usePrefersReducedMotion()
+
   return (
     <HomePageShell>
       <header className="glass-bar sticky top-0 z-20 border-b border-line/80 px-4 py-3 md:px-8">
@@ -65,10 +69,16 @@ export default function HomePage() {
 
       <HomeCapabilityMarquee className="relative z-[1]" />
 
-      <main className="home-content-shell flex-1 px-4 md:px-8">
-        {/* Hero — Postman-style lead + proof panel */}
-        <section className="grid items-center gap-10 border-b border-line py-14 md:py-20 lg:grid-cols-2 lg:gap-16">
-          <div className="space-y-6">
+      <main className="flex-1">
+        {/* Hero — full-bleed GridScan band + centered content */}
+        <section className="home-hero-band relative border-b border-line">
+          {!reducedMotion ? (
+            <div className="home-hero-gridscan hidden md:block" aria-hidden>
+              <GridScan {...GRID_SCAN_LIGHT} clickEffect="ping" className="h-full w-full" />
+            </div>
+          ) : null}
+          <div className="home-content-shell relative z-[1] w-full px-4 py-16 md:px-8 md:py-24 lg:py-28">
+          <div className="max-w-2xl space-y-6">
             <p className="home-section-eyebrow home-reveal text-primary-600">Reverse engineering · Automation</p>
             <h1 className="home-reveal text-3xl font-semibold tracking-tight text-ink md:text-[2.5rem] md:leading-[1.12]" style={{ animationDelay: '80ms' }}>
               Close the gap between live APIs and automated workflows — before drift widens it.
@@ -89,13 +99,11 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="home-reveal home-auth-panel-height flex w-full" style={{ animationDelay: '160ms' }}>
-            <HomeProductRail className="home-auth-rail-float h-full w-full shadow-pop" />
           </div>
         </section>
 
         {/* Challenges grid */}
-        <section className="border-b border-line py-14 md:py-18">
+        <section className="home-content-shell border-b border-line px-4 py-14 md:px-8 md:py-18">
           <p className="home-section-eyebrow text-ink-subtle">Three challenges</p>
           <h2 className="home-reveal mt-3 max-w-2xl text-2xl font-semibold text-ink">Where automation programs hit a ceiling</h2>
           <p className="home-reveal mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">
@@ -124,14 +132,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="border-b border-line py-14 md:py-18">
+        <section className="home-content-shell border-b border-line px-4 py-14 md:px-8 md:py-18">
           <HomeLiveLoop />
         </section>
 
-        <HomePortalStrip className="border-b border-line py-14 md:py-18" />
+        <HomePortalStrip className="home-content-shell border-b border-line px-4 py-14 md:px-8 md:py-18" />
 
         {/* Journey — platform stages */}
-        <section className="py-14 md:py-18">
+        <section className="home-content-shell px-4 py-14 md:px-8 md:py-18">
           <p className="home-section-eyebrow text-ink-subtle">The {BRAND_NAME} platform</p>
           <h2 className="home-reveal mt-3 text-2xl font-semibold text-ink">One workspace for every stage of the loop</h2>
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -149,7 +157,7 @@ export default function HomePage() {
         </section>
 
         {/* Closing CTA */}
-        <section className="mb-16">
+        <section className="home-content-shell mb-16 px-4 md:px-8">
           <div className="glass-card flex flex-col items-start gap-4 border-t-[3px] border-t-primary-500 p-8 md:flex-row md:items-center md:justify-between md:p-10">
             <div>
               <h2 className="text-lg font-semibold text-ink">Start on home.localhost. Work on client.localhost.</h2>
