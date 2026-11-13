@@ -84,15 +84,15 @@ export default function HomeProductRail({ portal = 'client', className = '' }) {
 
   return (
     <div
-      className={`home-product-rail home-auth-rail home-auth-rail-float glass-inset flex h-full flex-col ${className}`}
+      className={`home-feature-spotlight glass-card flex h-full min-h-[18rem] flex-col border border-line/90 bg-white p-8 shadow-pop md:min-h-[20rem] md:p-10 ${className}`}
     >
       <div className="home-product-slide home-product-slide--active flex flex-1 flex-col" key={slide.id}>
-        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
-          <Icon size={24} />
+        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-primary-100 bg-primary-50 text-primary-600">
+          <Icon size={22} />
         </div>
         <p className="home-section-eyebrow text-primary-600">{slide.eyebrow}</p>
-        <h2 className="mt-2 text-xl font-semibold leading-snug text-ink md:text-[1.35rem]">{slide.title}</h2>
-        <ul className="mt-5 flex flex-col gap-3">
+        <h2 className="mt-2 text-lg font-semibold leading-snug text-ink md:text-xl">{slide.title}</h2>
+        <ul className="mt-5 flex flex-1 flex-col gap-3">
           {slide.bullets.map((line) => (
             <li key={line} className="flex gap-2.5 text-sm leading-snug text-ink-muted md:text-[15px]">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500" />
@@ -101,7 +101,7 @@ export default function HomeProductRail({ portal = 'client', className = '' }) {
           ))}
         </ul>
       </div>
-      <div className="mt-6 flex gap-2">
+      <div className="mt-6 flex gap-2 border-t border-line/80 pt-5">
         {slides.map((s, i) => (
           <button
             key={s.id}

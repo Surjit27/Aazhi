@@ -1,6 +1,6 @@
 import { useInView } from '../../hooks/useInView.js'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
-/** Light-theme motion behind home + auth (CSS accents). GridScan lives in the home hero panel. */
+/** Light-theme motion behind home + auth (CSS mesh / orbs). */
 export default function HomeAnimatedBackdrop() {
   const reducedMotion = usePrefersReducedMotion()
   const [ref, inView] = useInView({ rootMargin: '120px', threshold: 0 })

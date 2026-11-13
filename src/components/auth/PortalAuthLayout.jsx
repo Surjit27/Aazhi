@@ -44,6 +44,7 @@ export default function PortalAuthLayout({
 }) {
   const { pathname } = useLocation()
   const portalCopy = COPY[portal]?.[mode] ?? COPY.client.login
+
   return (
     <HomePageShell>
       <header className="glass-bar border-b border-line/80 px-4 py-4 md:px-10">
