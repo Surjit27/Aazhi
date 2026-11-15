@@ -24,9 +24,11 @@ import {
   gitProviderLabel,
 } from '../data/backends.js'
 import { useAppStore } from '../stores/appStore.js'
-import { formatDateTime, relativeTime } from '../utils/format.js'
+import { relativeTime } from '../utils/format.js'
 import { NOW_MS } from '../data/executions.js'
 import DataTable from '../components/ui/DataTable.jsx'
+import { useClientTable } from '../hooks/useClientTable.js'
+import { TableFooter } from '../features/tables/TableFooter.jsx'
 
 const STATUS_TONE = { indexed: 'success', pending: 'warning', error: 'danger' }
 
@@ -47,6 +49,27 @@ export default function BackendsPage() {
         `${b.name} ${b.description} ${b.git.repository} ${architectureLabel(b.architecture)}`.toLowerCase().includes(q),
     )
   }, [backends, query])
+
+  const backendAccessors = useMemo(
+    () => ({
+      name: (b) => b.name,
+      architecture: (b) => architectureLabel(b.architecture),
+      repository: (b) => b.git.repository,
+      branch: (b) => b.git.branch,
+      status: (b) => b.status,
+      routes: (b) => b.stats.routes,
+      functions: (b) => b.stats.functions,
+      lastSync: (b) => b.git.lastSyncAt ?? 0,
+    }),
+    [],
+  )
+
+  const table = useClientTable(filtered, {
+    pageSize: 15,
+    accessors: backendAccessors,
+    defaultSort: { key: 'name', direction: 'asc' },
+    resetKey: query,
+  })
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
 
@@ -107,20 +130,24 @@ export default function BackendsPage() {
               <DataTable.Scroll>
                 <DataTable.Table>
                   <DataTable.Head sticky={false}>
-                    <DataTable.Th>Service</DataTable.Th>
-                    <DataTable.Th>Architecture</DataTable.Th>
-                    <DataTable.Th>Repository</DataTable.Th>
-                    <DataTable.Th>Branch</DataTable.Th>
-                    <DataTable.Th>Index</DataTable.Th>
-                    <DataTable.Th align="right">Routes</DataTable.Th>
-                    <DataTable.Th align="right">Functions</DataTable.Th>
-                    <DataTable.Th>Last sync</DataTable.Th>
+                    <DataTable.Th {...table.thProps('name')}>Service</DataTable.Th>
+                    <DataTable.Th {...table.thProps('architecture')}>Architecture</DataTable.Th>
+                    <DataTable.Th {...table.thProps('repository')}>Repository</DataTable.Th>
+                    <DataTable.Th {...table.thProps('branch')}>Branch</DataTable.Th>
+                    <DataTable.Th {...table.thProps('status')}>Index</DataTable.Th>
+                    <DataTable.Th align="right" {...table.thProps('routes')}>
+                      Routes
+                    </DataTable.Th>
+                    <DataTable.Th align="right" {...table.thProps('functions')}>
+                      Functions
+                    </DataTable.Th>
+                    <DataTable.Th {...table.thProps('lastSync')}>Last sync</DataTable.Th>
                     <DataTable.Th align="right">
                       <span className="sr-only">Actions</span>
                     </DataTable.Th>
                   </DataTable.Head>
                   <DataTable.Body>
-                    {filtered.map((b) => (
+                    {table.rows.map((b) => (
                       <DataTable.Row key={b.id} onClick={() => navigate(backendBasePath(b.id))}>
                         <DataTable.Td>
                           <p className="font-medium text-ink">{b.name}</p>
@@ -169,11 +196,21 @@ export default function BackendsPage() {
                   </DataTable.Body>
                 </DataTable.Table>
               </DataTable.Scroll>
-              <DataTable.FooterBar>
-                <span className="font-medium tabular-nums">
-                  {filtered.length} service{filtered.length === 1 ? '' : 's'}
-                </span>
-              </DataTable.FooterBar>
+              <TableFooter
+                summary={`${table.total} service${table.total === 1 ? '' : 's'}`}
+                pagination={{
+                  page: table.pagination.page,
+                  totalPages: table.pagination.totalPages,
+                  total: table.pagination.total,
+                  rangeStart: table.pagination.rangeStart,
+                  rangeEnd: table.pagination.rangeEnd,
+                  onPageChange: table.pagination.setPage,
+                  onPrev: table.pagination.goPrev,
+                  onNext: table.pagination.goNext,
+                  hasPrev: table.pagination.hasPrev,
+                  hasNext: table.pagination.hasNext,
+                }}
+              />
             </DataTable.Root>
           )}
         </Panel>

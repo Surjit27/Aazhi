@@ -130,7 +130,7 @@ export default function AdminOverviewPage() {
             description="Stock-style report · roles and emails"
             bodyClassName="p-0"
           >
-            <UserDirectoryTable users={users.slice(0, 8)} emptyMessage="No accounts in the system yet." />
+            <UserDirectoryTable users={users} pageSize={8} emptyMessage="No accounts in the system yet." />
           </Panel>
         </div>
 
