@@ -4,7 +4,7 @@ import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
 
 export default function ClientEmailHistoryPage() {
-  const { events, loading, error, reload } = useHistoryEvents('/api/client/history/emails')
+  const { events, loading, error, reload, pagination, sort, total } = useHistoryEvents('/api/client/history/emails')
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -24,6 +24,9 @@ export default function ClientEmailHistoryPage() {
             events={events}
             loading={loading}
             error={error}
+            total={total}
+            pagination={pagination}
+            sort={sort}
             emptyMessage="No email history in your workspace yet."
           />
         </Panel>

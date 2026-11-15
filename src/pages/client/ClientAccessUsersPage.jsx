@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '../../lib/api.js'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import { Field, Input, Select } from '../../components/ui/FormControls.jsx'
-import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { useClientTable } from '../../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { useAppStore } from '../../stores/appStore.js'
 import { useAuthStore } from '../../stores/authStore.js'
 
@@ -27,6 +29,16 @@ export default function ClientAccessUsersPage() {
   useEffect(() => {
     load()
   }, [pushToast])
+
+  const accessors = useMemo(
+    () => ({
+      email: (u) => u.email,
+      displayName: (u) => u.displayName,
+      accessRoleKey: (u) => u.accessRoleKey,
+    }),
+    [],
+  )
+  const table = useClientTable(users, { pageSize: 15, accessors, defaultSort: { key: 'email', direction: 'asc' } })
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -60,13 +72,19 @@ export default function ClientAccessUsersPage() {
           <table className="w-full min-w-[640px] border-collapse">
             <thead className="bg-surface">
               <tr className="border-b border-line">
-                <th className={thClass}>Email</th>
-                <th className={thClass}>Name</th>
-                <th className={thClass}>Access role</th>
+                <SortableLegacyTh sortKey="email" thProps={table.thProps}>
+                  Email
+                </SortableLegacyTh>
+                <SortableLegacyTh sortKey="displayName" thProps={table.thProps}>
+                  Name
+                </SortableLegacyTh>
+                <SortableLegacyTh sortKey="accessRoleKey" thProps={table.thProps}>
+                  Access role
+                </SortableLegacyTh>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {users.map((u) => (
+              {table.rows.map((u) => (
                 <tr key={u.id}>
                   <td className={tdClass}>{u.email}</td>
                   <td className={tdClass}>{u.displayName || '—'}</td>
@@ -79,6 +97,7 @@ export default function ClientAccessUsersPage() {
               ))}
             </tbody>
           </table>
+          <LegacyTableFooter table={table} itemLabel="user" />
         </Panel>
       </div>
 

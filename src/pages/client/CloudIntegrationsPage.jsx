@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Cloud, Plus, Trash2 } from 'lucide-react'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { Field, Input, Select } from '../../components/ui/FormControls.jsx'
-import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { useClientTable } from '../../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { CLOUD_PROVIDERS } from '../../data/cloudProviders.js'
 import { useCloudProvidersStore } from '../../stores/cloudProvidersStore.js'
 
@@ -30,6 +32,23 @@ export default function CloudIntegrationsPage() {
 
   const provider = CLOUD_PROVIDERS.find((p) => p.id === tab)
   const rows = profiles.filter((p) => p.providerId === tab)
+
+  const accessors = useMemo(
+    () => ({
+      label: (r) => r.label,
+      region: (r) => r.region,
+      account: (r) => r.accountRef || r.projectOrSubscription,
+      scheduler: (r) => r.schedulerTarget,
+      default: (r) => (r.defaultForOrchestration ? 1 : 0),
+    }),
+    [],
+  )
+  const table = useClientTable(rows, {
+    pageSize: 15,
+    accessors,
+    defaultSort: { key: 'label', direction: 'asc' },
+    resetKey: tab,
+  })
 
   const openCreate = () => {
     setModal({
@@ -95,25 +114,36 @@ export default function CloudIntegrationsPage() {
         </Panel>
 
         <Panel title="Deployment profiles" description="Stored locally until tenant cloud_credentials API ships." bodyClassName="p-0">
-          {rows.length === 0 ? (
+          {table.total === 0 ? (
             <p className="p-5 text-sm text-ink-muted">
               <Cloud size={14} className="mr-1 inline" />
               No {provider?.shortLabel} profiles. Add IAM role, region, and scheduler target.
             </p>
           ) : (
+            <>
             <table className="w-full min-w-[720px] border-collapse">
               <thead className="bg-surface">
                 <tr className="border-b border-line">
-                  <th className={thClass}>Profile</th>
-                  <th className={thClass}>Region</th>
-                  <th className={thClass}>Account</th>
-                  <th className={thClass}>Scheduler</th>
-                  <th className={thClass}>Default</th>
-                  <th className={thClass} />
+                  <SortableLegacyTh sortKey="label" thProps={table.thProps}>
+                    Profile
+                  </SortableLegacyTh>
+                  <SortableLegacyTh sortKey="region" thProps={table.thProps}>
+                    Region
+                  </SortableLegacyTh>
+                  <SortableLegacyTh sortKey="account" thProps={table.thProps}>
+                    Account
+                  </SortableLegacyTh>
+                  <SortableLegacyTh sortKey="scheduler" thProps={table.thProps}>
+                    Scheduler
+                  </SortableLegacyTh>
+                  <SortableLegacyTh sortKey="default" thProps={table.thProps}>
+                    Default
+                  </SortableLegacyTh>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {rows.map((r) => (
+                {table.rows.map((r) => (
                   <tr key={r.id}>
                     <td className={tdClass}>
                       <p className="font-medium text-ink">{r.label}</p>
@@ -141,6 +171,8 @@ export default function CloudIntegrationsPage() {
                 ))}
               </tbody>
             </table>
+            <LegacyTableFooter table={table} itemLabel="profile" />
+            </>
           )}
         </Panel>
 

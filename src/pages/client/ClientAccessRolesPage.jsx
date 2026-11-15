@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Badge from '../../components/ui/Badge.jsx'
-import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
 import { apiFetch } from '../../lib/api.js'
 import { useAppStore } from '../../stores/appStore.js'
+import { useClientTable } from '../../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 
 export default function ClientAccessRolesPage() {
   const pushToast = useAppStore((s) => s.pushToast)
@@ -14,6 +16,16 @@ export default function ClientAccessRolesPage() {
       .then((r) => setRoles(r.roles ?? []))
       .catch((e) => pushToast({ tone: 'danger', title: 'Failed to load roles', body: e.message }))
   }, [pushToast])
+
+  const accessors = useMemo(
+    () => ({
+      label: (r) => r.label,
+      key: (r) => r.key,
+      portal: (r) => r.portal,
+    }),
+    [],
+  )
+  const table = useClientTable(roles, { pageSize: 15, accessors, defaultSort: { key: 'label', direction: 'asc' } })
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -28,13 +40,19 @@ export default function ClientAccessRolesPage() {
             <table className="w-full min-w-[520px] border-collapse">
               <thead className="bg-surface">
                 <tr className="border-b border-line">
-                  <th className={thClass}>Role</th>
-                  <th className={thClass}>Key</th>
-                  <th className={thClass}>Portal</th>
+                  <SortableLegacyTh sortKey="label" thProps={table.thProps}>
+                    Role
+                  </SortableLegacyTh>
+                  <SortableLegacyTh sortKey="key" thProps={table.thProps}>
+                    Key
+                  </SortableLegacyTh>
+                  <SortableLegacyTh sortKey="portal" thProps={table.thProps}>
+                    Portal
+                  </SortableLegacyTh>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {roles.map((role) => (
+                {table.rows.map((role) => (
                   <tr key={role.id}>
                     <td className={tdClass}>
                       <Badge tone={role.key === 'super_admin' ? 'primary' : 'neutral'}>{role.label}</Badge>
@@ -45,6 +63,7 @@ export default function ClientAccessRolesPage() {
                 ))}
               </tbody>
             </table>
+            <LegacyTableFooter table={table} itemLabel="role" />
           </div>
         </Panel>
       </div>

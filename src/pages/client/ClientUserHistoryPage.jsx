@@ -4,7 +4,7 @@ import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
 
 export default function ClientUserHistoryPage() {
-  const { events, loading, error, reload } = useHistoryEvents('/api/client/history/users')
+  const { events, loading, error, reload, pagination, sort, total } = useHistoryEvents('/api/client/history/users')
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -24,6 +24,9 @@ export default function ClientUserHistoryPage() {
             events={events}
             loading={loading}
             error={error}
+            total={total}
+            pagination={pagination}
+            sort={sort}
             emptyMessage="No user activity in your workspace yet."
           />
         </Panel>

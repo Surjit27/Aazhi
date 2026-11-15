@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Play } from 'lucide-react'
 import { useInjectionStore } from '../stores/injectionStore.js'
 import { DATA_DESTINATIONS } from '../data/injection.js'
@@ -7,7 +8,9 @@ import Badge from '../components/ui/Badge.jsx'
 import Tabs from '../components/ui/Tabs.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
 import { Field, Select, Textarea } from '../components/ui/FormControls.jsx'
-import { thClass, tdClass } from '../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../features/explorer/ExplorerInsights.jsx'
+import { useClientTable } from '../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../features/tables/legacyTable.jsx'
 import { formatDateTime } from '../utils/format.js'
 
 const FORMAT_TABS = [
@@ -33,8 +36,33 @@ export default function DataInjectionPage() {
 
   const running = job?.status === 'running'
   const progress = job && job.total ? Math.round((job.done / job.total) * 100) : 0
-  const preview = parsed.ok ? parsed.records.slice(0, 5) : []
-  const columns = preview.length ? Object.keys(preview[0]) : []
+  const records = parsed.ok ? parsed.records : []
+  const columns = records[0] ? Object.keys(records[0]) : []
+
+  const recordAccessors = useMemo(
+    () => Object.fromEntries(columns.map((c) => [c, (row) => row[c]])),
+    [columns],
+  )
+  const previewTable = useClientTable(records, {
+    pageSize: 10,
+    accessors: recordAccessors,
+    resetKey: `${format}-${columns.join(',')}`,
+  })
+
+  const historyAccessors = useMemo(
+    () => ({
+      startedAt: (h) => h.startedAt,
+      destination: (h) => h.destination,
+      records: (h) => h.records,
+      status: (h) => h.status,
+    }),
+    [],
+  )
+  const historyTable = useClientTable(history, {
+    pageSize: 15,
+    accessors: historyAccessors,
+    defaultSort: { key: 'startedAt', direction: 'desc' },
+  })
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -62,21 +90,34 @@ export default function DataInjectionPage() {
           </div>
         </Panel>
 
-        <Panel title="Preview" description="First five records">
-          {preview.length === 0 ? (
+        <Panel title="Preview" description="Paginated record preview">
+          {previewTable.total === 0 ? (
             <EmptyState title="Nothing to preview" description="Fix the source data to see a preview." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead className="border-b border-line bg-surface">
-                  <tr>{columns.map((c) => <th key={c} className={thClass}>{c}</th>)}</tr>
+                  <tr>
+                    {columns.map((c) => (
+                      <SortableLegacyTh key={c} sortKey={c} thProps={previewTable.thProps}>
+                        {c}
+                      </SortableLegacyTh>
+                    ))}
+                  </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
-                  {preview.map((row, i) => (
-                    <tr key={i}>{columns.map((c) => <td key={c} className={tdClass}>{String(row[c] ?? '')}</td>)}</tr>
+                  {previewTable.rows.map((row, i) => (
+                    <tr key={i}>
+                      {columns.map((c) => (
+                        <td key={c} className={tdClass}>
+                          {String(row[c] ?? '')}
+                        </td>
+                      ))}
+                    </tr>
                   ))}
                 </tbody>
               </table>
+              <LegacyTableFooter table={previewTable} itemLabel="record" />
             </div>
           )}
         </Panel>
@@ -118,30 +159,43 @@ export default function DataInjectionPage() {
         </Panel>
 
         <Panel title="History" description="Recent injection jobs" bodyClassName="p-0">
-          {history.length === 0 ? (
+          {historyTable.total === 0 ? (
             <EmptyState title="No injections yet" description="Start an injection to see it listed here." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[480px] text-left">
                 <thead className="border-b border-line bg-surface">
                   <tr>
-                    <th className={thClass}>Started</th>
-                    <th className={thClass}>Destination</th>
-                    <th className={thClass}>Records</th>
-                    <th className={thClass}>Status</th>
+                    <SortableLegacyTh sortKey="startedAt" thProps={historyTable.thProps}>
+                      Started
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="destination" thProps={historyTable.thProps}>
+                      Destination
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="records" thProps={historyTable.thProps}>
+                      Records
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="status" thProps={historyTable.thProps}>
+                      Status
+                    </SortableLegacyTh>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
-                  {history.map((h) => (
+                  {historyTable.rows.map((h) => (
                     <tr key={h.id} className="hover:bg-surface/60">
                       <td className={tdClass}>{formatDateTime(h.startedAt)}</td>
                       <td className={tdClass}>{h.destination}</td>
-                      <td className={`${tdClass} tabular-nums`}>{h.succeeded}/{h.records}</td>
-                      <td className={tdClass}><Badge tone={HISTORY_TONE[h.status]}>{h.status}</Badge></td>
+                      <td className={`${tdClass} tabular-nums`}>
+                        {h.succeeded}/{h.records}
+                      </td>
+                      <td className={tdClass}>
+                        <Badge tone={HISTORY_TONE[h.status]}>{h.status}</Badge>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              <LegacyTableFooter table={historyTable} itemLabel="job" />
             </div>
           )}
         </Panel>

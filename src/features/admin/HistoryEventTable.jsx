@@ -1,5 +1,9 @@
+import { useMemo, useState } from 'react'
 import Badge from '../../components/ui/Badge.jsx'
 import DataTable from '../../components/ui/DataTable.jsx'
+import { TableFooter } from '../tables/TableFooter.jsx'
+import { sortRows } from '../../utils/tableSort.js'
+import { nextSortDirection } from '../../utils/tableSort.js'
 
 function formatWhen(iso) {
   if (!iso) return '—'
@@ -29,7 +33,53 @@ function formatPayload(value) {
   }
 }
 
-export default function HistoryEventTable({ events, loading, error, emptyMessage }) {
+const LOCAL_SORT_ACCESSORS = {
+  request: (ev) => formatPayload(ev.request ?? ev.metadata?.request),
+  response: (ev) => formatPayload(ev.response ?? ev.metadata?.response),
+}
+
+const SERVER_SORT_KEYS = new Set(['occurredAt', 'event', 'resource', 'performedBy'])
+
+export default function HistoryEventTable({
+  events,
+  loading,
+  error,
+  emptyMessage,
+  pagination,
+  sort,
+  total = 0,
+}) {
+  const [localSortKey, setLocalSortKey] = useState(null)
+  const [localSortDirection, setLocalSortDirection] = useState(null)
+
+  const toggleLocalSort = (key) => {
+    const next = nextSortDirection(localSortKey, localSortDirection, key)
+    if (!next) {
+      setLocalSortKey(null)
+      setLocalSortDirection(null)
+      return
+    }
+    setLocalSortKey(key)
+    setLocalSortDirection(next)
+  }
+
+  const th = (key) => {
+    if (SERVER_SORT_KEYS.has(key)) return sort?.thProps?.(key) ?? {}
+    const active = localSortKey === key
+    return {
+      sortable: true,
+      sortDirection: active ? localSortDirection : undefined,
+      onClick: () => toggleLocalSort(key),
+    }
+  }
+
+  const rows = useMemo(() => {
+    if (localSortKey && LOCAL_SORT_ACCESSORS[localSortKey]) {
+      return sortRows(events, LOCAL_SORT_ACCESSORS, localSortKey, localSortDirection)
+    }
+    return events
+  }, [events, localSortKey, localSortDirection])
+
   if (loading) {
     return (
       <DataTable.Root minWidth={960} aria-label="Event history">
@@ -46,23 +96,30 @@ export default function HistoryEventTable({ events, loading, error, emptyMessage
     )
   }
 
+  const summary =
+    total > 0
+      ? `${total} event${total === 1 ? '' : 's'}`
+      : rows.length > 0
+        ? `${rows.length} event${rows.length === 1 ? '' : 's'}`
+        : null
+
   return (
     <DataTable.Root minWidth={960} aria-label="Event history">
       <DataTable.Scroll>
         <DataTable.Table>
           <DataTable.Head>
-            <DataTable.Th>Occurred at</DataTable.Th>
-            <DataTable.Th>Event</DataTable.Th>
-            <DataTable.Th>Resource</DataTable.Th>
-            <DataTable.Th>Performed by</DataTable.Th>
-            <DataTable.Th>Request</DataTable.Th>
-            <DataTable.Th>Response</DataTable.Th>
+            <DataTable.Th {...th('occurredAt')}>Occurred at</DataTable.Th>
+            <DataTable.Th {...th('event')}>Event</DataTable.Th>
+            <DataTable.Th {...th('resource')}>Resource</DataTable.Th>
+            <DataTable.Th {...th('performedBy')}>Performed by</DataTable.Th>
+            <DataTable.Th {...th('request')}>Request</DataTable.Th>
+            <DataTable.Th {...th('response')}>Response</DataTable.Th>
           </DataTable.Head>
-          {events.length === 0 ? (
+          {rows.length === 0 ? (
             <DataTable.EmptyBody colSpan={6} message={emptyMessage} />
           ) : (
             <DataTable.Body>
-              {events.map((ev) => {
+              {rows.map((ev) => {
                 const occurredAt = ev.occurredAt ?? ev.createdAt
                 const eventName = ev.event ?? ev.action
                 const resource = ev.resource ?? ev.subjectLabel ?? ev.subjectId ?? '—'
@@ -102,13 +159,7 @@ export default function HistoryEventTable({ events, loading, error, emptyMessage
           )}
         </DataTable.Table>
       </DataTable.Scroll>
-      {events.length > 0 && (
-        <DataTable.FooterBar>
-          <span className="font-medium tabular-nums">
-            {events.length} event{events.length === 1 ? '' : 's'}
-          </span>
-        </DataTable.FooterBar>
-      )}
+      {(rows.length > 0 || total > 0) && <TableFooter summary={summary} pagination={pagination} />}
     </DataTable.Root>
   )
 }

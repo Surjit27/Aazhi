@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Play, Plus, Square, Trash } from 'lucide-react'
 import { useMockStore } from '../stores/mockStore.js'
 import { useAppStore } from '../stores/appStore.js'
@@ -12,7 +12,9 @@ import Drawer from '../components/ui/Drawer.jsx'
 import ConfirmDialog from '../components/ui/ConfirmDialog.jsx'
 import EmptyState from '../components/ui/EmptyState.jsx'
 import { Field, Input, Select } from '../components/ui/FormControls.jsx'
-import { thClass, tdClass } from '../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../features/explorer/ExplorerInsights.jsx'
+import { useClientTable } from '../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../features/tables/legacyTable.jsx'
 import { uid } from '../utils/format.js'
 
 const ENV_TABS = [
@@ -37,6 +39,25 @@ export default function MockServersPage() {
 
   const server = servers.find((sv) => sv.environment === envTab) ?? servers[0]
   const active = server && server.id === selectedServerId ? server : server
+
+  const endpointAccessors = useMemo(
+    () => ({
+      path: (ep) => ep.path,
+      status: (ep) => ep.status,
+      latency: (ep) => ep.latencyMs,
+      error: (ep) => (ep.errorInjection?.enabled ? ep.errorInjection.status : ''),
+      enabled: (ep) => (ep.enabled ? 1 : 0),
+    }),
+    [],
+  )
+
+  const endpointsTable = useClientTable(active?.endpoints ?? [], {
+    pageSize: 15,
+    accessors: endpointAccessors,
+    defaultSort: { key: 'path', direction: 'asc' },
+    resetKey: active?.id,
+  })
+
   if (!active) return null
 
   const toggleRunning = () => {
@@ -89,16 +110,28 @@ export default function MockServersPage() {
               <table className="w-full min-w-[640px]">
                 <thead className="border-b border-line bg-surface">
                   <tr>
-                    <th className={thClass}>Route</th>
-                    <th className={thClass}>Status</th>
-                    <th className={thClass}>Latency</th>
-                    <th className={thClass}>Error injection</th>
-                    <th className={thClass}>Enabled</th>
-                    <th className={thClass}><span className="sr-only">Actions</span></th>
+                    <SortableLegacyTh sortKey="path" thProps={endpointsTable.thProps}>
+                      Route
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="status" thProps={endpointsTable.thProps}>
+                      Status
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="latency" thProps={endpointsTable.thProps}>
+                      Latency
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="error" thProps={endpointsTable.thProps}>
+                      Error injection
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="enabled" thProps={endpointsTable.thProps}>
+                      Enabled
+                    </SortableLegacyTh>
+                    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
-                  {active.endpoints.map((ep) => (
+                  {endpointsTable.rows.map((ep) => (
                     <tr key={ep.id} className="transition-colors hover:bg-surface/60">
                       <td className={tdClass}>
                         <div className="flex items-center gap-2">
@@ -132,6 +165,7 @@ export default function MockServersPage() {
                   ))}
                 </tbody>
               </table>
+              <LegacyTableFooter table={endpointsTable} itemLabel="endpoint" />
             </div>
           )}
         </Panel>
