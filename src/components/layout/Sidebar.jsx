@@ -4,7 +4,6 @@ import { ChevronDown } from 'lucide-react'
 import { BRAND_NAME, BrandIcon } from '../ui/Brand.jsx'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
-import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
 import {
   ADMIN_NAV,
   CLIENT_ACCESS_NAV,
@@ -15,7 +14,7 @@ import {
 } from '../../routes/index.jsx'
 
 const linkClass = ({ isActive }) =>
-  `flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] transition-colors ${
+  `flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] transition-colors duration-150 ${
     isActive
       ? 'bg-primary-50 font-medium text-primary-600'
       : 'text-ink-muted hover:bg-white/70 hover:text-ink'
@@ -30,7 +29,7 @@ function NavSection({ label, open, onToggle, children }) {
         aria-expanded={open}
         className="mt-3 flex w-full cursor-pointer items-center gap-1.5 px-3 py-1 text-left text-[11px] font-semibold tracking-wide text-ink-subtle uppercase"
       >
-        <ChevronDown size={12} className={`transition-transform ${open ? '' : '-rotate-90'}`} />
+        <ChevronDown size={12} className={`transition-transform duration-200 ${open ? '' : '-rotate-90'}`} />
         {label}
       </button>
       {open && <div className="mt-0.5 flex flex-col gap-0.5">{children}</div>}
@@ -95,14 +94,13 @@ function AdminSidebarNav({ onNavigate }) {
 
 function ClientSidebarNav({ onNavigate }) {
   const location = useLocation()
-  const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
 
   const dashboard = CLIENT_NAV.find((item) => item.to === '/dashboard')
   const projects = CLIENT_NAV.find((item) => item.to === '/projects')
-  const pageItems = CLIENT_PAGES_NAV.filter((item) => item.alwaysShow || isNavEnabled(item.to, item.flagKey))
-  const deepItems = CLIENT_DEEP_BACKEND_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
-  const accessItems = CLIENT_ACCESS_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
-  const historyItems = CLIENT_HISTORY_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+  const pageItems = CLIENT_PAGES_NAV
+  const deepItems = CLIENT_DEEP_BACKEND_NAV
+  const accessItems = CLIENT_ACCESS_NAV
+  const historyItems = CLIENT_HISTORY_NAV
 
   const deepOpenByRoute = CLIENT_DEEP_BACKEND_NAV.some((item) => location.pathname.startsWith(item.to))
   const accessOpenByRoute = CLIENT_ACCESS_NAV.some((item) => location.pathname.startsWith(item.to))
@@ -119,14 +117,14 @@ function ClientSidebarNav({ onNavigate }) {
 
   return (
     <>
-      {dashboard && isNavEnabled(dashboard.to, dashboard.flagKey) && (
+      {dashboard && (
         <NavLink to={dashboard.to} end={dashboard.end} onClick={onNavigate} className={linkClass}>
           <dashboard.icon size={16} strokeWidth={1.75} />
           <span className="truncate">{dashboard.label}</span>
         </NavLink>
       )}
 
-      {projects && isNavEnabled(projects.to, projects.flagKey) && (
+      {projects && (
         <NavLink to={projects.to} onClick={onNavigate} className={linkClass}>
           <projects.icon size={16} strokeWidth={1.75} />
           <span className="truncate">{projects.label}</span>

@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 
 export default function Drawer({ open, onClose, title, description, children, footer, width = 'w-[520px]' }) {
+  const reducedMotion = usePrefersReducedMotion()
   useEffect(() => {
     if (!open) return
     const onKey = (e) => e.key === 'Escape' && onClose()
@@ -12,11 +14,14 @@ export default function Drawer({ open, onClose, title, description, children, fo
   if (!open) return null
 
   return (
-    <div className="animate-fade-in fixed inset-0 z-40 flex justify-end bg-ink/20" onMouseDown={onClose}>
+    <div
+      className={`${reducedMotion ? '' : 'animate-fade-in'} fixed inset-0 z-40 flex justify-end bg-ink/20`}
+      onMouseDown={onClose}
+    >
       <aside
         role="dialog"
         aria-label={title}
-        className={`animate-slide-in-right flex h-full max-w-full ${width} flex-col border-l border-line bg-white shadow-pop`}
+        className={`${reducedMotion ? '' : 'animate-slide-in-right'} flex h-full max-w-full ${width} flex-col border-l border-line bg-white shadow-pop`}
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">

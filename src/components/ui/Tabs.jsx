@@ -9,7 +9,7 @@ export default function Tabs({ tabs, value, onChange, className = '' }) {
             role="tab"
             aria-selected={active}
             onClick={() => onChange(tab.id)}
-            className={`-mb-px flex cursor-pointer items-center gap-1.5 border-b-2 px-3 py-2 text-[13px] font-medium transition-colors ${
+            className={`-mb-px flex cursor-pointer items-center gap-1.5 border-b-2 px-3 py-2 text-[13px] font-medium transition-colors duration-150 ${
               active ? 'border-primary-600 text-primary-700' : 'border-transparent text-ink-muted hover:text-ink'
             }`}
           >

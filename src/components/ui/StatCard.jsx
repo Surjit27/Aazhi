@@ -36,7 +36,7 @@ export default function StatCard({ label, value, hint, icon: Icon, tone = 'prima
   const trendClass = trendUp ? 'text-success-700' : 'text-danger-700'
 
   return (
-    <div className="glass-card relative p-5 transition-shadow hover:shadow-pop">
+    <div className="glass-card relative p-5 transition-[box-shadow] duration-200 hover:shadow-pop">
       {Icon && (
         <div className={`absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full ${iconClass}`}>
           <Icon size={18} strokeWidth={1.75} />

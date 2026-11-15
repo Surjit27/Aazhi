@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 
 export default function Modal({ open, onClose, title, description, children, footer, width = 'max-w-lg' }) {
+  const reducedMotion = usePrefersReducedMotion()
   useEffect(() => {
     if (!open) return
     const onKey = (e) => e.key === 'Escape' && onClose()
@@ -12,12 +14,15 @@ export default function Modal({ open, onClose, title, description, children, foo
   if (!open) return null
 
   return (
-    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-ink/30 p-4" onMouseDown={onClose}>
+    <div
+      className={`${reducedMotion ? '' : 'animate-fade-in'} fixed inset-0 z-50 flex items-center justify-center bg-ink/30 p-4`}
+      onMouseDown={onClose}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`animate-slide-up flex max-h-[90vh] w-full ${width} flex-col rounded-lg border border-line bg-white shadow-pop`}
+        className={`${reducedMotion ? '' : 'animate-slide-up'} flex max-h-[90vh] w-full ${width} flex-col rounded-lg border border-line bg-white shadow-pop`}
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">

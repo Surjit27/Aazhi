@@ -21,13 +21,19 @@ export default function BackendOverviewPage() {
   const base = backendBasePath(backendId)
   const schedules = useSchedulerStore((s) => s.schedules)
   const loadSchedules = useSchedulerStore((s) => s.loadSchedules)
-
-  useEffect(() => {
-    loadSchedules().catch(() => {})
-  }, [loadSchedules])
   const servers = useMockStore((s) => s.servers)
   const environments = useAppStore((s) => s.environments)
   const pushToast = useAppStore((s) => s.pushToast)
+
+  useEffect(() => {
+    loadSchedules().catch((e) => {
+      pushToast({
+        tone: 'danger',
+        title: 'Failed to load schedules',
+        body: e?.message ?? 'Could not load scheduler data.',
+      })
+    })
+  }, [loadSchedules, pushToast])
 
   const total = EXECUTIONS.length
   const failed = EXECUTIONS.filter((e) => e.status === 'failed').length
@@ -155,7 +161,10 @@ export default function BackendOverviewPage() {
             </ul>
           </Panel>
 
-          <Panel title="Upcoming events">
+          <Panel
+            title="Upcoming events"
+            description={`${enabledSchedules} enabled · ${schedules.length} total in workspace`}
+          >
             <ul className="divide-y divide-line">
               {upcoming.map((s) => (
                 <li key={s.id} className="flex items-center gap-3 px-4 py-2.5">

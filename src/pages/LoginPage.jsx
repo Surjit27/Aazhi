@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import PortalAuthLayout from '../components/auth/PortalAuthLayout.jsx'
+import PasswordInput from '../components/auth/PasswordInput.jsx'
 import Button from '../components/ui/Button.jsx'
-import { BRAND_NAME, BrandLockup } from '../components/ui/Brand.jsx'
 import { Field, Input } from '../components/ui/FormControls.jsx'
 import {
-  adminAppOrigin,
-  clientAppOrigin,
   getPortal,
   homePathForPortal,
   homePathForRole,
@@ -15,6 +14,14 @@ import {
   redirectToClient,
 } from '../lib/portal.js'
 import { useAuthStore } from '../stores/authStore.js'
+import {
+  AUTH_BUTTON_CLASS,
+  AUTH_ERROR_CLASS,
+  AUTH_FIELDS_CLASS,
+  AUTH_FORM_CLASS,
+  AUTH_INPUT_CLASS,
+  AUTH_SUBMIT_WRAP_CLASS,
+} from '../components/auth/authFormStyles.js'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -69,51 +76,40 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-col items-center justify-center bg-app-canvas p-6">
-      <div className="glass-card w-full max-w-md p-8 shadow-pop">
-        <div className="mb-6 space-y-3">
-          <BrandLockup className="h-10" />
-          <p className="text-xs text-ink-muted">
-            {isAdminHost ? 'Admin console' : 'Client portal'} · <span className="font-mono">{window.location.host}</span>
-          </p>
-          <p className="sr-only">{BRAND_NAME} sign in</p>
-        </div>
-
-        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+    <PortalAuthLayout portal={isAdminHost ? 'admin' : 'client'} mode="login">
+      <form className={AUTH_FORM_CLASS} onSubmit={onSubmit}>
+        <div className={AUTH_FIELDS_CLASS}>
+        <div className="home-reveal-stagger" style={{ '--stagger': 0 }}>
           <Field label="Email">
-            <Input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </Field>
-          <Field label="Password">
             <Input
-              type="password"
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className={AUTH_INPUT_CLASS}
+            />
+          </Field>
+        </div>
+        <div className="home-reveal-stagger" style={{ '--stagger': 1 }}>
+          <Field label="Password">
+            <PasswordInput
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className={AUTH_INPUT_CLASS}
             />
           </Field>
-          {error && <p className="text-xs text-danger-700">{error}</p>}
-          <Button type="submit" variant="primary" disabled={submitting} className="w-full justify-center">
+        </div>
+        </div>
+        {error && <p className={AUTH_ERROR_CLASS}>{error}</p>}
+        <div className={`home-reveal-stagger ${AUTH_SUBMIT_WRAP_CLASS}`} style={{ '--stagger': 2 }}>
+          <Button type="submit" variant="primary" disabled={submitting} className={AUTH_BUTTON_CLASS}>
             {submitting ? 'Signing in…' : 'Sign in'}
           </Button>
-        </form>
-
-        <p className="mt-4 text-[11px] leading-relaxed text-ink-subtle">
-          {isAdminHost ? (
-            <>
-              This sign-in is only for <strong>admin</strong> accounts on{' '}
-              <span className="font-mono">{adminAppOrigin()}</span>. Client users use{' '}
-              <span className="font-mono">{clientAppOrigin()}/login</span> in a separate session (different hostname).
-            </>
-          ) : (
-            <>
-              This sign-in is only for <strong>client</strong> accounts on{' '}
-              <span className="font-mono">{clientAppOrigin()}</span>. Staff admin access is a separate app at{' '}
-              <span className="font-mono">admin.localhost</span> — not linked from here after you sign in.
-            </>
-          )}
-        </p>
-      </div>
-    </div>
+        </div>
+      </form>
+    </PortalAuthLayout>
   )
 }

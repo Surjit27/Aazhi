@@ -1,5 +1,5 @@
 import { Navigate, Route } from 'react-router-dom'
-import { CalendarClock, Flag, History, Mail, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react'
+import { CalendarClock, History, Mail, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react'
 import {
   CLIENT_NAV,
   CLIENT_ACCESS_NAV,
@@ -19,7 +19,6 @@ import MockServersPage from '../pages/MockServersPage.jsx'
 import EventSchedulerPage from '../pages/EventSchedulerPage.jsx'
 import DataInjectionPage from '../pages/DataInjectionPage.jsx'
 import ExecutionMonitorPage from '../pages/ExecutionMonitorPage.jsx'
-import GitIntegrationPage from '../pages/GitIntegrationPage.jsx'
 import AIAssistantPage from '../pages/AIAssistantPage.jsx'
 import AdminOverviewPage from '../pages/admin/AdminOverviewPage.jsx'
 import AdminRolesPage from '../pages/admin/AdminRolesPage.jsx'
@@ -28,7 +27,6 @@ import AdminUserManagementPage from '../pages/admin/AdminUserManagementPage.jsx'
 import UserHistoryPage from '../pages/admin/UserHistoryPage.jsx'
 import EmailHistoryPage from '../pages/admin/EmailHistoryPage.jsx'
 import JobHistoryPage from '../pages/admin/JobHistoryPage.jsx'
-import AdminFeatureFlagsPage from '../pages/admin/AdminFeatureFlagsPage.jsx'
 import ClientAccessPage from '../pages/client/ClientAccessPage.jsx'
 import ClientAccessRolesPage from '../pages/client/ClientAccessRolesPage.jsx'
 import ClientAccessUsersPage from '../pages/client/ClientAccessUsersPage.jsx'
@@ -53,7 +51,6 @@ export const ADMIN_NAV = [
   { to: '/roles', label: 'Roles', icon: Shield },
   { to: '/admin/client-users', label: 'Client user management', icon: Users },
   { to: '/admin/admin-users', label: 'Admin user management', icon: UserCog },
-  { to: '/admin/feature-flags', label: 'Feature flags', icon: Flag },
   { to: '/admin/history/users', label: 'User history', icon: History },
   { to: '/admin/history/emails', label: 'Email history', icon: Mail },
   { to: '/admin/history/jobs', label: 'Job history', icon: CalendarClock },
@@ -68,7 +65,7 @@ export function AdminPortalRoutes() {
       <Route path="roles" element={<AdminRolesPage />} />
       <Route path="admin/client-users" element={<ClientUserManagementPage />} />
       <Route path="admin/admin-users" element={<AdminUserManagementPage />} />
-      <Route path="admin/feature-flags" element={<AdminFeatureFlagsPage />} />
+      <Route path="admin/feature-flags" element={<Navigate to="/overview" replace />} />
       <Route path="admin/history/users" element={<UserHistoryPage />} />
       <Route path="admin/history/emails" element={<EmailHistoryPage />} />
       <Route path="admin/history/jobs" element={<JobHistoryPage />} />

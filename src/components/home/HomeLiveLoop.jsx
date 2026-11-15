@@ -1,0 +1,107 @@
+import { useEffect, useState } from 'react'
+import { BRAND_NAME } from '../ui/Brand.jsx'
+import { useDocumentVisible } from '../../hooks/useDocumentVisible.js'
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
+
+const STAGES = [
+  { id: 'discover', label: 'Discover', detail: 'Index backends from Git' },
+  { id: 'model', label: 'Model', detail: 'Map microarchitecture' },
+  { id: 'design', label: 'Design', detail: 'Visual workflows' },
+  { id: 'trigger', label: 'Trigger', detail: 'Schedules & hooks' },
+  { id: 'observe', label: 'Observe', detail: 'Runs & events' },
+]
+
+const STEP_MS = 3200
+
+export default function HomeLiveLoop({ className = '' }) {
+  const [active, setActive] = useState(0)
+  const [autoRotate, setAutoRotate] = useState(true)
+  const docVisible = useDocumentVisible()
+  const reducedMotion = usePrefersReducedMotion()
+  const stage = STAGES[active]
+
+  useEffect(() => {
+    if (!autoRotate || reducedMotion || !docVisible) return undefined
+    const id = setInterval(() => setActive((i) => (i + 1) % STAGES.length), STEP_MS)
+    return () => clearInterval(id)
+  }, [autoRotate, reducedMotion, docVisible])
+
+  return (
+    <div className={`home-live-loop glass-card home-reveal flex flex-col gap-8 p-8 md:flex-row md:items-center md:gap-12 md:p-10 ${className}`}>
+      <div className="home-loop-ring-wrap relative mx-auto shrink-0 md:mx-0" aria-hidden>
+        <div className="home-loop-ring">
+          <div className="home-loop-orbit" style={{ transform: `rotate(${active * 72}deg)` }}>
+            <span className="home-loop-satellite" />
+          </div>
+          <div className="home-loop-core flex h-full w-full flex-col items-center justify-center border border-line/80 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-primary-600">Live loop</p>
+            <p className="mt-1 text-lg font-semibold text-ink">{stage.label}</p>
+          </div>
+        </div>
+        <ul className="home-loop-labels">
+          {STAGES.map((s, i) => (
+            <li
+              key={s.id}
+              className={`home-loop-label ${i === active ? 'home-loop-label--active' : ''}`}
+              style={{ '--i': i }}
+            >
+              <span className="home-loop-label-dot" />
+              <span className="text-[10px] font-medium text-ink-muted">{s.label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-4">
+        <p className="home-section-eyebrow text-ink-subtle">Continuous automation</p>
+        <h2 className="text-xl font-semibold text-ink md:text-2xl">The loop never sleeps — only the stage changes</h2>
+        <p className="text-pretty text-sm leading-relaxed text-ink-muted" key={stage.id}>
+          <span className="font-medium text-ink">{stage.label}.</span> {stage.detail}.{' '}
+          <span className="font-medium lowercase text-ink">{BRAND_NAME}</span> keeps every stage in the same glass
+          workspace your team uses on <span className="whitespace-nowrap">client.localhost</span>.
+        </p>
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {STAGES.map((s, i) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => {
+                setActive(i)
+                setAutoRotate(false)
+              }}
+              className={`rounded-full border px-3 py-1 text-[11px] font-medium transition-colors duration-150 ${
+                i === active
+                  ? 'border-primary-200 bg-primary-50 text-primary-700'
+                  : 'border-line bg-white/60 text-ink-muted hover:border-primary-100 hover:text-ink'
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <p className="flex items-center gap-1.5 text-[11px] text-ink-subtle">
+          {autoRotate && !reducedMotion && docVisible ? (
+            <span className="relative flex h-2 w-2">
+              <span className="home-live-pulse absolute inline-flex h-full w-full rounded-full bg-primary-500 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-500" />
+            </span>
+          ) : null}
+          {reducedMotion
+            ? 'Auto-rotation off (reduced motion). Pick a stage below.'
+            : autoRotate && docVisible
+              ? `Rotating every ${(STEP_MS / 1000).toFixed(1)}s · click a stage to pin`
+              : 'Rotation paused · click Resume or pick a stage'}
+          {!reducedMotion && !autoRotate ? (
+            <button
+              type="button"
+              onClick={() => setAutoRotate(true)}
+              className="font-medium text-primary-600 hover:text-primary-700"
+            >
+              Resume auto-rotate
+            </button>
+          ) : null}
+        </p>
+      </div>
+    </div>
+  )
+}
