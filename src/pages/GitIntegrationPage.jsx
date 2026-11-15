@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { GitBranch, GitCommitHorizontal } from 'lucide-react'
 import { GIT_REPOSITORIES, GIT_BRANCHES, GIT_COMMITS, GIT_CHANGED_FILES, GIT_MODIFIED_FUNCTIONS, GRAPH_COMPARISON, REGRESSION_SUGGESTIONS } from '../data/git.js'
 import { useAppStore } from '../stores/appStore.js'
@@ -7,7 +7,9 @@ import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
 import Tabs from '../components/ui/Tabs.jsx'
 import { Select } from '../components/ui/FormControls.jsx'
-import { thClass, tdClass } from '../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../features/explorer/ExplorerInsights.jsx'
+import { useClientTable } from '../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../features/tables/legacyTable.jsx'
 import { formatDateTime } from '../utils/format.js'
 
 const RISK_TONE = { high: 'danger', medium: 'warning', low: 'neutral' }
@@ -24,6 +26,20 @@ export default function GitIntegrationPage() {
   const repo = GIT_REPOSITORIES.find((r) => r.id === repoId)
   const currentBranch = GIT_BRANCHES.find((b) => b.id === branch)
   const commits = GIT_COMMITS.filter((c) => c.branch === branch)
+
+  const fileAccessors = useMemo(
+    () => ({
+      path: (f) => f.path,
+      status: (f) => f.status,
+      changes: (f) => f.additions + f.deletions,
+    }),
+    [],
+  )
+  const filesTable = useClientTable(GIT_CHANGED_FILES, {
+    pageSize: 15,
+    accessors: fileAccessors,
+    defaultSort: { key: 'path', direction: 'asc' },
+  })
 
   const toggleSuggestion = (id) =>
     setSelectedSuggestions((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))
@@ -82,10 +98,20 @@ export default function GitIntegrationPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[480px] text-left">
                     <thead className="border-b border-line bg-surface">
-                      <tr><th className={thClass}>File</th><th className={thClass}>Status</th><th className={thClass}>Changes</th></tr>
+                      <tr>
+                        <SortableLegacyTh sortKey="path" thProps={filesTable.thProps}>
+                          File
+                        </SortableLegacyTh>
+                        <SortableLegacyTh sortKey="status" thProps={filesTable.thProps}>
+                          Status
+                        </SortableLegacyTh>
+                        <SortableLegacyTh sortKey="changes" thProps={filesTable.thProps}>
+                          Changes
+                        </SortableLegacyTh>
+                      </tr>
                     </thead>
                     <tbody className="divide-y divide-line">
-                      {GIT_CHANGED_FILES.map((f) => (
+                      {filesTable.rows.map((f) => (
                         <tr key={f.path} className="hover:bg-surface/60">
                           <td className={`${tdClass} font-mono text-xs`}>{f.path}</td>
                           <td className={tdClass}><Badge tone={FILE_TONE[f.status]}>{f.status}</Badge></td>
@@ -94,6 +120,7 @@ export default function GitIntegrationPage() {
                       ))}
                     </tbody>
                   </table>
+                  <LegacyTableFooter table={filesTable} itemLabel="file" />
                 </div>
               </Panel>
 
