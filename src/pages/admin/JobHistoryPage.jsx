@@ -4,7 +4,7 @@ import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
 
 export default function JobHistoryPage() {
-  const { events, loading, error, reload } = useHistoryEvents('/api/admin/history/jobs')
+  const { events, loading, error, reload, pagination, sort, total } = useHistoryEvents('/api/admin/history/jobs')
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -22,6 +22,9 @@ export default function JobHistoryPage() {
             events={events}
             loading={loading}
             error={error}
+            total={total}
+            pagination={pagination}
+            sort={sort}
             emptyMessage="No job activity yet. Create or run triggers from Settings to populate this log."
           />
         </Panel>
