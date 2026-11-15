@@ -1,4 +1,5 @@
 import { createContext, useContext, useId, useMemo } from 'react'
+import TablePagination from './TablePagination.jsx'
 
 /** @typedef {'compact' | 'comfortable' | 'spacious'} TableDensity */
 /** @typedef {'primary' | 'violet' | 'teal' | 'amber' | 'cyan' | 'slate'} TableAccent */
@@ -176,6 +177,7 @@ function Th({
   scope = 'col',
   sortable = false,
   sortDirection,
+  onClick,
   className = '',
   ...rest
 }) {
@@ -192,6 +194,18 @@ function Th({
       aria-sort={
         sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : sortable ? 'none' : undefined
       }
+      onClick={sortable ? onClick : undefined}
+      onKeyDown={
+        sortable && onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onClick(e)
+              }
+            }
+          : undefined
+      }
+      tabIndex={sortable && onClick ? 0 : undefined}
       {...rest}
     >
       <span className="inline-flex items-center gap-1">
@@ -294,6 +308,7 @@ const DataTable = {
   Th,
   Td,
   FooterBar,
+  Pagination: TablePagination,
   EmptyBody,
   Skeleton,
   Message,
