@@ -2,6 +2,7 @@ import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 export default function ClientJobHistoryPage() {
   const { events, loading, error, reload, pagination, sort, total } = useHistoryEvents('/api/client/history/jobs')
@@ -11,7 +12,7 @@ export default function ClientJobHistoryPage() {
       <PageHeader
         title="Job history"
         description="Scheduler and trigger runs scoped to your schema."
-        breadcrumbs={['deepe', 'History', 'Jobs']}
+        breadcrumbs={brandBreadcrumbs('History', 'Jobs')}
         actions={
           <Button type="button" onClick={reload} disabled={loading}>
             Refresh

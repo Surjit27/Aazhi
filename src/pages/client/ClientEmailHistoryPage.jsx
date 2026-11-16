@@ -2,6 +2,7 @@ import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 export default function ClientEmailHistoryPage() {
   const { events, loading, error, reload, pagination, sort, total } = useHistoryEvents('/api/client/history/emails')
@@ -11,7 +12,7 @@ export default function ClientEmailHistoryPage() {
       <PageHeader
         title="Email history"
         description="Outbound email attempts for this client workspace."
-        breadcrumbs={['deepe', 'History', 'Emails']}
+        breadcrumbs={brandBreadcrumbs('History', 'Emails')}
         actions={
           <Button type="button" onClick={reload} disabled={loading}>
             Refresh

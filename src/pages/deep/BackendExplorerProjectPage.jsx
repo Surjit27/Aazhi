@@ -11,6 +11,7 @@ import FlowPlayground from '../../features/codeMap/FlowPlayground.jsx'
 import DeepExplorerCodeWorkspace from '../../features/deep/DeepExplorerCodeWorkspace.jsx'
 import { DISCOVERY_STAGES } from '../../data/deepBackend.js'
 import { useExplorerProjectsStore } from '../../stores/explorerProjectsStore.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 const TABS = [
   { id: 'overview', label: 'Overview', icon: Layers },
   { id: 'codebase', label: 'Codebase', icon: Code2 },
@@ -77,7 +78,7 @@ export default function BackendExplorerProjectPage({ projectId, connectedRepos }
       <PageHeader
         title={project.name}
         description={project.description || 'Backend reverse engineering and flow design workspace.'}
-        breadcrumbs={['deepe', 'Deep Backend', 'Backend Explorer', project.name]}
+        breadcrumbs={brandBreadcrumbs('Deep Backend', 'Backend Explorer')}
         actions={
           <>
             <Link to="/deep/explorer">

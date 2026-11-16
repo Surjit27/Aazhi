@@ -6,8 +6,10 @@ import Switch from '../components/ui/Switch.jsx'
 import { Field, Input } from '../components/ui/FormControls.jsx'
 import { apiFetch } from '../lib/api.js'
 import { clientAppOrigin, getPortal, PORTAL } from '../lib/portal.js'
+import { formatAccessRoleLabel } from '../lib/accessRoles.js'
 import { useAppStore } from '../stores/appStore.js'
 import { useAuthStore } from '../stores/authStore.js'
+import { brandBreadcrumbs } from '../lib/breadcrumbs.js'
 
 const EMAIL_TABS = [
   { id: 'configuration', label: 'Configuration' },
@@ -31,7 +33,7 @@ function ClientSettingsPage() {
       <PageHeader
         title="Settings"
         description="Workspace preferences on the client portal."
-        breadcrumbs={['deepe', 'Pages', 'Settings']}
+        breadcrumbs={brandBreadcrumbs('Pages', 'Settings')}
       />
       <div className="flex flex-col gap-6 px-6 pb-10">
         <Panel title="Your account">
@@ -41,7 +43,7 @@ function ClientSettingsPage() {
               <p className="mt-1 text-sm font-semibold text-ink">{user?.displayName || '—'}</p>
               <p className="text-xs text-ink-muted">{user?.email || '—'}</p>
               <p className="mt-2 text-xs text-ink-muted">
-                Access role: {user?.accessRoleKey === 'super_admin' ? 'Super admin' : user?.accessRoleKey || 'Member'}
+                Access role: {formatAccessRoleLabel(user?.accessRoleKey)}
               </p>
             </div>
             <div className="glass-inset p-4">
@@ -58,19 +60,7 @@ function ClientSettingsPage() {
   )
 }
 
-export default function SettingsPage() {
-  if (getPortal() === PORTAL.CLIENT) {
-    return <ClientSettingsPage />
-  }
-
-  if (getPortal() !== PORTAL.ADMIN) {
-    return (
-      <div className="flex min-h-0 flex-1 flex-col">
-        <PageHeader title="Settings" />
-      </div>
-    )
-  }
-
+function AdminSettingsPage() {
   const [tab, setTab] = useState('configuration')
 
   return (
@@ -107,6 +97,22 @@ export default function SettingsPage() {
       </div>
     </div>
   )
+}
+
+export default function SettingsPage() {
+  if (getPortal() === PORTAL.CLIENT) {
+    return <ClientSettingsPage />
+  }
+
+  if (getPortal() !== PORTAL.ADMIN) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <PageHeader title="Settings" />
+      </div>
+    )
+  }
+
+  return <AdminSettingsPage />
 }
 
 function EmailConfigurationTab() {

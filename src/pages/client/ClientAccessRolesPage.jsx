@@ -3,9 +3,11 @@ import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
 import { apiFetch } from '../../lib/api.js'
+import { accessRoleBadgeTone } from '../../lib/accessRoles.js'
 import { useAppStore } from '../../stores/appStore.js'
 import { useClientTable } from '../../hooks/useClientTable.js'
 import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 export default function ClientAccessRolesPage() {
   const pushToast = useAppStore((s) => s.pushToast)
@@ -32,7 +34,7 @@ export default function ClientAccessRolesPage() {
       <PageHeader
         title="Roles"
         description="Client workspace roles. New sign-ups receive Super admin by default."
-        breadcrumbs={['deepe', 'Access', 'Roles']}
+        breadcrumbs={brandBreadcrumbs('Access', 'Roles')}
       />
       <div className="p-4 md:p-6">
         <Panel title={`Client roles (${roles.length})`} bodyClassName="p-0">
@@ -55,7 +57,7 @@ export default function ClientAccessRolesPage() {
                 {table.rows.map((role) => (
                   <tr key={role.id}>
                     <td className={tdClass}>
-                      <Badge tone={role.key === 'super_admin' ? 'primary' : 'neutral'}>{role.label}</Badge>
+                      <Badge tone={accessRoleBadgeTone(role.key)}>{role.label}</Badge>
                     </td>
                     <td className={`${tdClass} font-mono text-xs`}>{role.key}</td>
                     <td className={`${tdClass} font-mono text-xs`}>{role.portal}</td>

@@ -10,6 +10,7 @@ import { useClientTable } from '../../hooks/useClientTable.js'
 import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { CLOUD_PROVIDERS } from '../../data/cloudProviders.js'
 import { useCloudProvidersStore } from '../../stores/cloudProvidersStore.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const EMPTY = {
   label: '',
@@ -72,7 +73,7 @@ export default function CloudIntegrationsPage() {
       <PageHeader
         title="Cloud deployment access"
         description="Connect AWS, GCP, or Azure so Event Scheduler can deploy workers and fire scheduled runs."
-        breadcrumbs={['deepe', 'Integrations', 'Cloud']}
+        breadcrumbs={brandBreadcrumbs('Integrations', 'Cloud')}
         actions={
           <Button variant="primary" onClick={openCreate}>
             <Plus size={14} /> Add profile
