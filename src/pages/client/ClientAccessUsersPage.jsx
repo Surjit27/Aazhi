@@ -9,9 +9,10 @@ import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
 import { useClientTable } from '../../hooks/useClientTable.js'
 import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { useAppStore } from '../../stores/appStore.js'
+import { ACCESS_ROLE, accessRoleBadgeTone, formatAccessRoleLabel, isSuperAdminUser } from '../../lib/accessRoles.js'
 import { useAuthStore } from '../../stores/authStore.js'
 
-const EMPTY = { email: '', password: '', displayName: '', accessRoleKey: 'member' }
+const EMPTY = { email: '', password: '', displayName: '', accessRoleKey: ACCESS_ROLE.MEMBER }
 
 export default function ClientAccessUsersPage() {
   const pushToast = useAppStore((s) => s.pushToast)
@@ -19,7 +20,7 @@ export default function ClientAccessUsersPage() {
   const [users, setUsers] = useState([])
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(EMPTY)
-  const isSuperAdmin = me?.accessRoleKey === 'super_admin' || !me?.accessRoleKey
+  const isSuperAdmin = isSuperAdminUser(me)
 
   const load = () =>
     apiFetch('/api/client/access/users')
@@ -89,8 +90,8 @@ export default function ClientAccessUsersPage() {
                   <td className={tdClass}>{u.email}</td>
                   <td className={tdClass}>{u.displayName || '—'}</td>
                   <td className={tdClass}>
-                    <Badge tone={u.accessRoleKey === 'super_admin' ? 'primary' : 'neutral'}>
-                      {u.accessRoleKey === 'super_admin' ? 'Super admin' : 'Member'}
+                    <Badge tone={accessRoleBadgeTone(u.accessRoleKey)}>
+                      {formatAccessRoleLabel(u.accessRoleKey)}
                     </Badge>
                   </td>
                 </tr>
@@ -128,8 +129,8 @@ export default function ClientAccessUsersPage() {
           </Field>
           <Field label="Access role">
             <Select value={form.accessRoleKey} onChange={(e) => setForm((f) => ({ ...f, accessRoleKey: e.target.value }))}>
-              <option value="member">Member</option>
-              <option value="super_admin">Super admin</option>
+              <option value={ACCESS_ROLE.MEMBER}>Member</option>
+              <option value={ACCESS_ROLE.SUPER_ADMIN}>Super admin</option>
             </Select>
           </Field>
         </form>
