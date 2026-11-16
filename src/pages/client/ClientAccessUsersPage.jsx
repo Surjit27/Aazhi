@@ -11,6 +11,7 @@ import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legac
 import { useAppStore } from '../../stores/appStore.js'
 import { ACCESS_ROLE, accessRoleBadgeTone, formatAccessRoleLabel, isSuperAdminUser } from '../../lib/accessRoles.js'
 import { useAuthStore } from '../../stores/authStore.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const EMPTY = { email: '', password: '', displayName: '', accessRoleKey: ACCESS_ROLE.MEMBER }
 
@@ -59,7 +60,7 @@ export default function ClientAccessUsersPage() {
       <PageHeader
         title="User management"
         description="Users in your tenant schema workspace. Super admin can invite members."
-        breadcrumbs={['deepe', 'Access', 'Users']}
+        breadcrumbs={brandBreadcrumbs('Access', 'Users')}
         actions={
           isSuperAdmin ? (
             <Button variant="primary" onClick={() => setOpen(true)}>

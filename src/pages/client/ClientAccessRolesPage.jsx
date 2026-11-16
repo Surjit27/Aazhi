@@ -7,6 +7,7 @@ import { accessRoleBadgeTone } from '../../lib/accessRoles.js'
 import { useAppStore } from '../../stores/appStore.js'
 import { useClientTable } from '../../hooks/useClientTable.js'
 import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 export default function ClientAccessRolesPage() {
   const pushToast = useAppStore((s) => s.pushToast)
@@ -33,7 +34,7 @@ export default function ClientAccessRolesPage() {
       <PageHeader
         title="Roles"
         description="Client workspace roles. New sign-ups receive Super admin by default."
-        breadcrumbs={['deepe', 'Access', 'Roles']}
+        breadcrumbs={brandBreadcrumbs('Access', 'Roles')}
       />
       <div className="p-4 md:p-6">
         <Panel title={`Client roles (${roles.length})`} bodyClassName="p-0">

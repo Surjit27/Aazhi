@@ -13,6 +13,7 @@ import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legac
 import { useAppStore } from '../../stores/appStore.js'
 import { isSuperAdminUser } from '../../lib/accessRoles.js'
 import { useAuthStore } from '../../stores/authStore.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const EMPTY_PAT = { accountEmail: '', label: '', token: '' }
 
@@ -196,7 +197,7 @@ export default function ClientGitHubConnectPage() {
       <PageHeader
         title="GitHub connections"
         description="Multiple GitHub accounts for microservices — OAuth and PAT can coexist; one row per account email."
-        breadcrumbs={['deepe', 'Deep Backend', 'GitHub']}
+        breadcrumbs={brandBreadcrumbs('Deep Backend', 'GitHub')}
         actions={
           isSuperAdmin ? (
             <Button variant="primary" onClick={() => setConfigureOpen(true)}>

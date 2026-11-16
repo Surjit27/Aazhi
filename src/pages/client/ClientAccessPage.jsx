@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Shield, Users } from 'lucide-react'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import { useAuthStore } from '../../stores/authStore.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 export default function ClientAccessPage() {
   const user = useAuthStore((s) => s.user)
@@ -11,7 +12,7 @@ export default function ClientAccessPage() {
       <PageHeader
         title="Access"
         description="Roles and user management for your tenant. New clients receive the Super admin role by default."
-        breadcrumbs={['deepe', 'Access']}
+        breadcrumbs={brandBreadcrumbs('Access')}
       />
 
       <div className="flex flex-col gap-6 px-6 pb-10">
