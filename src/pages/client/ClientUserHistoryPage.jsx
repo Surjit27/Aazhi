@@ -2,6 +2,7 @@ import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 export default function ClientUserHistoryPage() {
   const { events, loading, error, reload, pagination, sort, total } = useHistoryEvents('/api/client/history/users')
@@ -11,7 +12,7 @@ export default function ClientUserHistoryPage() {
       <PageHeader
         title="User history"
         description="Activity stored in your client schema only."
-        breadcrumbs={['deepe', 'History', 'Users']}
+        breadcrumbs={brandBreadcrumbs('History', 'Users')}
         actions={
           <Button type="button" onClick={reload} disabled={loading}>
             Refresh
