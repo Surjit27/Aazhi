@@ -6,6 +6,7 @@ import Switch from '../components/ui/Switch.jsx'
 import { Field, Input } from '../components/ui/FormControls.jsx'
 import { apiFetch } from '../lib/api.js'
 import { clientAppOrigin, getPortal, PORTAL } from '../lib/portal.js'
+import { formatAccessRoleLabel } from '../lib/accessRoles.js'
 import { useAppStore } from '../stores/appStore.js'
 import { useAuthStore } from '../stores/authStore.js'
 
@@ -41,7 +42,7 @@ function ClientSettingsPage() {
               <p className="mt-1 text-sm font-semibold text-ink">{user?.displayName || '—'}</p>
               <p className="text-xs text-ink-muted">{user?.email || '—'}</p>
               <p className="mt-2 text-xs text-ink-muted">
-                Access role: {user?.accessRoleKey === 'super_admin' ? 'Super admin' : user?.accessRoleKey || 'Member'}
+                Access role: {formatAccessRoleLabel(user?.accessRoleKey)}
               </p>
             </div>
             <div className="glass-inset p-4">
