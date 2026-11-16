@@ -6,6 +6,25 @@
     -webkit-backdrop-filter: none;
   }
 
+  /* Reads as one surface with .bg-app-canvas — soft top veil for nav contrast only. */
+  .home-page--marketing .home-site-header--transparent::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgb(243 245 248 / 0.55) 0%,
+      rgb(243 245 248 / 0.2) 55%,
+      transparent 100%
+    );
+  }
+
+  .home-page--marketing .home-site-header--transparent {
+    position: sticky;
+  }
+
   .home-site-header__grid {
     display: grid;
     grid-template-columns: 1fr auto 1fr;

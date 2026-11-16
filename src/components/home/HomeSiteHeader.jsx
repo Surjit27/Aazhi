@@ -20,7 +20,7 @@ export default function HomeSiteHeader({ authSlot = null, showSectionNav = true 
   }, [reducedMotion, showSectionNav])
 
   return (
-    <header className="home-site-header home-site-header--transparent sticky top-0 z-30 w-full">
+    <header className="home-site-header home-site-header--transparent sticky top-0 z-30 w-full relative">
       <div className="home-site-header__grid home-content-shell px-4 py-4 md:px-8 md:py-5">
         <Link
           to="/"
