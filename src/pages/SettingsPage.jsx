@@ -58,19 +58,7 @@ function ClientSettingsPage() {
   )
 }
 
-export default function SettingsPage() {
-  if (getPortal() === PORTAL.CLIENT) {
-    return <ClientSettingsPage />
-  }
-
-  if (getPortal() !== PORTAL.ADMIN) {
-    return (
-      <div className="flex min-h-0 flex-1 flex-col">
-        <PageHeader title="Settings" />
-      </div>
-    )
-  }
-
+function AdminSettingsPage() {
   const [tab, setTab] = useState('configuration')
 
   return (
@@ -107,6 +95,22 @@ export default function SettingsPage() {
       </div>
     </div>
   )
+}
+
+export default function SettingsPage() {
+  if (getPortal() === PORTAL.CLIENT) {
+    return <ClientSettingsPage />
+  }
+
+  if (getPortal() !== PORTAL.ADMIN) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <PageHeader title="Settings" />
+      </div>
+    )
+  }
+
+  return <AdminSettingsPage />
 }
 
 function EmailConfigurationTab() {
