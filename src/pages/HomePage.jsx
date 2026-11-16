@@ -1,3 +1,4 @@
+import HomeAutomationPipeline from '../components/home/HomeAutomationPipeline.jsx'
 import HomePageShell from '../components/home/HomePageShell.jsx'
 import HomePortalStrip from '../components/home/HomePortalStrip.jsx'
 import HomeProductRail from '../components/home/HomeProductRail.jsx'
@@ -129,10 +130,7 @@ export default function HomePage() {
         </section>
 
         <section id="platform" className="scroll-mt-28 border-b border-line py-14 md:py-18">
-          <div id="platform" className="glass-card home-reveal p-8 md:p-10 scroll-mt-28">
-            <p className="home-section-eyebrow text-ink-subtle">Continuous automation</p>
-            <h2 className="mt-2 text-xl font-semibold text-ink">Pipeline visualization ships in the next PR</h2>
-          </div>
+          <HomeAutomationPipeline />
         </section>
 
         <HomePortalStrip id="portals" className="scroll-mt-28 border-b border-line py-14 md:py-18" />
