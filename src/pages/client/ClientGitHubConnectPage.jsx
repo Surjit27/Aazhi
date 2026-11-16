@@ -11,6 +11,7 @@ import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
 import { useClientTable } from '../../hooks/useClientTable.js'
 import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { useAppStore } from '../../stores/appStore.js'
+import { isSuperAdminUser } from '../../lib/accessRoles.js'
 import { useAuthStore } from '../../stores/authStore.js'
 
 const EMPTY_PAT = { accountEmail: '', label: '', token: '' }
@@ -25,7 +26,7 @@ const ACCESS_TONE = { admin: 'primary', write: 'success', read: 'neutral', none:
 export default function ClientGitHubConnectPage() {
   const pushToast = useAppStore((s) => s.pushToast)
   const me = useAuthStore((s) => s.user)
-  const isSuperAdmin = me?.accessRoleKey === 'super_admin' || !me?.accessRoleKey
+  const isSuperAdmin = isSuperAdminUser(me)
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [status, setStatus] = useState(null)
