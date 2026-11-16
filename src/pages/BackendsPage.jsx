@@ -29,6 +29,7 @@ import { NOW_MS } from '../data/executions.js'
 import DataTable from '../components/ui/DataTable.jsx'
 import { useClientTable } from '../hooks/useClientTable.js'
 import { TableFooter } from '../features/tables/TableFooter.jsx'
+import { brandBreadcrumbs } from '../lib/breadcrumbs.js'
 
 const STATUS_TONE = { indexed: 'success', pending: 'warning', error: 'danger' }
 
@@ -90,7 +91,7 @@ export default function BackendsPage() {
       <PageHeader
         title="Backends"
         description="Configure services from Git, then reverse-engineer routes, code and workflows per backend."
-        breadcrumbs={['deepe', 'Backends', 'Registry']}
+        breadcrumbs={brandBreadcrumbs('Backends', 'Registry')}
         actions={
           <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={14} /> Add backend

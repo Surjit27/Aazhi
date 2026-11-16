@@ -10,6 +10,7 @@ import { Field, Input, Select, Textarea } from '../../components/ui/FormControls
 import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
 import { useExplorerProjectsStore } from '../../stores/explorerProjectsStore.js'
 import BackendExplorerProjectPage from './BackendExplorerProjectPage.jsx'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const WORKFLOW_OPTIONS = [
   { value: 'mono', label: 'Mono-repo (single service)' },
@@ -92,7 +93,7 @@ export default function BackendExplorerPage() {
       <PageHeader
         title="Backend Explorer"
         description="Projects group GitHub-linked repos, reverse-engineering, and Flow Studio — connect repos under GitHub connections."
-        breadcrumbs={['deepe', 'Deep Backend', 'Backend Explorer']}
+        breadcrumbs={brandBreadcrumbs('Deep Backend', 'Backend Explorer')}
         actions={
           <Button variant="primary" onClick={() => setCreateOpen(true)}>
             <Plus size={16} /> New project

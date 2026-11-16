@@ -12,6 +12,7 @@ import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legac
 import { usePagerStore } from '../../stores/pagerStore.js'
 import { formatDateTime } from '../../utils/format.js'
 import PagerProjectPage from './PagerProjectPage.jsx'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const STATUS_TONE = { live: 'success', saved: 'primary', draft: 'neutral' }
 
@@ -72,7 +73,7 @@ export default function PagerPage() {
       <PageHeader
         title="Pager"
         description="Pager projects hold hostable event workflows — open one to design on the canvas with AI."
-        breadcrumbs={['deepe', 'Deep Backend', 'Pager']}
+        breadcrumbs={brandBreadcrumbs('Deep Backend', 'Pager')}
         actions={
           <Button variant="primary" onClick={() => setCreateOpen(true)}>
             <Plus size={16} /> New Pager project
