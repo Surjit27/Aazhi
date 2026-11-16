@@ -14,6 +14,7 @@ import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import StatCard from '../../components/ui/StatCard.jsx'
 import UserDirectoryTable from '../../features/admin/UserDirectoryTable.jsx'
 import { useAppStore } from '../../stores/appStore.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug']
 
@@ -81,7 +82,7 @@ export default function AdminOverviewPage() {
       <PageHeader
         title="Overview"
         description="Users, activity, and workspace health."
-        breadcrumbs={['deepe', 'Dashboards', 'Overview']}
+        breadcrumbs={brandBreadcrumbs('Dashboards', 'Overview')}
       />
 
       <div className="flex flex-col gap-6 px-6 pb-10">

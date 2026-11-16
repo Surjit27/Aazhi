@@ -9,6 +9,7 @@ import { clientAppOrigin, getPortal, PORTAL } from '../lib/portal.js'
 import { formatAccessRoleLabel } from '../lib/accessRoles.js'
 import { useAppStore } from '../stores/appStore.js'
 import { useAuthStore } from '../stores/authStore.js'
+import { brandBreadcrumbs } from '../lib/breadcrumbs.js'
 
 const EMAIL_TABS = [
   { id: 'configuration', label: 'Configuration' },
@@ -32,7 +33,7 @@ function ClientSettingsPage() {
       <PageHeader
         title="Settings"
         description="Workspace preferences on the client portal."
-        breadcrumbs={['deepe', 'Pages', 'Settings']}
+        breadcrumbs={brandBreadcrumbs('Pages', 'Settings')}
       />
       <div className="flex flex-col gap-6 px-6 pb-10">
         <Panel title="Your account">
