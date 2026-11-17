@@ -33,7 +33,7 @@ export default function ClientUserManagementPage() {
         pushToast({ tone: 'danger', title: 'Popup blocked', body: 'Allow popups for the admin console, then try again.' })
         return
       }
-      tab.location = `${clientAppOrigin()}/session#${code}`
+      tab.location = `${clientAppOrigin()}/session#${encodeURIComponent(code)}`
       try {
         tab.opener = null
       } catch {

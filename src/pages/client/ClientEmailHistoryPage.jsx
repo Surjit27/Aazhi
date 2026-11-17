@@ -28,6 +28,8 @@ export default function ClientEmailHistoryPage() {
             total={total}
             pagination={pagination}
             sort={sort}
+            showEmailPreview
+            previewApiPath="/api/client/history/email-previews"
             emptyMessage="No email history in your workspace yet."
           />
         </Panel>

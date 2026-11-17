@@ -25,7 +25,8 @@ export default function EmailHistoryPage() {
             total={total}
             pagination={pagination}
             sort={sort}
-            emptyMessage="No email activity yet. Updates and test sends from Settings will appear here."
+            showEmailPreview
+            emptyMessage="No email activity yet. Previews and test sends from Settings will appear here."
           />
         </Panel>
       </div>
