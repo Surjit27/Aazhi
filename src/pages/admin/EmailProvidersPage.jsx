@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
-import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
+import { Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { Field, Input, Select } from '../../components/ui/FormControls.jsx'
 import { apiFetch } from '../../lib/api.js'
-import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 import { useAppStore } from '../../stores/appStore.js'
 
 const thClass = 'px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-ink-subtle'
@@ -49,64 +48,64 @@ export default function EmailProvidersPage() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <PageHeader
+    <div className="px-6 pb-10 pt-2">
+      <Panel
         title="Email providers"
-        description="Transactional senders — SendGrid today, more providers later."
-        breadcrumbs={brandBreadcrumbs('Admin', 'Settings', 'Email providers')}
+        description="SendGrid today — configure, preview, and test from the provider row."
+        bodyClassName="p-0"
         actions={
           <Button type="button" onClick={() => setOpen(true)}>
             <Plus size={16} />
             Create email provider
           </Button>
         }
-      />
-      <div className="px-6 pb-10">
-        <Panel title="Configured providers" bodyClassName="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse">
-              <thead className="bg-surface">
-                <tr className="border-b border-line">
-                  <th className={thClass}>Name</th>
-                  <th className={thClass}>Type</th>
-                  <th className={thClass}>Status</th>
-                  <th className={thClass}>From</th>
-                  <th className={thClass}>API key</th>
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse">
+            <thead className="bg-surface">
+              <tr className="border-b border-line">
+                <th className={thClass}>Name</th>
+                <th className={thClass}>Type</th>
+                <th className={thClass}>Status</th>
+                <th className={thClass}>From</th>
+                <th className={thClass}>API key</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line bg-white">
+              {providers.map((row) => (
+                <tr key={row.id}>
+                  <td className={tdClass}>
+                    <Link
+                      to={`/settings/email/${row.id}`}
+                      className="font-medium text-primary-600 hover:underline"
+                    >
+                      {row.name}
+                    </Link>
+                    {row.isDefault ? (
+                      <Badge tone="primary" className="ml-2">
+                        Default
+                      </Badge>
+                    ) : null}
+                  </td>
+                  <td className={tdClass}>{row.providerLabel}</td>
+                  <td className={tdClass}>
+                    <Badge tone={row.status === 'active' ? 'success' : 'neutral'}>{row.status}</Badge>
+                  </td>
+                  <td className={`${tdClass} font-mono text-xs`}>{row.fromEmail || '—'}</td>
+                  <td className={tdClass}>{row.apiKeyMasked || '—'}</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-line bg-white">
-                {providers.map((row) => (
-                  <tr key={row.id}>
-                    <td className={tdClass}>
-                      <Link to={`/settings/email-providers/${row.id}`} className="font-medium text-primary-600 hover:underline">
-                        {row.name}
-                      </Link>
-                      {row.isDefault ? (
-                        <Badge tone="primary" className="ml-2">
-                          Default
-                        </Badge>
-                      ) : null}
-                    </td>
-                    <td className={tdClass}>{row.providerLabel}</td>
-                    <td className={tdClass}>
-                      <Badge tone={row.status === 'active' ? 'success' : 'neutral'}>{row.status}</Badge>
-                    </td>
-                    <td className={`${tdClass} font-mono text-xs`}>{row.fromEmail || '—'}</td>
-                    <td className={tdClass}>{row.apiKeyMasked || '—'}</td>
-                  </tr>
-                ))}
-                {!providers.length ? (
-                  <tr>
-                    <td colSpan={5} className="px-3 py-8 text-center text-sm text-ink-muted">
-                      No providers yet. Create SendGrid to get started.
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
-        </Panel>
-      </div>
+              ))}
+              {!providers.length ? (
+                <tr>
+                  <td colSpan={5} className="px-3 py-8 text-center text-sm text-ink-muted">
+                    No providers yet. Create SendGrid to get started.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Create email provider">
         <form className="grid gap-4 p-1" onSubmit={onCreate}>

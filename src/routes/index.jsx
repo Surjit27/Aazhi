@@ -1,4 +1,4 @@
-import { Navigate, Route } from 'react-router-dom'
+import { Navigate, Route, useParams } from 'react-router-dom'
 import { CalendarClock, History, Mail, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react'
 import {
   CLIENT_NAV,
@@ -10,6 +10,7 @@ import {
 import BackendLayout from '../components/layout/BackendLayout.jsx'
 import HomeRedirect from '../components/auth/HomeRedirect.jsx'
 import SettingsPage from '../pages/SettingsPage.jsx'
+import AdminSettingsLayout from '../pages/admin/AdminSettingsLayout.jsx'
 import EmailProvidersPage from '../pages/admin/EmailProvidersPage.jsx'
 import EmailProviderDetailPage from '../pages/admin/EmailProviderDetailPage.jsx'
 import ApiTokenProvidersPage from '../pages/admin/ApiTokenProvidersPage.jsx'
@@ -50,6 +51,26 @@ import NotFoundPage from '../pages/NotFoundPage.jsx'
 export { CLIENT_NAV, CLIENT_ACCESS_NAV, CLIENT_DEEP_BACKEND_NAV, CLIENT_HISTORY_NAV, CLIENT_PAGES_NAV }
 
 /** Admin portal sidebar (admin.localhost only). */
+function RedirectLegacyEmailProvider() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/settings/email/${id}` : '/settings/email'} replace />
+}
+
+function RedirectLegacyApiToken() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/settings/api/${id}` : '/settings/api'} replace />
+}
+
+function RedirectLegacyIntegrationsEmail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/settings/email/${id}` : '/settings/email'} replace />
+}
+
+function RedirectLegacyIntegrationsApi() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/settings/api/${id}` : '/settings/api'} replace />
+}
+
 export const ADMIN_NAV = [
   { to: '/overview', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/roles', label: 'Roles', icon: Shield },
@@ -74,11 +95,22 @@ export function AdminPortalRoutes() {
       <Route path="admin/history/emails" element={<EmailHistoryPage />} />
       <Route path="admin/history/jobs" element={<JobHistoryPage />} />
       <Route path="admin/users" element={<Navigate to="/admin/client-users" replace />} />
-      <Route path="settings" element={<SettingsPage />} />
-      <Route path="settings/email-providers" element={<EmailProvidersPage />} />
-      <Route path="settings/email-providers/:id" element={<EmailProviderDetailPage />} />
-      <Route path="settings/api-tokens" element={<ApiTokenProvidersPage />} />
-      <Route path="settings/api-tokens/:id" element={<ApiTokenProviderDetailPage />} />
+      <Route path="settings" element={<AdminSettingsLayout />}>
+        <Route index element={<Navigate to="email" replace />} />
+        <Route path="email" element={<EmailProvidersPage />} />
+        <Route path="email/:id" element={<EmailProviderDetailPage />} />
+        <Route path="api" element={<ApiTokenProvidersPage />} />
+        <Route path="api/:id" element={<ApiTokenProviderDetailPage />} />
+      </Route>
+      <Route path="settings/integrations/email" element={<Navigate to="/settings/email" replace />} />
+      <Route path="settings/integrations/email/:id" element={<RedirectLegacyIntegrationsEmail />} />
+      <Route path="settings/integrations/api" element={<Navigate to="/settings/api" replace />} />
+      <Route path="settings/integrations/api/:id" element={<RedirectLegacyIntegrationsApi />} />
+      <Route path="settings/ai" element={<Navigate to="/settings/api" replace />} />
+      <Route path="settings/email-providers" element={<Navigate to="/settings/email" replace />} />
+      <Route path="settings/email-providers/:id" element={<RedirectLegacyEmailProvider />} />
+      <Route path="settings/api-tokens" element={<Navigate to="/settings/api" replace />} />
+      <Route path="settings/api-tokens/:id" element={<RedirectLegacyApiToken />} />
       <Route path="backends" element={<Navigate to="/overview" replace />} />
       <Route path="backends/*" element={<Navigate to="/overview" replace />} />
       <Route path="mocks" element={<Navigate to="/overview" replace />} />

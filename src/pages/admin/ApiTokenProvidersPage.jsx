@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
-import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
+import { Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { Field, Input, Select } from '../../components/ui/FormControls.jsx'
 import { apiFetch } from '../../lib/api.js'
-import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 import { useAppStore } from '../../stores/appStore.js'
 
 const thClass = 'px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-ink-subtle'
@@ -53,55 +52,62 @@ export default function ApiTokenProvidersPage() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <PageHeader
+    <div className="px-6 pb-10 pt-2">
+      {storageNote ? <p className="mb-3 text-xs text-ink-muted">{storageNote}</p> : null}
+      <Panel
         title="Model API tokens"
-        description="LLM and inference keys — stored only in the Python worker database (schema ai)."
-        breadcrumbs={brandBreadcrumbs('Admin', 'Settings', 'API tokens')}
+        description="OpenAI, Gemini, Claude, Cursor, Cerebras, Groq, Mistral, OpenRouter."
+        bodyClassName="p-0"
         actions={
           <Button type="button" onClick={() => setOpen(true)}>
             <Plus size={16} />
             Create API token
           </Button>
         }
-      />
-      <div className="px-6 pb-10">
-        {storageNote ? <p className="mb-4 text-xs text-ink-muted">{storageNote}</p> : null}
-        <Panel title="Configured tokens" bodyClassName="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] border-collapse">
-              <thead className="bg-surface">
-                <tr className="border-b border-line">
-                  <th className={thClass}>Name</th>
-                  <th className={thClass}>Provider</th>
-                  <th className={thClass}>Status</th>
-                  <th className={thClass}>Free allowance</th>
-                  <th className={thClass}>Best for</th>
-                  <th className={thClass}>Key</th>
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[800px] border-collapse">
+            <thead className="bg-surface">
+              <tr className="border-b border-line">
+                <th className={thClass}>Name</th>
+                <th className={thClass}>Provider</th>
+                <th className={thClass}>Status</th>
+                <th className={thClass}>Free allowance</th>
+                <th className={thClass}>Best for</th>
+                <th className={thClass}>Key</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line bg-white">
+              {providers.map((row) => (
+                <tr key={row.id}>
+                  <td className={tdClass}>
+                    <Link
+                      to={`/settings/api/${row.id}`}
+                      className="font-medium text-primary-600 hover:underline"
+                    >
+                      {row.name}
+                    </Link>
+                  </td>
+                  <td className={tdClass}>{row.providerLabel}</td>
+                  <td className={tdClass}>
+                    <Badge tone={row.status === 'active' ? 'success' : 'neutral'}>{row.status}</Badge>
+                  </td>
+                  <td className={`${tdClass} text-xs text-ink-muted`}>{row.freeAllowance || '—'}</td>
+                  <td className={`${tdClass} text-xs text-ink-muted`}>{row.bestFor || '—'}</td>
+                  <td className={tdClass}>{row.apiKeyMasked || '—'}</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-line bg-white">
-                {providers.map((row) => (
-                  <tr key={row.id}>
-                    <td className={tdClass}>
-                      <Link to={`/settings/api-tokens/${row.id}`} className="font-medium text-primary-600 hover:underline">
-                        {row.name}
-                      </Link>
-                    </td>
-                    <td className={tdClass}>{row.providerLabel}</td>
-                    <td className={tdClass}>
-                      <Badge tone={row.status === 'active' ? 'success' : 'neutral'}>{row.status}</Badge>
-                    </td>
-                    <td className={`${tdClass} text-xs text-ink-muted`}>{row.freeAllowance || '—'}</td>
-                    <td className={`${tdClass} text-xs text-ink-muted`}>{row.bestFor || '—'}</td>
-                    <td className={tdClass}>{row.apiKeyMasked || '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Panel>
-      </div>
+              ))}
+              {!providers.length ? (
+                <tr>
+                  <td colSpan={6} className="px-3 py-8 text-center text-sm text-ink-muted">
+                    No API tokens yet. Create a provider row to store a key.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Create API token">
         <form className="grid gap-4" onSubmit={onCreate}>

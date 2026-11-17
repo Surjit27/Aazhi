@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
+import { useParams } from 'react-router-dom'
+import { Panel } from '../../components/ui/Panel.jsx'
+import SettingsBackLink from '../../components/settings/SettingsBackLink.jsx'
 import { apiFetch } from '../../lib/api.js'
-import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 import { useAppStore } from '../../stores/appStore.js'
 import EmailProviderWorkspace from '../../features/settings/EmailProviderWorkspace.jsx'
 
@@ -22,22 +22,19 @@ export default function EmailProviderDetailPage() {
   }, [load])
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <PageHeader
-        title={provider?.name ?? 'Email provider'}
-        description={provider ? `${provider.providerLabel} · ${provider.status}` : 'Loading…'}
-        breadcrumbs={brandBreadcrumbs('Admin', 'Settings', 'Email providers', provider?.name ?? id)}
-        actions={
-          <Link to="/settings/email-providers" className="text-xs font-medium text-primary-600 hover:underline">
-            ← All email providers
-          </Link>
-        }
-      />
-      <div className="px-6 pb-10">
-        <Panel bodyClassName="p-4">
-          {provider ? <EmailProviderWorkspace providerId={id} provider={provider} onProviderChange={setProvider} /> : null}
-        </Panel>
+    <div className="px-6 pb-10 pt-2">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold text-ink">{provider?.name ?? 'Email provider'}</h2>
+          <p className="mt-0.5 text-xs text-ink-muted">
+            {provider ? `${provider.providerLabel} · ${provider.status}` : 'Loading…'}
+          </p>
+        </div>
+        <SettingsBackLink integration="email" />
       </div>
+      <Panel bodyClassName="p-4">
+        {provider ? <EmailProviderWorkspace providerId={id} provider={provider} onProviderChange={setProvider} /> : null}
+      </Panel>
     </div>
   )
 }

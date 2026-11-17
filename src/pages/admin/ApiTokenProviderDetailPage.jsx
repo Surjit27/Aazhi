@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
+import { useParams } from 'react-router-dom'
+import { Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Switch from '../../components/ui/Switch.jsx'
+import SettingsBackLink from '../../components/settings/SettingsBackLink.jsx'
 import { Field, Input } from '../../components/ui/FormControls.jsx'
 import { apiFetch } from '../../lib/api.js'
-import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 import { useAppStore } from '../../stores/appStore.js'
 
 export default function ApiTokenProviderDetailPage() {
@@ -56,56 +56,51 @@ export default function ApiTokenProviderDetailPage() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <PageHeader
-        title={provider?.name ?? 'API token'}
-        description={provider?.providerLabel}
-        breadcrumbs={brandBreadcrumbs('Admin', 'Settings', 'API tokens', provider?.name ?? id)}
-        actions={
-          <Link to="/settings/api-tokens" className="text-xs font-medium text-primary-600 hover:underline">
-            ← All API tokens
-          </Link>
-        }
-      />
-      <div className="px-6 pb-10">
-        <Panel title="Configuration">
-          {provider ? (
-            <form className="grid max-w-2xl gap-4 p-5" onSubmit={save}>
-              <div className="glass-inset rounded-lg p-4 text-xs text-ink-muted">
-                <p>
-                  <strong className="text-ink">Free allowance:</strong> {provider.freeAllowance || '—'}
-                </p>
-                <p className="mt-2">
-                  <strong className="text-ink">Best for:</strong> {provider.bestFor || '—'}
-                </p>
-                <p className="mt-2">
-                  Storage: <span className="font-mono">ai.api_token_providers</span>
-                </p>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs font-medium text-ink">Active</span>
-                <Switch
-                  checked={form.status === 'active'}
-                  onChange={(on) => setForm((c) => ({ ...c, status: on ? 'active' : 'inactive' }))}
-                  label="Status"
-                />
-              </div>
-              <Badge tone={form.status === 'active' ? 'success' : 'neutral'}>{form.status}</Badge>
-              <Field label="API key" hint={provider.apiKeyMasked ? 'Leave blank to keep saved key.' : 'Paste key from provider dashboard.'}>
-                <Input type="password" value={form.apiKey} onChange={(e) => setForm((c) => ({ ...c, apiKey: e.target.value }))} autoComplete="off" />
-              </Field>
-              <Field label="Base URL (optional)" hint="For Cursor or OpenAI-compatible endpoints.">
-                <Input value={form.baseUrl} onChange={(e) => setForm((c) => ({ ...c, baseUrl: e.target.value }))} placeholder="https://api.openai.com/v1" />
-              </Field>
-              <div className="flex justify-end">
-                <Button type="submit" disabled={saving}>
-                  {saving ? 'Saving…' : 'Save token'}
-                </Button>
-              </div>
-            </form>
-          ) : null}
-        </Panel>
+    <div className="px-6 pb-10 pt-2">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold text-ink">{provider?.name ?? 'API token'}</h2>
+          <p className="mt-0.5 text-xs text-ink-muted">{provider?.providerLabel}</p>
+        </div>
+        <SettingsBackLink integration="api" />
       </div>
+      <Panel title="Configuration">
+        {provider ? (
+          <form className="grid max-w-2xl gap-4 p-5" onSubmit={save}>
+            <div className="glass-inset rounded-lg p-4 text-xs text-ink-muted">
+              <p>
+                <strong className="text-ink">Free allowance:</strong> {provider.freeAllowance || '—'}
+              </p>
+              <p className="mt-2">
+                <strong className="text-ink">Best for:</strong> {provider.bestFor || '—'}
+              </p>
+              <p className="mt-2">
+                Storage: <span className="font-mono">ai.api_token_providers</span>
+              </p>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-medium text-ink">Active</span>
+              <Switch
+                checked={form.status === 'active'}
+                onChange={(on) => setForm((c) => ({ ...c, status: on ? 'active' : 'inactive' }))}
+                label="Status"
+              />
+            </div>
+            <Badge tone={form.status === 'active' ? 'success' : 'neutral'}>{form.status}</Badge>
+            <Field label="API key" hint={provider.apiKeyMasked ? 'Leave blank to keep saved key.' : 'Paste key from provider dashboard.'}>
+              <Input type="password" value={form.apiKey} onChange={(e) => setForm((c) => ({ ...c, apiKey: e.target.value }))} autoComplete="off" />
+            </Field>
+            <Field label="Base URL (optional)" hint="For Cursor or OpenAI-compatible endpoints.">
+              <Input value={form.baseUrl} onChange={(e) => setForm((c) => ({ ...c, baseUrl: e.target.value }))} placeholder="https://api.openai.com/v1" />
+            </Field>
+            <div className="flex justify-end">
+              <Button type="submit" disabled={saving}>
+                {saving ? 'Saving…' : 'Save token'}
+              </Button>
+            </div>
+          </form>
+        ) : null}
+      </Panel>
     </div>
   )
 }

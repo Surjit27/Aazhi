@@ -1,16 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch, setStoredToken } from '../lib/api.js'
 import { useAuthStore } from '../stores/authStore.js'
 
 const PENDING_IMPERSONATION_KEY = 'aazhi_impersonate_pending'
 
-/** Dedupe exchange + navigate once; survives React Strict Mode double-mount. */
+/** Dedupe exchange across React Strict Mode double-mount (codes are single-use on the server). */
 const exchangeByCode = new Map()
-const navigatedForCode = new Set()
+const settledByCode = new Map()
 
 function readImpersonationCode() {
-  let code = window.location.hash.replace(/^#/, '').trim()
+  const rawHash = window.location.hash.replace(/^#/, '').trim()
+  let code = rawHash
+  if (rawHash) {
+    try {
+      code = decodeURIComponent(rawHash)
+    } catch {
+      code = rawHash
+    }
+  }
   if (!code) {
     code = sessionStorage.getItem(PENDING_IMPERSONATION_KEY) ?? ''
   }
@@ -29,11 +37,26 @@ export default function ImpersonateSessionPage() {
   const navigate = useNavigate()
   const applySession = useAuthStore((s) => s.applySession)
   const [message, setMessage] = useState('Opening client session…')
+  const appliedRef = useRef(false)
 
   useEffect(() => {
     const code = readImpersonationCode()
     if (!code) {
       setMessage('Missing impersonation code. Start again from the admin console.')
+      return
+    }
+
+    const finish = (data) => {
+      if (appliedRef.current) return
+      appliedRef.current = true
+      setStoredToken(data.token, { isolated: true })
+      applySession(data.token, data.user)
+      navigate('/dashboard', { replace: true })
+    }
+
+    const cached = settledByCode.get(code)
+    if (cached) {
+      finish(cached)
       return
     }
 
@@ -45,10 +68,12 @@ export default function ImpersonateSessionPage() {
         auth: false,
       })
         .then((data) => {
+          settledByCode.set(code, data)
           sessionStorage.removeItem(PENDING_IMPERSONATION_KEY)
           return data
         })
         .catch((err) => {
+          exchangeByCode.delete(code)
           sessionStorage.removeItem(PENDING_IMPERSONATION_KEY)
           throw err
         })
@@ -56,20 +81,9 @@ export default function ImpersonateSessionPage() {
     }
 
     promise
-      .then(({ token, user }) => {
-        setStoredToken(token, { isolated: true })
-        applySession(token, user)
-        if (!navigatedForCode.has(code)) {
-          navigatedForCode.add(code)
-          navigate('/dashboard', { replace: true })
-        }
-      })
+      .then(finish)
       .catch((err) => {
         setMessage(err.message || 'Could not open the client session')
-      })
-      .finally(() => {
-        exchangeByCode.delete(code)
-        navigatedForCode.delete(code)
       })
   }, [applySession, navigate])
 
