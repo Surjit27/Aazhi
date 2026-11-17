@@ -37,6 +37,100 @@ const EMPTY_EMAIL = {
   apiKey: '',
   apiKeySet: false,
   apiKeySource: 'none',
+  apiKeyMasked: null,
+  apiKeySavedInDatabase: false,
+  storageTable: 'email_settings',
+  storageColumn: null,
+  updatedAt: null,
+}
+
+const thClass = 'px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-ink-subtle'
+const tdClass = 'px-3 py-2.5 text-sm text-ink'
+
+function formatSettingsTimestamp(value) {
+  if (!value) return '—'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+  return date.toLocaleString()
+}
+
+function apiKeySourceLabel(source) {
+  if (source === 'saved') return 'Database (encrypted)'
+  if (source === 'env') return 'API environment'
+  return 'Not configured'
+}
+
+function SendGridSavedKeysTable({ email }) {
+  const rows = [
+    {
+      label: 'PostgreSQL table',
+      value: (
+        <span className="font-mono text-xs">
+          public.{email.storageTable ?? 'email_settings'}
+          {email.storageColumn ? (
+            <>
+              <span className="text-ink-muted"> · </span>
+              {email.storageColumn}
+            </>
+          ) : null}
+        </span>
+      ),
+    },
+    {
+      label: 'API key',
+      value: email.apiKeyMasked ? (
+        <span className="font-mono text-xs">{email.apiKeyMasked}</span>
+      ) : (
+        <span className="text-ink-muted">No key</span>
+      ),
+    },
+    {
+      label: 'Key source',
+      value: (
+        <Badge tone={email.apiKeySet ? 'success' : 'neutral'}>{apiKeySourceLabel(email.apiKeySource)}</Badge>
+      ),
+    },
+    {
+      label: 'From address',
+      value: email.fromEmail || '—',
+    },
+    {
+      label: 'From name',
+      value: email.fromName || '—',
+    },
+    {
+      label: 'Last saved',
+      value: <span className="text-xs tabular-nums text-ink-muted">{formatSettingsTimestamp(email.updatedAt)}</span>,
+    },
+    {
+      label: 'Delivery',
+      value: <Badge tone={email.enabled ? 'success' : 'neutral'}>{email.enabled ? 'Enabled' : 'Disabled'}</Badge>,
+    },
+  ]
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-line">
+      <table className="w-full min-w-[320px] border-collapse">
+        <thead className="bg-surface">
+          <tr className="border-b border-line">
+            <th className={thClass}>Setting</th>
+            <th className={thClass}>Current value</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-line bg-white">
+          {rows.map((row) => (
+            <tr key={row.label}>
+              <td className={`${tdClass} w-[40%] text-xs font-medium text-ink-muted`}>{row.label}</td>
+              <td className={tdClass}>{row.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="border-t border-line bg-surface px-3 py-2 text-[11px] text-ink-subtle">
+        Keys pasted in the form below are encrypted at rest; only a masked suffix is shown here.
+      </p>
+    </div>
+  )
 }
 
 function SettingsPillBar({ tab, onTab }) {
@@ -302,7 +396,9 @@ function EmailConfigurationTab() {
         : 'Create a key in SendGrid. It starts with SG. and is stored encrypted.'
 
   return (
-    <form className="grid max-w-xl grid-cols-1 gap-4" onSubmit={save}>
+    <div className="grid max-w-2xl grid-cols-1 gap-5">
+      <SendGridSavedKeysTable email={form} />
+      <form className="grid grid-cols-1 gap-4" onSubmit={save}>
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs font-medium text-ink">Enabled</span>
         <Switch checked={form.enabled} onChange={(enabled) => setForm((current) => ({ ...current, enabled }))} label="Enable email" />
@@ -310,8 +406,11 @@ function EmailConfigurationTab() {
       <Field label="SendGrid API key" hint={keyHint}>
         <Input type="password" value={form.apiKey} onChange={set('apiKey')} autoComplete="off" placeholder="SG." />
       </Field>
-      <Field label="From address">
-        <Input type="email" value={form.fromEmail} onChange={set('fromEmail')} placeholder="noreply@example.com" required={form.enabled} />
+      <Field
+        label="From address"
+        hint="Must match a verified Sender Identity in SendGrid (Settings → Sender Authentication). Use that exact email here—not a placeholder domain."
+      >
+        <Input type="email" value={form.fromEmail} onChange={set('fromEmail')} placeholder="noreply@yourdomain.com" required={form.enabled} />
       </Field>
       <Field label="From name">
         <Input value={form.fromName} onChange={set('fromName')} placeholder="deepe" />
@@ -322,6 +421,7 @@ function EmailConfigurationTab() {
         </Button>
       </div>
     </form>
+    </div>
   )
 }
 
@@ -329,27 +429,101 @@ function EmailTestTab() {
   const pushToast = useAppStore((s) => s.pushToast)
   const [testTo, setTestTo] = useState('')
   const [testing, setTesting] = useState(false)
+  const [fromEmail, setFromEmail] = useState('')
+
+  useEffect(() => {
+    apiFetch('/api/settings/email')
+      .then(({ email }) => setFromEmail(email.fromEmail || ''))
+      .catch(() => setFromEmail(''))
+  }, [])
 
   const sendTest = async () => {
     setTesting(true)
     try {
       const result = await apiFetch('/api/settings/email/test', { method: 'POST', body: { to: testTo } })
-      pushToast({ title: 'Test email sent', body: result.to })
+      const body = [
+        `To: ${result.to}`,
+        result.from ? `From: ${result.from}` : null,
+        result.messageId ? `SendGrid ID: ${result.messageId}` : null,
+        result.deliveryNote || 'Check inbox and spam. In SendGrid: Email Activity.',
+      ]
+        .filter(Boolean)
+        .join(' · ')
+      pushToast({ title: 'SendGrid accepted the test', body })
     } catch (err) {
-      pushToast({ tone: 'danger', title: 'Could not send test email', body: err.message })
+      const body = String(err.message ?? '')
+      const senderIdentity = /sender identity|verified sender/i.test(body)
+      pushToast({
+        tone: 'danger',
+        title: senderIdentity ? 'From address not verified in SendGrid' : 'Could not send test email',
+        body: senderIdentity
+          ? `${body} In SendGrid: Settings → Sender Authentication → verify Single Sender or authenticate your domain, then set the same From address here.`
+          : body,
+      })
     } finally {
       setTesting(false)
     }
   }
 
   return (
-    <div className="grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-      <Field label="Send a test to">
-        <Input type="email" value={testTo} onChange={(event) => setTestTo(event.target.value)} placeholder="you@example.com" />
-      </Field>
-      <Button type="button" onClick={sendTest} disabled={testing}>
-        {testing ? 'Sending…' : 'Send test'}
-      </Button>
+    <div className="grid max-w-2xl grid-cols-1 gap-4">
+      <div className="rounded-lg border border-warning-50 bg-warning-50/40 p-4 text-sm text-ink">
+        <p className="font-medium text-ink">Sender identity must match SendGrid</p>
+        <p className="mt-2 text-xs leading-relaxed text-ink-muted">
+          Current <span className="font-medium text-ink">From address</span>:{' '}
+          <span className="font-mono">{fromEmail || '(none saved—set on Configuration tab)'}</span>
+        </p>
+        <ol className="mt-3 list-decimal space-y-1.5 pl-4 text-xs text-ink-muted">
+          <li>
+            Open{' '}
+            <a
+              href="https://app.sendgrid.com/settings/sender_auth/senders"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-primary-600 hover:underline"
+            >
+              SendGrid → Single Sender Verification
+            </a>{' '}
+            (same login as the account that owns your API key).
+          </li>
+          <li>
+            Create or open the sender for <span className="font-mono">{fromEmail || 'your From email'}</span> and complete
+            verification (link in the inbox for that address).
+          </li>
+          <li>
+            Save the <strong>same</strong> address on the Configuration tab, then run test send again.
+          </li>
+        </ol>
+        <a
+          href="https://sendgrid.com/docs/for-developers/sending-email/sender-identity/"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-block text-xs font-medium text-primary-600 hover:underline"
+        >
+          SendGrid sender identity docs →
+        </a>
+        <p className="mt-3 border-t border-warning-50 pt-3 text-xs text-ink-muted">
+          API <strong className="text-ink">200</strong> means SendGrid accepted the message, not that it is in your inbox yet. Check{' '}
+          <strong>Spam</strong>, wait a few minutes, then{' '}
+          <a
+            href="https://app.sendgrid.com/email_activity"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium text-primary-600 hover:underline"
+          >
+            Email Activity
+          </a>{' '}
+          for <em>Delivered</em>, <em>Deferred</em>, or <em>Bounce</em>.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+        <Field label="Send a test to">
+          <Input type="email" value={testTo} onChange={(event) => setTestTo(event.target.value)} placeholder="you@example.com" />
+        </Field>
+        <Button type="button" onClick={sendTest} disabled={testing}>
+          {testing ? 'Sending…' : 'Send test'}
+        </Button>
+      </div>
     </div>
   )
 }
