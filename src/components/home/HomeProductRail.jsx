@@ -47,19 +47,19 @@ const SLIDES_ADMIN = [
     title: 'Onboard and support client teams',
     bullets: [
       'Client and admin user directories',
-      'Feature flags per client schema',
+      'Impersonation with isolated sessions',
       'History for users, email, and jobs',
     ],
   },
   {
-    id: 'flags',
+    id: 'ops',
     icon: Flag,
-    eyebrow: 'Feature flags',
-    title: 'Ship capabilities with control',
+    eyebrow: 'Operations',
+    title: 'Email, jobs, and audit history',
     bullets: [
-      'Toggle client portal surfaces safely',
-      'Map nav paths to routes',
-      'Email and scheduler settings in one place',
+      'SendGrid configuration for transactional mail',
+      'BullMQ-backed job triggers and run history',
+      'Audit trails across users and impersonation',
     ],
   },
 ]
