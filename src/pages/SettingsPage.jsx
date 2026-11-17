@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { PageHeader, Panel } from '../components/ui/Panel.jsx'
 import Button from '../components/ui/Button.jsx'
 import Switch from '../components/ui/Switch.jsx'
+import PillTabNav from '../components/ui/PillTabNav.jsx'
 import { Field, Input } from '../components/ui/FormControls.jsx'
 import { apiFetch } from '../lib/api.js'
 import { clientAppOrigin, getPortal, PORTAL } from '../lib/portal.js'
@@ -35,7 +36,7 @@ function ClientSettingsPage() {
         description="Workspace preferences on the client portal."
         breadcrumbs={brandBreadcrumbs('Pages', 'Settings')}
       />
-      <div className="flex flex-col gap-6 px-6 pb-10">
+      <div className="flex flex-col gap-6 px-6 py-6">
         <Panel title="Your account">
           <div className="grid gap-4 p-5 sm:grid-cols-2">
             <div className="glass-inset p-4">
@@ -61,37 +62,23 @@ function ClientSettingsPage() {
 }
 
 function AdminSettingsPage() {
-  const [tab, setTab] = useState('configuration')
+  const [emailTab, setEmailTab] = useState('configuration')
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <PageHeader title="Settings" />
-      <div className="flex flex-1 flex-col overflow-y-auto p-4 md:p-6">
-        <Panel title="Email configuration" bodyClassName="p-0">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <PageHeader
+        title="Settings"
+        description="SendGrid delivery for invites, alerts, and admin notifications."
+        breadcrumbs={brandBreadcrumbs('Admin', 'Settings')}
+      />
+      <div className="flex flex-col gap-6 px-6 pb-10 pt-2">
+        <Panel title="SendGrid" bodyClassName="p-0">
           <div className="border-b border-line px-4 py-3">
-            <div className="inline-flex gap-1 rounded-lg border border-line bg-surface p-0.5" role="tablist" aria-label="Email settings">
-              {EMAIL_TABS.map(({ id, label }) => {
-                const active = tab === id
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => setTab(id)}
-                    className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                      active ? 'bg-white text-ink shadow-card' : 'text-ink-muted hover:text-ink'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                )
-              })}
-            </div>
+            <PillTabNav tabs={EMAIL_TABS} value={emailTab} onChange={setEmailTab} ariaLabel="Email settings" />
           </div>
           <div className="p-4">
-            {tab === 'configuration' && <EmailConfigurationTab />}
-            {tab === 'test' && <EmailTestTab />}
+            {emailTab === 'configuration' && <EmailConfigurationTab />}
+            {emailTab === 'test' && <EmailTestTab />}
           </div>
         </Panel>
       </div>
