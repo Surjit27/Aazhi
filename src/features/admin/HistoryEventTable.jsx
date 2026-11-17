@@ -1,6 +1,11 @@
 import { useMemo, useState } from 'react'
+import { Eye } from 'lucide-react'
 import Badge from '../../components/ui/Badge.jsx'
+import Button from '../../components/ui/Button.jsx'
+import Modal from '../../components/ui/Modal.jsx'
 import DataTable from '../../components/ui/DataTable.jsx'
+import EmailHtmlPreview from '../email/EmailHtmlPreview.jsx'
+import { apiFetch } from '../../lib/api.js'
 import { TableFooter } from '../tables/TableFooter.jsx'
 import { sortRows } from '../../utils/tableSort.js'
 import { nextSortDirection } from '../../utils/tableSort.js'
@@ -48,9 +53,15 @@ export default function HistoryEventTable({
   pagination,
   sort,
   total = 0,
+  showEmailPreview = false,
+  previewApiPath = '/api/settings/email/previews',
 }) {
   const [localSortKey, setLocalSortKey] = useState(null)
   const [localSortDirection, setLocalSortDirection] = useState(null)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const [previewError, setPreviewError] = useState('')
+  const [previewDoc, setPreviewDoc] = useState(null)
 
   const toggleLocalSort = (key) => {
     const next = nextSortDirection(localSortKey, localSortDirection, key)
@@ -80,10 +91,28 @@ export default function HistoryEventTable({
     return events
   }, [events, localSortKey, localSortDirection])
 
+  const colCount = showEmailPreview ? 7 : 6
+
+  const openPreview = async (previewId) => {
+    if (!previewId) return
+    setPreviewOpen(true)
+    setPreviewLoading(true)
+    setPreviewError('')
+    setPreviewDoc(null)
+    try {
+      const { preview } = await apiFetch(`${previewApiPath}/${previewId}`)
+      setPreviewDoc(preview)
+    } catch (err) {
+      setPreviewError(err.message || 'Could not load preview')
+    } finally {
+      setPreviewLoading(false)
+    }
+  }
+
   if (loading) {
     return (
       <DataTable.Root minWidth={960} aria-label="Event history">
-        <DataTable.Skeleton columns={6} rows={8} />
+        <DataTable.Skeleton columns={colCount} rows={8} />
       </DataTable.Root>
     )
   }
@@ -104,6 +133,7 @@ export default function HistoryEventTable({
         : null
 
   return (
+    <>
     <DataTable.Root minWidth={960} aria-label="Event history">
       <DataTable.Scroll>
         <DataTable.Table>
@@ -112,11 +142,12 @@ export default function HistoryEventTable({
             <DataTable.Th {...th('event')}>Event</DataTable.Th>
             <DataTable.Th {...th('resource')}>Resource</DataTable.Th>
             <DataTable.Th {...th('performedBy')}>Performed by</DataTable.Th>
+            {showEmailPreview ? <DataTable.Th>Preview</DataTable.Th> : null}
             <DataTable.Th {...th('request')}>Request</DataTable.Th>
             <DataTable.Th {...th('response')}>Response</DataTable.Th>
           </DataTable.Head>
           {rows.length === 0 ? (
-            <DataTable.EmptyBody colSpan={6} message={emptyMessage} />
+            <DataTable.EmptyBody colSpan={colCount} message={emptyMessage} />
           ) : (
             <DataTable.Body>
               {rows.map((ev) => {
@@ -131,6 +162,7 @@ export default function HistoryEventTable({
                 const response = ev.response ?? ev.metadata?.response
                 const legacyMeta =
                   !request && !response && ev.metadata && Object.keys(ev.metadata).length > 0 ? ev.metadata : null
+                const previewId = ev.previewId ?? ev.metadata?.previewId
 
                 return (
                   <DataTable.Row key={ev.id}>
@@ -140,6 +172,17 @@ export default function HistoryEventTable({
                     </DataTable.Td>
                     <DataTable.Td className="text-xs">{resource}</DataTable.Td>
                     <DataTable.Td className="text-xs text-ink-muted">{performedBy}</DataTable.Td>
+                    {showEmailPreview ? (
+                      <DataTable.Td>
+                        {previewId ? (
+                          <Button type="button" size="sm" variant="secondary" onClick={() => openPreview(previewId)}>
+                            <Eye size={14} /> View
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-ink-subtle">—</span>
+                        )}
+                      </DataTable.Td>
+                    ) : null}
                     <DataTable.Td
                       className="max-w-[14rem] truncate font-mono text-[11px] text-ink-muted"
                       title={formatPayload(request)}
@@ -161,5 +204,31 @@ export default function HistoryEventTable({
       </DataTable.Scroll>
       {(rows.length > 0 || total > 0) && <TableFooter summary={summary} pagination={pagination} />}
     </DataTable.Root>
+    {showEmailPreview ? (
+      <Modal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        title="Stored email preview"
+        width="max-w-3xl"
+        description="HTML snapshot saved when you previewed or sent from Settings."
+      >
+        {previewLoading ? (
+          <p className="text-sm text-ink-muted">Loading preview…</p>
+        ) : previewError ? (
+          <p className="text-sm text-danger-700">{previewError}</p>
+        ) : previewDoc ? (
+          <EmailHtmlPreview
+            html={previewDoc.html}
+            subject={previewDoc.subject}
+            fromLabel={
+              previewDoc.from?.email
+                ? `${previewDoc.from.name ? `${previewDoc.from.name} ` : ''}<${previewDoc.from.email}>`
+                : null
+            }
+          />
+        ) : null}
+      </Modal>
+    ) : null}
+    </>
   )
 }

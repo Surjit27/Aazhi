@@ -13,6 +13,7 @@ import { formatAccessRoleLabel } from '../lib/accessRoles.js'
 import { useAppStore } from '../stores/appStore.js'
 import { useAuthStore } from '../stores/authStore.js'
 import { brandBreadcrumbs } from '../lib/breadcrumbs.js'
+import EmailHtmlPreview from '../features/email/EmailHtmlPreview.jsx'
 import {
   AI_MODELS,
   AI_SCAN_DEPTHS,
@@ -21,12 +22,13 @@ import {
 } from '../stores/platformSettingsStore.js'
 
 const SETTINGS_TABS = [
-  { id: 'email', label: 'SendGrid email' },
+  { id: 'integrations', label: 'Integrations' },
   { id: 'ai', label: 'AI configuration' },
 ]
 
 const EMAIL_TABS = [
   { id: 'configuration', label: 'Configuration' },
+  { id: 'preview', label: 'Preview' },
   { id: 'test', label: 'Test send' },
 ]
 
@@ -176,19 +178,46 @@ function ClientSettingsPage() {
   )
 }
 
+function AdminIntegrationsHub() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <Panel title="Email providers" description="SendGrid and future delivery providers — configure, preview, and test per provider.">
+        <p className="p-5 text-xs text-ink-muted">
+          Keys live in <span className="font-mono">public.email_providers</span> on the Node API database.
+        </p>
+        <div className="border-t border-line px-5 py-4">
+          <Link to="/settings/email-providers" className="text-sm font-medium text-primary-600 hover:underline">
+            Open email providers →
+          </Link>
+        </div>
+      </Panel>
+      <Panel title="Model API tokens" description="OpenAI, Google AI Studio, Claude, Cursor, Cerebras, Groq, Mistral, OpenRouter.">
+        <p className="p-5 text-xs text-ink-muted">
+          Keys live only in the Python worker DB (<span className="font-mono">ai.api_token_providers</span>).
+        </p>
+        <div className="border-t border-line px-5 py-4">
+          <Link to="/settings/api-tokens" className="text-sm font-medium text-primary-600 hover:underline">
+            Open API tokens →
+          </Link>
+        </div>
+      </Panel>
+    </div>
+  )
+}
+
 function AdminSettingsPage() {
-  const [tab, setTab] = useState('email')
+  const [tab, setTab] = useState('integrations')
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Settings"
-        description="SendGrid delivery and AI worker defaults."
+        description="Integrations, model API tokens, and AI worker defaults."
         breadcrumbs={brandBreadcrumbs('Admin', 'Settings')}
       />
       <SettingsPillBar tab={tab} onTab={setTab} />
       <div className="flex flex-col gap-6 px-6 pb-10 pt-2">
-        {tab === 'email' && <AdminEmailSettingsSection />}
+        {tab === 'integrations' && <AdminIntegrationsHub />}
         {tab === 'ai' && <AdminAiSettingsSection />}
       </div>
     </div>
@@ -196,7 +225,20 @@ function AdminSettingsPage() {
 }
 
 function AdminEmailSettingsSection() {
+  const pushToast = useAppStore((s) => s.pushToast)
   const [emailTab, setEmailTab] = useState('configuration')
+  const [qaMeta, setQaMeta] = useState(null)
+  const [qaVariables, setQaVariables] = useState({ recipientName: 'there', summary: '' })
+
+  useEffect(() => {
+    apiFetch('/api/settings/email/templates')
+      .then(({ templates: list }) => {
+        const qa = list?.[0] ?? null
+        setQaMeta(qa)
+        if (qa?.sampleVars) setQaVariables(qa.sampleVars)
+      })
+      .catch((err) => pushToast({ tone: 'danger', title: 'Could not load QA email template', body: err.message }))
+  }, [pushToast])
 
   return (
     <Panel
@@ -209,7 +251,10 @@ function AdminEmailSettingsSection() {
       </div>
       <div className="p-4">
         {emailTab === 'configuration' && <EmailConfigurationTab />}
-        {emailTab === 'test' && <EmailTestTab />}
+        {emailTab === 'preview' && (
+          <EmailPreviewTab qaMeta={qaMeta} variables={qaVariables} onVariablesChange={setQaVariables} />
+        )}
+        {emailTab === 'test' && <EmailTestTab variables={qaVariables} />}
       </div>
     </Panel>
   )
@@ -322,8 +367,8 @@ function AdminAiSettingsSection() {
           <div className="glass-inset rounded-lg p-4">
             <p className="text-[10px] font-semibold uppercase text-ink-subtle">Model API keys</p>
             <p className="mt-1 text-xs leading-relaxed text-ink-muted">
-              Set <span className="font-mono">OPENAI_API_KEY</span> and <span className="font-mono">GOOGLE_API_KEY</span> on the
-              Python API (<span className="font-mono">.env</span>). Keys are not stored in the browser.
+              Manage keys under <Link to="/settings/api-tokens" className="font-medium text-primary-600 hover:underline">Settings → API tokens</Link>.
+              Values are stored in the Python worker database (<span className="font-mono">ai.api_token_providers</span>).
             </p>
           </div>
           <div className="flex justify-end">
@@ -425,22 +470,104 @@ function EmailConfigurationTab() {
   )
 }
 
-function EmailTestTab() {
+function EmailPreviewTab({ qaMeta, variables, onVariablesChange }) {
+  const pushToast = useAppStore((s) => s.pushToast)
+  const [preview, setPreview] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const refreshPreview = async () => {
+    setLoading(true)
+    try {
+      const { preview: body } = await apiFetch('/api/settings/email/preview', {
+        method: 'POST',
+        body: { variables },
+      })
+      setPreview(body)
+      if (body.previewId) {
+        pushToast({ title: 'Preview saved', body: 'Stored in email history — open History → Email to view.' })
+      }
+    } catch (err) {
+      pushToast({ tone: 'danger', title: 'Could not render preview', body: err.message })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (qaMeta) refreshPreview()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qaMeta?.id])
+
+  const varKeys = Object.keys(variables)
+
+  return (
+    <div className="grid max-w-3xl grid-cols-1 gap-4">
+      <p className="text-xs text-ink-muted">
+        QA layout from <span className="font-mono text-[11px]">templateConstants.qa.js</span> (preview / test send). Production copy lives
+        in <span className="font-mono text-[11px]">templateConstants.js</span>.
+      </p>
+      {qaMeta?.description ? <p className="text-xs text-ink-subtle">{qaMeta.description}</p> : null}
+      {varKeys.length > 0 ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {varKeys.map((key) => (
+            <Field key={key} label={key}>
+              <Input
+                value={variables[key] ?? ''}
+                onChange={(e) => onVariablesChange((v) => ({ ...v, [key]: e.target.value }))}
+              />
+            </Field>
+          ))}
+        </div>
+      ) : null}
+      <div className="flex justify-end">
+        <Button type="button" variant="secondary" onClick={refreshPreview} disabled={loading}>
+          {loading ? 'Rendering…' : 'Refresh preview'}
+        </Button>
+      </div>
+      <EmailHtmlPreview
+        html={preview?.html}
+        subject={preview?.subject}
+        fromLabel={
+          preview?.from?.email
+            ? `${preview.from.name ? `${preview.from.name} ` : ''}<${preview.from.email}>`
+            : null
+        }
+      />
+    </div>
+  )
+}
+
+function EmailTestTab({ variables }) {
   const pushToast = useAppStore((s) => s.pushToast)
   const [testTo, setTestTo] = useState('')
   const [testing, setTesting] = useState(false)
   const [fromEmail, setFromEmail] = useState('')
+  const [testRecipients, setTestRecipients] = useState([])
+
+  const loadTestRecipients = () =>
+    apiFetch('/api/settings/email/test-recipients')
+      .then(({ recipients }) => setTestRecipients(Array.isArray(recipients) ? recipients : []))
+      .catch(() => setTestRecipients([]))
 
   useEffect(() => {
     apiFetch('/api/settings/email')
       .then(({ email }) => setFromEmail(email.fromEmail || ''))
       .catch(() => setFromEmail(''))
+    loadTestRecipients()
   }, [])
 
   const sendTest = async () => {
     setTesting(true)
     try {
-      const result = await apiFetch('/api/settings/email/test', { method: 'POST', body: { to: testTo } })
+      const recipientName = testTo.includes('@') ? testTo.split('@')[0] : testTo
+      const result = await apiFetch('/api/settings/email/test', {
+        method: 'POST',
+        body: {
+          to: testTo,
+          recipientName,
+          variables,
+        },
+      })
       const body = [
         `To: ${result.to}`,
         result.from ? `From: ${result.from}` : null,
@@ -449,6 +576,8 @@ function EmailTestTab() {
       ]
         .filter(Boolean)
         .join(' · ')
+      setTestTo(result.to || testTo)
+      await loadTestRecipients()
       pushToast({ title: 'SendGrid accepted the test', body })
     } catch (err) {
       const body = String(err.message ?? '')
@@ -516,9 +645,34 @@ function EmailTestTab() {
           for <em>Delivered</em>, <em>Deferred</em>, or <em>Bounce</em>.
         </p>
       </div>
+      <Field
+        label="Previous test addresses"
+        hint={testRecipients.length ? 'Choose one or enter a new address below.' : 'Addresses appear here after you send a successful test.'}
+      >
+        <Select
+          value={testRecipients.includes(testTo) ? testTo : ''}
+          onChange={(event) => {
+            const next = event.target.value
+            if (next) setTestTo(next)
+          }}
+          disabled={!testRecipients.length}
+        >
+          <option value="">{testRecipients.length ? 'Choose a saved address…' : 'No saved addresses yet'}</option>
+          {testRecipients.map((email) => (
+            <option key={email} value={email}>
+              {email}
+            </option>
+          ))}
+        </Select>
+      </Field>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
         <Field label="Send a test to">
-          <Input type="email" value={testTo} onChange={(event) => setTestTo(event.target.value)} placeholder="you@example.com" />
+          <Input
+            type="email"
+            value={testTo}
+            onChange={(event) => setTestTo(event.target.value)}
+            placeholder="you@example.com"
+          />
         </Field>
         <Button type="button" onClick={sendTest} disabled={testing}>
           {testing ? 'Sending…' : 'Send test'}

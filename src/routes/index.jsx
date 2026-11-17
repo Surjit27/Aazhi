@@ -10,6 +10,10 @@ import {
 import BackendLayout from '../components/layout/BackendLayout.jsx'
 import HomeRedirect from '../components/auth/HomeRedirect.jsx'
 import SettingsPage from '../pages/SettingsPage.jsx'
+import EmailProvidersPage from '../pages/admin/EmailProvidersPage.jsx'
+import EmailProviderDetailPage from '../pages/admin/EmailProviderDetailPage.jsx'
+import ApiTokenProvidersPage from '../pages/admin/ApiTokenProvidersPage.jsx'
+import ApiTokenProviderDetailPage from '../pages/admin/ApiTokenProviderDetailPage.jsx'
 import ClientPortalPage from '../pages/ClientPortalPage.jsx'
 import BackendsPage from '../pages/BackendsPage.jsx'
 import BackendOverviewPage from '../pages/BackendOverviewPage.jsx'
@@ -71,6 +75,10 @@ export function AdminPortalRoutes() {
       <Route path="admin/history/jobs" element={<JobHistoryPage />} />
       <Route path="admin/users" element={<Navigate to="/admin/client-users" replace />} />
       <Route path="settings" element={<SettingsPage />} />
+      <Route path="settings/email-providers" element={<EmailProvidersPage />} />
+      <Route path="settings/email-providers/:id" element={<EmailProviderDetailPage />} />
+      <Route path="settings/api-tokens" element={<ApiTokenProvidersPage />} />
+      <Route path="settings/api-tokens/:id" element={<ApiTokenProviderDetailPage />} />
       <Route path="backends" element={<Navigate to="/overview" replace />} />
       <Route path="backends/*" element={<Navigate to="/overview" replace />} />
       <Route path="mocks" element={<Navigate to="/overview" replace />} />
