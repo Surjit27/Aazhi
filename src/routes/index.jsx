@@ -15,6 +15,7 @@ import EmailProvidersPage from '../pages/admin/EmailProvidersPage.jsx'
 import EmailProviderDetailPage from '../pages/admin/EmailProviderDetailPage.jsx'
 import ApiTokenProvidersPage from '../pages/admin/ApiTokenProvidersPage.jsx'
 import ApiTokenProviderDetailPage from '../pages/admin/ApiTokenProviderDetailPage.jsx'
+import AdminPersonalSettingsSection from '../pages/admin/AdminPersonalSettingsSection.jsx'
 import ClientPortalPage from '../pages/ClientPortalPage.jsx'
 import BackendsPage from '../pages/BackendsPage.jsx'
 import BackendOverviewPage from '../pages/BackendOverviewPage.jsx'
@@ -96,7 +97,8 @@ export function AdminPortalRoutes() {
       <Route path="admin/history/jobs" element={<JobHistoryPage />} />
       <Route path="admin/users" element={<Navigate to="/admin/client-users" replace />} />
       <Route path="settings" element={<AdminSettingsLayout />}>
-        <Route index element={<Navigate to="email" replace />} />
+        <Route index element={<Navigate to="personal" replace />} />
+        <Route path="personal" element={<AdminPersonalSettingsSection />} />
         <Route path="email" element={<EmailProvidersPage />} />
         <Route path="email/:id" element={<EmailProviderDetailPage />} />
         <Route path="api" element={<ApiTokenProvidersPage />} />

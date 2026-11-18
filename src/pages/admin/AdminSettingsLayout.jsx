@@ -5,13 +5,15 @@ import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 
 const SETTINGS_TABS = [
+  { id: 'personal', label: 'Personal' },
   { id: 'email', label: 'Email' },
   { id: 'api', label: 'API model configure' },
 ]
 
 function resolveTab(pathname) {
   if (pathname.includes('/settings/api')) return 'api'
-  return 'email'
+  if (pathname.includes('/settings/email')) return 'email'
+  return 'personal'
 }
 
 export default function AdminSettingsLayout() {
@@ -25,7 +27,9 @@ export default function AdminSettingsLayout() {
   }
 
   const onTab = (id) => {
-    navigate(id === 'api' ? '/settings/api' : '/settings/email')
+    if (id === 'api') navigate('/settings/api')
+    else if (id === 'email') navigate('/settings/email')
+    else navigate('/settings/personal')
   }
 
   return (
