@@ -1,5 +1,6 @@
 import PersonalSettingsPanel from '../../components/settings/PersonalSettingsPanel.jsx'
 import PasswordChangePanel from '../../components/settings/PasswordChangePanel.jsx'
+import TwoFactorPanel from '../../components/settings/TwoFactorPanel.jsx'
 
 export default function AdminPersonalSettingsSection() {
   return (
@@ -9,6 +10,7 @@ export default function AdminPersonalSettingsSection() {
         description="Preferences for your admin account — separate from platform email and API configuration."
       />
       <PasswordChangePanel />
+      <TwoFactorPanel />
     </div>
   )
 }

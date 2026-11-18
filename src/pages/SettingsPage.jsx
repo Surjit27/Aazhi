@@ -6,6 +6,7 @@ import { useAuthStore } from '../stores/authStore.js'
 import { brandBreadcrumbs } from '../lib/breadcrumbs.js'
 import PersonalSettingsPanel from '../components/settings/PersonalSettingsPanel.jsx'
 import PasswordChangePanel from '../components/settings/PasswordChangePanel.jsx'
+import TwoFactorPanel from '../components/settings/TwoFactorPanel.jsx'
 
 function ClientSettingsPage() {
   const user = useAuthStore((s) => s.user)
@@ -37,6 +38,7 @@ function ClientSettingsPage() {
         </Panel>
         <PersonalSettingsPanel />
         <PasswordChangePanel />
+        <TwoFactorPanel />
       </div>
     </div>
   )
