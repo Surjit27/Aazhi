@@ -5,6 +5,7 @@ import { formatAccessRoleLabel } from '../lib/accessRoles.js'
 import { useAuthStore } from '../stores/authStore.js'
 import { brandBreadcrumbs } from '../lib/breadcrumbs.js'
 import PersonalSettingsPanel from '../components/settings/PersonalSettingsPanel.jsx'
+import PasswordChangePanel from '../components/settings/PasswordChangePanel.jsx'
 
 function ClientSettingsPage() {
   const user = useAuthStore((s) => s.user)
@@ -35,6 +36,7 @@ function ClientSettingsPage() {
           </div>
         </Panel>
         <PersonalSettingsPanel />
+        <PasswordChangePanel />
       </div>
     </div>
   )
