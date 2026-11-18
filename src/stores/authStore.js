@@ -102,6 +102,39 @@ export const useAuthStore = create((set, get) => ({
     set({ user: null, token: null, twoFactorPending: null, error: null })
   },
 
+  completeTwoFactor: async (code) => {
+    const pending = get().twoFactorPending
+    if (!pending?.pendingToken) {
+      const err = new Error('Two-factor session expired — sign in again')
+      set({ error: err.message })
+      throw err
+    }
+    set({ loading: true, error: null })
+    try {
+      const data = await apiFetch('/api/auth/two-factor/verify-login', {
+        method: 'POST',
+        body: { pendingToken: pending.pendingToken, code },
+        auth: false,
+      })
+      const { token, user, handoffCode } = data
+      if (getPortal() === PORTAL.HOME && handoffCode) {
+        set({ loading: false, twoFactorPending: null, error: null })
+        openClientSessionWithHandoff(handoffCode)
+        return user
+      }
+      setStoredToken(token)
+      set({ user, token, loading: false, twoFactorPending: null })
+      usePersonalSettingsStore.getState().fetch()
+      useAccountSecurityStore.getState().fetchSecurity()
+      return user
+    } catch (err) {
+      set({ error: err.message, loading: false })
+      throw err
+    }
+  },
+
+  clearTwoFactorPending: () => set({ twoFactorPending: null, error: null }),
+
   isAdmin: () => get().user?.role === 'admin',
   isClient: () => get().user?.role === 'client',
 }))
