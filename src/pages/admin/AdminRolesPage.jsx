@@ -9,6 +9,8 @@ import { useClientTable } from '../../hooks/useClientTable.js'
 import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { apiFetch } from '../../lib/api.js'
 import { adminAppOrigin, clientAppOrigin, PORTAL } from '../../lib/portal.js'
+import { summarizePermissions } from '../../lib/rolePermissions.js'
+import RolePermissionsModal from '../../components/admin/RolePermissionsModal.jsx'
 import { useAppStore } from '../../stores/appStore.js'
 
 const EMPTY = { key: '', label: '', portal: PORTAL.CLIENT }
@@ -17,6 +19,7 @@ export default function AdminRolesPage() {
   const pushToast = useAppStore((s) => s.pushToast)
   const [roles, setRoles] = useState([])
   const [open, setOpen] = useState(false)
+  const [permRole, setPermRole] = useState(null)
   const [form, setForm] = useState(EMPTY)
 
   const load = () =>
@@ -55,6 +58,7 @@ export default function AdminRolesPage() {
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Roles"
+        description="Portal roles and per-page permissions (Settings, Feature flags, history, and more)."
         actions={
           <Button variant="primary" onClick={() => setOpen(true)}>
             Create role
@@ -78,6 +82,9 @@ export default function AdminRolesPage() {
                     Portal
                   </SortableLegacyTh>
                   <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+                    Page permissions
+                  </th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
                     Sign-in URL
                   </th>
                 </tr>
@@ -92,6 +99,12 @@ export default function AdminRolesPage() {
                       </td>
                       <td className={`${tdClass} font-mono text-xs`}>{role.key}</td>
                       <td className={`${tdClass} font-mono text-xs`}>{role.portal}</td>
+                      <td className={tdClass}>
+                        <p className="text-xs text-ink-muted">{summarizePermissions(role.portal, role.permissions)}</p>
+                        <Button size="sm" variant="secondary" className="mt-1" onClick={() => setPermRole(role)}>
+                          Edit permissions
+                        </Button>
+                      </td>
                       <td className={`${tdClass} font-mono text-xs`}>
                         <a href={`${origin}/login`} className="text-primary-700 hover:underline">
                           {origin}/login
@@ -102,7 +115,7 @@ export default function AdminRolesPage() {
                 })}
                 {table.total === 0 && (
                   <tr>
-                    <td colSpan={4} className={`${tdClass} py-8 text-center text-xs text-ink-muted`}>
+                    <td colSpan={5} className={`${tdClass} py-8 text-center text-xs text-ink-muted`}>
                       No roles yet.
                     </td>
                   </tr>
@@ -113,6 +126,18 @@ export default function AdminRolesPage() {
           </div>
         </Panel>
       </div>
+
+      <RolePermissionsModal
+        role={permRole}
+        portal={permRole?.portal ?? PORTAL.ADMIN}
+        catalogPath={
+          permRole ? `/api/auth/roles/permissions/catalog?portal=${encodeURIComponent(permRole.portal)}` : ''
+        }
+        patchPath={permRole ? `/api/auth/roles/${encodeURIComponent(permRole.key)}/permissions` : ''}
+        open={Boolean(permRole)}
+        onClose={() => setPermRole(null)}
+        onSaved={() => load()}
+      />
 
       <Modal
         open={open}
