@@ -39,7 +39,7 @@ export default function AdminSettingsLayout() {
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Settings"
-        description="Personal account, email delivery, model keys, and client portal feature flags."
+        description="Personal account, email delivery, model keys, and client portal feature flags. Gate feature flags per admin role on the Roles page."
         breadcrumbs={brandBreadcrumbs('Admin', 'Settings')}
       />
       <div className="border-b border-line px-6 pb-4 pt-2">
