@@ -1,16 +1,19 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import AppLayout from './components/layout/AppLayout.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import { HostRoleSync } from './components/auth/HostSurfaceGate.jsx'
 import PortalGate from './components/auth/PortalGate.jsx'
 import ClientFeatureGate from './components/auth/ClientFeatureGate.jsx'
+import RouteLoadingFallback from './components/ui/RouteLoadingFallback.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import ForbiddenPage from './pages/ForbiddenPage.jsx'
 import ImpersonateSessionPage from './pages/ImpersonateSessionPage.jsx'
-import HomePage from './pages/HomePage.jsx'
-import HomeLoginPage from './pages/HomeLoginPage.jsx'
-import HomeSignUpPage from './pages/HomeSignUpPage.jsx'
+
+const HomePage = lazy(() => import('./pages/HomePage.jsx'))
+const HomeLoginPage = lazy(() => import('./pages/HomeLoginPage.jsx'))
+const HomeSignUpPage = lazy(() => import('./pages/HomeSignUpPage.jsx'))
 import { redirectBareLocalhostToClient } from './lib/appHost.js'
 import { getPortal, PORTAL } from './lib/portal.js'
 import { AdminPortalRoutes, ClientPortalRoutes } from './routes/index.jsx'
@@ -27,12 +30,14 @@ export default function App() {
 
   if (portal === PORTAL.HOME) {
     return (
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<HomeLoginPage />} />
-        <Route path="/signup" element={<HomeSignUpPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<HomeLoginPage />} />
+          <Route path="/signup" element={<HomeSignUpPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     )
   }
 
