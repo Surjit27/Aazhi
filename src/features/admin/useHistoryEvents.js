@@ -13,41 +13,33 @@ export function useHistoryEvents(apiPath) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const load = useCallback(() => {
+  const fetchEvents = useCallback((path, { isCancelled = () => false } = {}) => {
     setLoading(true)
     setError(null)
-    return apiFetch(apiPath)
+    return apiFetch(path)
       .then((r) => {
+        if (isCancelled()) return
         setEvents(r.events ?? [])
       })
       .catch((e) => {
-        setEvents([])
-        setError(historyErrorMessage(e))
-      })
-      .finally(() => setLoading(false))
-  }, [apiPath])
-
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setError(null)
-    apiFetch(apiPath)
-      .then((r) => {
-        if (cancelled) return
-        setEvents(r.events ?? [])
-      })
-      .catch((e) => {
-        if (cancelled) return
+        if (isCancelled()) return
         setEvents([])
         setError(historyErrorMessage(e))
       })
       .finally(() => {
-        if (!cancelled) setLoading(false)
+        if (!isCancelled()) setLoading(false)
       })
+  }, [])
+
+  const load = useCallback(() => fetchEvents(apiPath), [apiPath, fetchEvents])
+
+  useEffect(() => {
+    let cancelled = false
+    void fetchEvents(apiPath, { isCancelled: () => cancelled })
     return () => {
       cancelled = true
     }
-  }, [apiPath])
+  }, [apiPath, fetchEvents])
 
   return { events, loading, error, reload: load }
 }
