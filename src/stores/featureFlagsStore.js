@@ -27,6 +27,7 @@ export const useFeatureFlagsStore = create((set, get) => ({
       set({ loaded: false, flags: [], byPath: {} })
       return
     }
+    if (get().loaded) return
     try {
       const { flags } = await apiFetch('/api/client/feature-flags')
       const list = flags ?? []
