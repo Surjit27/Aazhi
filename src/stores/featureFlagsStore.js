@@ -15,6 +15,8 @@ export const useFeatureFlagsStore = create((set, get) => ({
   flags: [],
   byPath: {},
 
+  reset: () => set({ loaded: false, flags: [], byPath: {} }),
+
   loadClientFlags: async () => {
     if (getPortal() !== PORTAL.CLIENT) {
       set({ loaded: true, flags: [], byPath: {} })

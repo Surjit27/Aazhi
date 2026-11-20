@@ -13,6 +13,7 @@ export const useAuthStore = create((set, get) => ({
   bootstrap: async () => {
     const token = getStoredToken()
     if (!token) {
+      useFeatureFlagsStore.getState().reset()
       set({ user: null, token: null, loading: false })
       return
     }
@@ -23,6 +24,7 @@ export const useAuthStore = create((set, get) => ({
       await useFeatureFlagsStore.getState().loadClientFlags()
     } catch {
       clearStoredToken()
+      useFeatureFlagsStore.getState().reset()
       set({ user: null, token: null, loading: false })
     }
   },
@@ -81,6 +83,7 @@ export const useAuthStore = create((set, get) => ({
     } catch {
       /* still clear the local session */
     }
+    useFeatureFlagsStore.getState().reset()
     clearStoredToken()
     set({ user: null, token: null, error: null })
   },
