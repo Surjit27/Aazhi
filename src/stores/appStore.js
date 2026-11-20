@@ -5,17 +5,13 @@ import { uid } from '../utils/format.js'
 
 export const useAppStore = create((set, get) => ({
   backends: INITIAL_BACKENDS,
-  /** @deprecated use backends — kept for components not yet migrated */
-  projects: INITIAL_BACKENDS.map(({ id, name, description }) => ({ id, name, description })),
   backendId: 'auth',
-  projectId: 'auth',
   environments: ENVIRONMENTS,
   environmentId: 'local',
   notifications: INITIAL_NOTIFICATIONS,
   toasts: [],
 
-  setBackend: (backendId) => set({ backendId, projectId: backendId }),
-  setProject: (projectId) => set({ projectId, backendId: projectId }),
+  setBackend: (backendId) => set({ backendId }),
 
   addBackend: (payload) => {
     const id = uid('backend')
@@ -39,7 +35,6 @@ export const useAppStore = create((set, get) => ({
     }
     set((s) => ({
       backends: [backend, ...s.backends],
-      projects: [{ id, name: backend.name, description: backend.description }, ...s.projects],
     }))
     return backend
   },
