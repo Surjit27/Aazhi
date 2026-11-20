@@ -5,7 +5,6 @@ import App from './App.jsx'
 import { useAuthStore } from './stores/authStore.js'
 import { useFeatureFlagsStore } from './stores/featureFlagsStore.js'
 import './index.css'
-import '@xyflow/react/dist/style.css'
 
 function Bootstrap() {
   const bootstrap = useAuthStore((s) => s.bootstrap)
