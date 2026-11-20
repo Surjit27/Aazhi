@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import { Navigate, Route } from 'react-router-dom'
 import { CalendarClock, Flag, History, Mail, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react'
 import {
@@ -9,41 +10,41 @@ import {
 } from './clientNav.js'
 import BackendLayout from '../components/layout/BackendLayout.jsx'
 import HomeRedirect from '../components/auth/HomeRedirect.jsx'
-import SettingsPage from '../pages/SettingsPage.jsx'
-import ClientPortalPage from '../pages/ClientPortalPage.jsx'
-import BackendsPage from '../pages/BackendsPage.jsx'
-import BackendOverviewPage from '../pages/BackendOverviewPage.jsx'
-import BackendExplorerPage from '../pages/BackendExplorerPage.jsx'
-import WorkflowBuilderPage from '../pages/WorkflowBuilderPage.jsx'
-import MockServersPage from '../pages/MockServersPage.jsx'
-import EventSchedulerPage from '../pages/EventSchedulerPage.jsx'
-import DataInjectionPage from '../pages/DataInjectionPage.jsx'
-import ExecutionMonitorPage from '../pages/ExecutionMonitorPage.jsx'
-import GitIntegrationPage from '../pages/GitIntegrationPage.jsx'
-import AIAssistantPage from '../pages/AIAssistantPage.jsx'
-import AdminOverviewPage from '../pages/admin/AdminOverviewPage.jsx'
-import AdminRolesPage from '../pages/admin/AdminRolesPage.jsx'
-import ClientUserManagementPage from '../pages/admin/ClientUserManagementPage.jsx'
-import AdminUserManagementPage from '../pages/admin/AdminUserManagementPage.jsx'
-import UserHistoryPage from '../pages/admin/UserHistoryPage.jsx'
-import EmailHistoryPage from '../pages/admin/EmailHistoryPage.jsx'
-import JobHistoryPage from '../pages/admin/JobHistoryPage.jsx'
-import AdminFeatureFlagsPage from '../pages/admin/AdminFeatureFlagsPage.jsx'
-import ClientAccessPage from '../pages/client/ClientAccessPage.jsx'
-import ClientAccessRolesPage from '../pages/client/ClientAccessRolesPage.jsx'
-import ClientAccessUsersPage from '../pages/client/ClientAccessUsersPage.jsx'
-import ClientGitHubConnectPage from '../pages/client/ClientGitHubConnectPage.jsx'
-import CloudIntegrationsPage from '../pages/client/CloudIntegrationsPage.jsx'
-import PagerPage from '../pages/deep/PagerPage.jsx'
-import ClientUserHistoryPage from '../pages/client/ClientUserHistoryPage.jsx'
-import ClientEmailHistoryPage from '../pages/client/ClientEmailHistoryPage.jsx'
-import ClientJobHistoryPage from '../pages/client/ClientJobHistoryPage.jsx'
-import DashboardPage from '../pages/deep/DashboardPage.jsx'
-import ProjectsPage from '../pages/deep/ProjectsPage.jsx'
-import DeepBackendExplorerPage from '../pages/deep/BackendExplorerPage.jsx'
-import DeepEventSchedulerPage from '../pages/deep/DeepEventSchedulerPage.jsx'
-import FlowStudioPage from '../pages/deep/FlowStudioPage.jsx'
-import NotFoundPage from '../pages/NotFoundPage.jsx'
+
+const SettingsPage = lazy(() => import('../pages/SettingsPage.jsx'))
+const ClientPortalPage = lazy(() => import('../pages/ClientPortalPage.jsx'))
+const BackendsPage = lazy(() => import('../pages/BackendsPage.jsx'))
+const BackendOverviewPage = lazy(() => import('../pages/BackendOverviewPage.jsx'))
+const BackendExplorerPage = lazy(() => import('../pages/BackendExplorerPage.jsx'))
+const WorkflowBuilderPage = lazy(() => import('../pages/WorkflowBuilderPage.jsx'))
+const MockServersPage = lazy(() => import('../pages/MockServersPage.jsx'))
+const EventSchedulerPage = lazy(() => import('../pages/EventSchedulerPage.jsx'))
+const DataInjectionPage = lazy(() => import('../pages/DataInjectionPage.jsx'))
+const ExecutionMonitorPage = lazy(() => import('../pages/ExecutionMonitorPage.jsx'))
+const AIAssistantPage = lazy(() => import('../pages/AIAssistantPage.jsx'))
+const AdminOverviewPage = lazy(() => import('../pages/admin/AdminOverviewPage.jsx'))
+const AdminRolesPage = lazy(() => import('../pages/admin/AdminRolesPage.jsx'))
+const ClientUserManagementPage = lazy(() => import('../pages/admin/ClientUserManagementPage.jsx'))
+const AdminUserManagementPage = lazy(() => import('../pages/admin/AdminUserManagementPage.jsx'))
+const UserHistoryPage = lazy(() => import('../pages/admin/UserHistoryPage.jsx'))
+const EmailHistoryPage = lazy(() => import('../pages/admin/EmailHistoryPage.jsx'))
+const JobHistoryPage = lazy(() => import('../pages/admin/JobHistoryPage.jsx'))
+const AdminFeatureFlagsPage = lazy(() => import('../pages/admin/AdminFeatureFlagsPage.jsx'))
+const ClientAccessPage = lazy(() => import('../pages/client/ClientAccessPage.jsx'))
+const ClientAccessRolesPage = lazy(() => import('../pages/client/ClientAccessRolesPage.jsx'))
+const ClientAccessUsersPage = lazy(() => import('../pages/client/ClientAccessUsersPage.jsx'))
+const ClientGitHubConnectPage = lazy(() => import('../pages/client/ClientGitHubConnectPage.jsx'))
+const CloudIntegrationsPage = lazy(() => import('../pages/client/CloudIntegrationsPage.jsx'))
+const PagerPage = lazy(() => import('../pages/deep/PagerPage.jsx'))
+const ClientUserHistoryPage = lazy(() => import('../pages/client/ClientUserHistoryPage.jsx'))
+const ClientEmailHistoryPage = lazy(() => import('../pages/client/ClientEmailHistoryPage.jsx'))
+const ClientJobHistoryPage = lazy(() => import('../pages/client/ClientJobHistoryPage.jsx'))
+const DashboardPage = lazy(() => import('../pages/deep/DashboardPage.jsx'))
+const ProjectsPage = lazy(() => import('../pages/deep/ProjectsPage.jsx'))
+const DeepBackendExplorerPage = lazy(() => import('../pages/deep/BackendExplorerPage.jsx'))
+const DeepEventSchedulerPage = lazy(() => import('../pages/deep/DeepEventSchedulerPage.jsx'))
+const FlowStudioPage = lazy(() => import('../pages/deep/FlowStudioPage.jsx'))
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage.jsx'))
 
 export { CLIENT_NAV, CLIENT_ACCESS_NAV, CLIENT_DEEP_BACKEND_NAV, CLIENT_HISTORY_NAV, CLIENT_PAGES_NAV }
 
