@@ -4,6 +4,7 @@ import { openClientSessionWithHandoff } from '../lib/clientHandoff.js'
 import { getPortal, PORTAL } from '../lib/portal.js'
 import { usePersonalSettingsStore } from './personalSettingsStore.js'
 import { useAccountSecurityStore } from './accountSecurityStore.js'
+import { useFeatureFlagsStore } from './featureFlagsStore.js'
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -17,6 +18,7 @@ export const useAuthStore = create((set, get) => ({
     if (!token) {
       usePersonalSettingsStore.getState().reset()
       useAccountSecurityStore.getState().reset()
+      useFeatureFlagsStore.getState().reset()
       set({ user: null, token: null, twoFactorPending: null, loading: false })
       return
     }
@@ -26,10 +28,12 @@ export const useAuthStore = create((set, get) => ({
       set({ user, token, loading: false })
       usePersonalSettingsStore.getState().fetch()
       useAccountSecurityStore.getState().fetchSecurity()
+      await useFeatureFlagsStore.getState().loadClientFlags()
     } catch {
       clearStoredToken()
       usePersonalSettingsStore.getState().reset()
       useAccountSecurityStore.getState().reset()
+      useFeatureFlagsStore.getState().reset()
       set({ user: null, token: null, twoFactorPending: null, loading: false })
     }
   },
@@ -60,6 +64,7 @@ export const useAuthStore = create((set, get) => ({
       set({ user, token, loading: false, twoFactorPending: null })
       usePersonalSettingsStore.getState().fetch()
       useAccountSecurityStore.getState().fetchSecurity()
+      await useFeatureFlagsStore.getState().loadClientFlags()
       return user
     } catch (err) {
       set({ error: err.message, loading: false })
@@ -98,6 +103,7 @@ export const useAuthStore = create((set, get) => ({
     }
     usePersonalSettingsStore.getState().reset()
     useAccountSecurityStore.getState().reset()
+    useFeatureFlagsStore.getState().reset()
     clearStoredToken()
     set({ user: null, token: null, twoFactorPending: null, error: null })
   },
@@ -126,6 +132,7 @@ export const useAuthStore = create((set, get) => ({
       set({ user, token, loading: false, twoFactorPending: null })
       usePersonalSettingsStore.getState().fetch()
       useAccountSecurityStore.getState().fetchSecurity()
+      await useFeatureFlagsStore.getState().loadClientFlags()
       return user
     } catch (err) {
       set({ error: err.message, loading: false })

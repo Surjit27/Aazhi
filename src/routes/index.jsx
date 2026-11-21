@@ -16,6 +16,7 @@ import EmailProviderDetailPage from '../pages/admin/EmailProviderDetailPage.jsx'
 import ApiTokenProvidersPage from '../pages/admin/ApiTokenProvidersPage.jsx'
 import ApiTokenProviderDetailPage from '../pages/admin/ApiTokenProviderDetailPage.jsx'
 import AdminPersonalSettingsSection from '../pages/admin/AdminPersonalSettingsSection.jsx'
+import AdminFeatureFlagsSection from '../pages/admin/AdminFeatureFlagsSection.jsx'
 import ClientPortalPage from '../pages/ClientPortalPage.jsx'
 import BackendsPage from '../pages/BackendsPage.jsx'
 import BackendOverviewPage from '../pages/BackendOverviewPage.jsx'
@@ -91,7 +92,7 @@ export function AdminPortalRoutes() {
       <Route path="roles" element={<AdminRolesPage />} />
       <Route path="admin/client-users" element={<ClientUserManagementPage />} />
       <Route path="admin/admin-users" element={<AdminUserManagementPage />} />
-      <Route path="admin/feature-flags" element={<Navigate to="/overview" replace />} />
+      <Route path="admin/feature-flags" element={<Navigate to="/settings/feature-flags" replace />} />
       <Route path="admin/history/users" element={<UserHistoryPage />} />
       <Route path="admin/history/emails" element={<EmailHistoryPage />} />
       <Route path="admin/history/jobs" element={<JobHistoryPage />} />
@@ -103,7 +104,10 @@ export function AdminPortalRoutes() {
         <Route path="email/:id" element={<EmailProviderDetailPage />} />
         <Route path="api" element={<ApiTokenProvidersPage />} />
         <Route path="api/:id" element={<ApiTokenProviderDetailPage />} />
+        <Route path="feature-flags" element={<AdminFeatureFlagsSection />} />
       </Route>
+      <Route path="settings/feature-flag" element={<Navigate to="/settings/feature-flags" replace />} />
+      <Route path="settings/feature-flag/*" element={<Navigate to="/settings/feature-flags" replace />} />
       <Route path="settings/integrations/email" element={<Navigate to="/settings/email" replace />} />
       <Route path="settings/integrations/email/:id" element={<RedirectLegacyIntegrationsEmail />} />
       <Route path="settings/integrations/api" element={<Navigate to="/settings/api" replace />} />

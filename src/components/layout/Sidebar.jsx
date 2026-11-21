@@ -4,6 +4,7 @@ import { ChevronDown } from 'lucide-react'
 import { BRAND_NAME, BrandIcon } from '../ui/Brand.jsx'
 import { getPortal, PORTAL } from '../../lib/portal.js'
 import { useAuthStore } from '../../stores/authStore.js'
+import { useFeatureFlagsStore } from '../../stores/featureFlagsStore.js'
 import {
   ADMIN_NAV,
   CLIENT_ACCESS_NAV,
@@ -94,13 +95,14 @@ function AdminSidebarNav({ onNavigate }) {
 
 function ClientSidebarNav({ onNavigate }) {
   const location = useLocation()
+  const isNavEnabled = useFeatureFlagsStore((s) => s.isNavEnabled)
 
   const dashboard = CLIENT_NAV.find((item) => item.to === '/dashboard')
   const projects = CLIENT_NAV.find((item) => item.to === '/projects')
-  const pageItems = CLIENT_PAGES_NAV
-  const deepItems = CLIENT_DEEP_BACKEND_NAV
-  const accessItems = CLIENT_ACCESS_NAV
-  const historyItems = CLIENT_HISTORY_NAV
+  const pageItems = CLIENT_PAGES_NAV.filter((item) => item.alwaysShow || isNavEnabled(item.to, item.flagKey))
+  const deepItems = CLIENT_DEEP_BACKEND_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+  const accessItems = CLIENT_ACCESS_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
+  const historyItems = CLIENT_HISTORY_NAV.filter((item) => isNavEnabled(item.to, item.flagKey))
 
   const deepOpenByRoute = CLIENT_DEEP_BACKEND_NAV.some((item) => location.pathname.startsWith(item.to))
   const accessOpenByRoute = CLIENT_ACCESS_NAV.some((item) => location.pathname.startsWith(item.to))
@@ -117,14 +119,14 @@ function ClientSidebarNav({ onNavigate }) {
 
   return (
     <>
-      {dashboard && (
+      {dashboard && isNavEnabled(dashboard.to, dashboard.flagKey) && (
         <NavLink to={dashboard.to} end={dashboard.end} onClick={onNavigate} className={linkClass}>
           <dashboard.icon size={16} strokeWidth={1.75} />
           <span className="truncate">{dashboard.label}</span>
         </NavLink>
       )}
 
-      {projects && (
+      {projects && isNavEnabled(projects.to, projects.flagKey) && (
         <NavLink to={projects.to} onClick={onNavigate} className={linkClass}>
           <projects.icon size={16} strokeWidth={1.75} />
           <span className="truncate">{projects.label}</span>
