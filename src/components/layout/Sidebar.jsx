@@ -40,10 +40,17 @@ function NavSection({ label, open, onToggle, children }) {
 function AdminSidebarNav({ onNavigate }) {
   const location = useLocation()
   const historyItems = ADMIN_NAV.filter((item) => item.to.startsWith('/admin/history/'))
+  const pageItems = ['/settings', '/admin/feature-flags']
+    .map((to) => ADMIN_NAV.find((item) => item.to === to))
+    .filter(Boolean)
   const accessItems = ADMIN_NAV.filter(
-    (item) => item.to !== '/overview' && item.to !== '/settings' && !item.to.startsWith('/admin/history/'),
+    (item) =>
+      item.to !== '/overview' &&
+      item.to !== '/settings' &&
+      item.to !== '/admin/feature-flags' &&
+      !item.to.startsWith('/admin/history/'),
   )
-  const topItems = ADMIN_NAV.filter((item) => item.to === '/overview' || item.to === '/settings')
+  const overviewItem = ADMIN_NAV.find((item) => item.to === '/overview')
   const accessOpenByRoute = accessItems.some((item) => location.pathname.startsWith(item.to))
   const historyOpenByRoute = historyItems.some((item) => location.pathname.startsWith(item.to))
   const [accessOpen, setAccessOpen] = useState(accessOpenByRoute)
@@ -52,14 +59,18 @@ function AdminSidebarNav({ onNavigate }) {
   return (
     <>
       <p className="px-3 pt-2 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Dashboards</p>
-      {topItems
-        .filter((item) => item.to === '/overview')
-        .map(({ to, label, icon: Icon, end }) => (
-          <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
-            <Icon size={16} strokeWidth={1.75} />
-            <span className="truncate">{label}</span>
-          </NavLink>
-        ))}
+      {overviewItem && (
+        <NavLink
+          key={overviewItem.to}
+          to={overviewItem.to}
+          end={overviewItem.end}
+          onClick={onNavigate}
+          className={linkClass}
+        >
+          <overviewItem.icon size={16} strokeWidth={1.75} />
+          <span className="truncate">{overviewItem.label}</span>
+        </NavLink>
+      )}
 
       <NavSection label="Access" open={accessOpen} onToggle={() => setAccessOpen((v) => !v)}>
         {accessItems.map(({ to, label, icon: Icon }) => (
@@ -80,14 +91,12 @@ function AdminSidebarNav({ onNavigate }) {
       </NavSection>
 
       <p className="mt-3 px-3 text-[11px] font-semibold tracking-wide text-ink-subtle uppercase">Pages</p>
-      {topItems
-        .filter((item) => item.to === '/settings')
-        .map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
-            <Icon size={16} strokeWidth={1.75} />
-            <span className="truncate">{label}</span>
-          </NavLink>
-        ))}
+      {pageItems.map(({ to, label, icon: Icon }) => (
+        <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
+          <Icon size={16} strokeWidth={1.75} />
+          <span className="truncate">{label}</span>
+        </NavLink>
+      ))}
     </>
   )
 }
