@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom'
 import HomePageShell from '../components/home/HomePageShell.jsx'
-import Hyperspeed from '../components/hyperspeed/Hyperspeed.jsx'
-import { HYPERSPEED_LIGHT } from '../components/hyperspeed/hyperspeedPresets.js'
 import HomeFloatingNav from '../components/home/HomeFloatingNav.jsx'
 import Button from '../components/ui/Button.jsx'
 import { BRAND_NAME } from '../components/ui/Brand.jsx'
@@ -17,14 +15,9 @@ export default function HomePage() {
   const reducedMotion = usePrefersReducedMotion()
 
   return (
-    <HomePageShell className="home-page--immersive">
+    <HomePageShell hyperspeed hyperspeedInteractive className="home-page--immersive">
       <main className="flex min-h-[calc(100vh-4rem)] flex-1 flex-col">
         <section className="home-hero-band home-hero-band--immersive relative flex flex-1 flex-col">
-          {!reducedMotion ? (
-            <div className="home-hero-hyperspeed" aria-hidden>
-              <Hyperspeed {...HYPERSPEED_LIGHT} className="h-full w-full" />
-            </div>
-          ) : null}
           <div className="home-hero-band-fade" aria-hidden />
           <div className="home-hero-overlay home-hero-overlay--on-speed relative z-[2] flex min-h-[min(78vh,880px)] w-full flex-1 flex-col">
             <header className="home-hero-nav home-reveal flex w-full items-center justify-between gap-4 px-4 py-6 md:px-10 md:py-8">
