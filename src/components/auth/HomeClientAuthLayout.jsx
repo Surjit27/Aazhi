@@ -1,6 +1,6 @@
 import PortalAuthLayout from './PortalAuthLayout.jsx'
 
-/** Home marketing hostname — same chrome as client/admin auth. */
+/** home.localhost `/login` and `/signup` — plain auth shell (no marketing hyperspeed). */
 export default function HomeClientAuthLayout(props) {
   return <PortalAuthLayout portal="home" {...props} />
 }
