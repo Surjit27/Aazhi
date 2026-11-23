@@ -25,7 +25,7 @@ export default function HomeSiteHeader({ authSlot = null, showSectionNav = true 
         <Link
           to="/"
           className="home-site-header__brand justify-self-start"
-          aria-label="Home"
+          aria-label="deepe home"
         >
           <BrandLockup className="h-9 md:h-10" iconSize={36} />
         </Link>
