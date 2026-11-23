@@ -1,6 +1,6 @@
 /**
  * Three surfaces, one app build (Ad-portal pattern, simplified):
- * - home.localhost   → public marketing home (client sign-in / sign-up)
+ * - home.localhost   → public marketing home; auth at `/login` and `/signup`
  * - client.localhost → client portal (role must be `client`)
  * - admin.localhost  → admin portal (role must be `admin`)
  */

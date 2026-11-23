@@ -11,6 +11,7 @@ export default function HomePageShell({
   authOnly = false,
 }) {
   const immersive = !authOnly && (hyperspeed || className.includes('home-page--immersive'))
+  /** Full-viewport hyperspeed; marketing home uses hero-scoped backdrop in `HomePage` instead. */
   const showHyperspeed = !authOnly && hyperspeed
 
   return (

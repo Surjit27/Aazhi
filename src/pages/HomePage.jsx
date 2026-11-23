@@ -5,6 +5,7 @@ import HomeProductRail from '../components/home/HomeProductRail.jsx'
 import { HomeHeaderAuth, HomeHeroAuth } from '../components/home/HomeMarketingAuth.jsx'
 import HomeSiteFooter from '../components/home/HomeSiteFooter.jsx'
 import HomeSiteHeader from '../components/home/HomeSiteHeader.jsx'
+import HomeHyperspeedBackdrop from '../components/home/HomeHyperspeedBackdrop.jsx'
 import { BRAND_NAME } from '../components/ui/Brand.jsx'
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion.js'
 
@@ -56,10 +57,15 @@ export default function HomePage() {
   const reducedMotion = usePrefersReducedMotion()
 
   return (
-    <HomePageShell hyperspeed hyperspeedInteractive className="home-page--immersive home-page--marketing">
+    <HomePageShell className="home-page--immersive home-page--marketing">
       <HomeSiteHeader authSlot={<HomeHeaderAuth />} />
 
       <section className="home-hero-band home-hero-band--immersive relative flex flex-col" aria-labelledby="home-hero-title">
+        {!reducedMotion ? (
+          <div className="home-hero-hyperspeed" aria-hidden>
+            <HomeHyperspeedBackdrop interactive />
+          </div>
+        ) : null}
         <div className="home-hero-band-fade" aria-hidden />
         <div className="home-hero-overlay home-hero-overlay--on-speed relative z-[2] flex min-h-[min(68vh,760px)] w-full flex-col">
           <div className="home-hero-pitch home-content-shell relative z-[3] flex flex-1 flex-col items-center justify-center px-4 pb-16 pt-2 text-center md:px-8 md:pb-20">

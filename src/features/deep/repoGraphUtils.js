@@ -1,3 +1,4 @@
+/** Extensions we treat as import-parseable source for the explorer graph. */
 const SOURCE_EXT = /\.(js|jsx|ts|tsx|mjs|cjs|py|go)$/i
 
 export function isSourceFilePath(path) {
