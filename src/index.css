@@ -506,6 +506,16 @@
     -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 52%, rgb(0 0 0 / 35%) 82%, transparent 100%);
   }
 
+  /* Hero-scoped layer — avoids `position: fixed` sticking on scroll. */
+  .home-hero-hyperspeed .home-hyperspeed-bg {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    min-height: 100%;
+    mask-image: linear-gradient(to bottom, #000 0%, #000 55%, rgb(0 0 0 / 35%) 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, rgb(0 0 0 / 35%) 88%, transparent 100%);
+  }
+
   .home-hero-band-fade {
     position: absolute;
     inset-inline: 0;
