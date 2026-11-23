@@ -245,6 +245,7 @@
     flex-direction: column;
   }
 
+  /* Shared max width for marketing header, hero, and auth cards. */
   .home-content-shell {
     margin-inline: auto;
     width: 100%;
