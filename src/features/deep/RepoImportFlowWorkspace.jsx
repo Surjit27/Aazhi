@@ -6,10 +6,11 @@ import Badge from '../../components/ui/Badge.jsx'
 import { Input } from '../../components/ui/FormControls.jsx'
 import { useRepoCodeGraph } from '../../hooks/useRepoCodeGraph.js'
 import RepoFileNode from './RepoFileNode.jsx'
+import RepoFolderNode from './RepoFolderNode.jsx'
 import { buildImportFlowGraph, buildRepoTreeEntries, graphStats } from './repoGraphUtils.js'
 import { MINIMAP_COLORS } from '../workflow/nodeKinds.js'
 
-const nodeTypes = { repoFile: RepoFileNode }
+const nodeTypes = { repoFile: RepoFileNode, repoFolder: RepoFolderNode }
 
 function RepoImportFlowCanvas({ graphRoot, query, onlyWithImports, selectedFileId, onSelectFile }) {
   const { nodes, edges, capped, shown } = useMemo(
@@ -31,7 +32,7 @@ function RepoImportFlowCanvas({ graphRoot, query, onlyWithImports, selectedFileI
   }
 
   return (
-    <div className="relative h-full min-h-[400px] w-full">
+    <div className="relative h-full min-h-[560px] w-full">
       {capped ? (
         <p className="absolute top-2 right-2 z-10 rounded-md bg-warning-50 px-2 py-1 text-[10px] text-warning-800">
           Showing first 240 files — narrow search or enable “imports only”.
@@ -41,17 +42,26 @@ function RepoImportFlowCanvas({ graphRoot, query, onlyWithImports, selectedFileI
         nodes={flowNodes}
         edges={edges}
         nodeTypes={nodeTypes}
-        onNodeClick={(_, node) => onSelectFile(node.id)}
+        onNodeClick={(_, node) => {
+          if (node.type === 'repoFile') onSelectFile(node.id)
+        }}
         onPaneClick={() => onSelectFile(null)}
+        nodesDraggable
+        nodesConnectable={false}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.15}
-        maxZoom={1.4}
+        fitViewOptions={{ padding: 0.35, maxZoom: 0.95 }}
+        minZoom={0.06}
+        maxZoom={1.6}
+        panOnScroll
+        zoomOnScroll
         defaultEdgeOptions={{ type: 'smoothstep' }}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#E5E9EF" />
         <Controls showInteractive={false} />
-        <MiniMap nodeColor={(n) => MINIMAP_COLORS[n.data?.kind] ?? '#94A3B8'} className="!border-line !bg-white/90" />
+        <MiniMap
+          nodeColor={(n) => (n.type === 'repoFolder' ? '#D9E6FF' : MINIMAP_COLORS[n.data?.kind] ?? '#94A3B8')}
+          className="!border-line !bg-white/90"
+        />
       </ReactFlow>
     </div>
   )

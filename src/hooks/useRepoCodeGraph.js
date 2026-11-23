@@ -1,6 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
 import { apiFetch } from '../lib/api.js'
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+async function waitForIndexJob(connectedRepoId, jobId) {
+  const base = `/api/client/explorer/repos/${encodeURIComponent(connectedRepoId)}/index/status`
+  const query = jobId != null ? `?jobId=${encodeURIComponent(jobId)}` : ''
+  for (let attempt = 0; attempt < 90; attempt += 1) {
+    const status = await apiFetch(`${base}${query}`)
+    if (status.status === 'success') return status
+    if (status.status === 'failed') {
+      const err = new Error(status.error || 'Repository indexing failed')
+      err.status = 403
+      throw err
+    }
+    await sleep(2000)
+  }
+  throw new Error('Indexing timed out — try Refresh index in a minute')
+}
+
 export function useRepoCodeGraph(connectedRepoId) {
   const [meta, setMeta] = useState(null)
   const [graphRoot, setGraphRoot] = useState(null)
@@ -48,7 +66,12 @@ export function useRepoCodeGraph(connectedRepoId) {
     setIndexing(true)
     setError(null)
     try {
-      await apiFetch(`/api/client/explorer/repos/${encodeURIComponent(connectedRepoId)}/index`, { method: 'POST' })
+      const queued = await apiFetch(`/api/client/explorer/repos/${encodeURIComponent(connectedRepoId)}/index`, {
+        method: 'POST',
+      })
+      if (queued?.async) {
+        await waitForIndexJob(connectedRepoId, queued.jobId)
+      }
       await loadGraph()
     } catch (err) {
       setError(err.message ?? 'Indexing failed')
