@@ -4,7 +4,7 @@ import { FileCode2 } from 'lucide-react'
 export default function RepoFileNode({ data, selected }) {
   return (
     <div
-      className={`min-w-[160px] max-w-[200px] rounded-lg border border-line bg-white px-2.5 py-2 shadow-card ${
+      className={`w-[188px] rounded-lg border border-line bg-white px-2.5 py-2 shadow-card ${
         selected ? 'border-primary-400 ring-2 ring-primary-100' : ''
       }`}
     >
