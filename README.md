@@ -1,4 +1,6 @@
-# React + Vite
+# deepe · React + Vite
+
+Local dev uses hostname portals: `home.localhost:5173`, `client.localhost:5173`, and `admin.localhost:5173` (map in `/etc/hosts`).
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
