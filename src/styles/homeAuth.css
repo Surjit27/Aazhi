@@ -1,4 +1,26 @@
 @layer components {
+  .home-marketing-auth--compact {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 768px) {
+    .home-marketing-auth--compact {
+      gap: 0.75rem;
+    }
+  }
+
+  .home-marketing-auth--hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
   .home-marketing-auth__signin {
     display: inline-flex;
     align-items: center;
@@ -31,6 +53,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
+    white-space: nowrap;
     padding: 0.5rem 1.1rem 0.5rem 1.25rem;
     border-radius: 999px;
     border: 1px solid var(--color-primary-600);

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Code2, GitBranch, Layers, ListTodo, Sparkles, Workflow } from 'lucide-react'
+import { Code2, FileCode2, GitBranch, Layers, ListTodo, Sparkles, Workflow } from 'lucide-react'
 import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
@@ -9,12 +9,14 @@ import { Field, Input, Select, Textarea } from '../../components/ui/FormControls
 import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
 import FlowPlayground from '../../features/codeMap/FlowPlayground.jsx'
 import DeepExplorerCodeWorkspace from '../../features/deep/DeepExplorerCodeWorkspace.jsx'
+import RepoImportFlowWorkspace from '../../features/deep/RepoImportFlowWorkspace.jsx'
 import { DISCOVERY_STAGES } from '../../data/deepBackend.js'
 import { useExplorerProjectsStore } from '../../stores/explorerProjectsStore.js'
 import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 const TABS = [
   { id: 'overview', label: 'Overview', icon: Layers },
   { id: 'codebase', label: 'Codebase', icon: Code2 },
+  { id: 'files', label: 'File map', icon: FileCode2 },
   { id: 'studio', label: 'Flow playground', icon: Workflow },
   { id: 'issues', label: 'Issues', icon: ListTodo },
 ]
@@ -36,12 +38,16 @@ export default function BackendExplorerProjectPage({ projectId, connectedRepos }
   const [agentStep, setAgentStep] = useState(0)
   const [issueOpen, setIssueOpen] = useState(false)
   const [issueForm, setIssueForm] = useState({ title: '', type: 'reverse-engineer', description: '' })
+  const [activeRepoId, setActiveRepoId] = useState(null)
 
   const repos = useMemo(() => {
     const ids = project?.connectedRepoIds ?? []
     const set = new Set(ids)
     return (connectedRepos ?? []).filter((r) => set.has(r.id))
   }, [project?.connectedRepoIds, connectedRepos])
+
+  const selectedRepoId = activeRepoId ?? repos[0]?.id ?? null
+  const activeRepo = repos.find((r) => r.id === selectedRepoId) ?? repos[0]
 
   if (!project) {
     return null
@@ -226,6 +232,27 @@ export default function BackendExplorerProjectPage({ projectId, connectedRepos }
         )}
 
         {tab === 'codebase' && <DeepExplorerCodeWorkspace repos={repos} />}
+
+        {tab === 'files' && (
+          <div className="flex flex-col gap-3">
+            {repos.length > 1 ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-medium text-ink-muted">Repository</span>
+                {repos.map((r) => (
+                  <Button
+                    key={r.id}
+                    size="sm"
+                    variant={r.id === selectedRepoId ? 'primary' : 'secondary'}
+                    onClick={() => setActiveRepoId(r.id)}
+                  >
+                    {r.repo}
+                  </Button>
+                ))}
+              </div>
+            ) : null}
+            <RepoImportFlowWorkspace connectedRepo={activeRepo} repoLabel={activeRepo?.repo} />
+          </div>
+        )}
 
         {tab === 'studio' && <FlowPlayground linkedRepos={repos} projectName={project.name} />}
 
