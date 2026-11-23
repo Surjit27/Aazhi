@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 
 export function HomeHeaderAuth() {
   return (
-    <nav className="home-marketing-auth home-marketing-auth--compact flex items-center gap-2 md:gap-3" aria-label="Account">
+    <nav className="home-marketing-auth home-marketing-auth--compact" aria-label="Account">
       <Link to="/login" className="home-marketing-auth__signin">
         Sign in
       </Link>
@@ -17,7 +17,7 @@ export function HomeHeaderAuth() {
 
 export function HomeHeroAuth({ className = '' }) {
   return (
-    <div className={`home-marketing-auth home-marketing-auth--hero flex flex-wrap items-center justify-center gap-3 ${className}`}>
+    <div className={`home-marketing-auth home-marketing-auth--hero ${className}`}>
       <Link to="/signup" className="home-marketing-auth__signup home-marketing-auth__signup--lg">
         <span>Sign up for free</span>
         <ArrowRight className="home-marketing-auth__arrow" size={17} aria-hidden />

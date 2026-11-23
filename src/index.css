@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "./styles/homeHeader.css";
+@import "./styles/homeAuth.css";
+@import "./styles/homePipeline.css";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -466,15 +469,14 @@
     opacity: 0.55;
   }
 
-  .home-page--auth-immersive .home-hyperspeed-bg {
-    opacity: 0.78;
-    mask-image: linear-gradient(to bottom, #000 0%, #000 70%, rgb(0 0 0 / 25%) 92%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 70%, rgb(0 0 0 / 25%) 92%, transparent 100%);
+  .home-page--auth-plain {
+    background: var(--color-canvas);
+    background-image: radial-gradient(circle at 1px 1px, rgba(148, 158, 175, 0.14) 1px, transparent 0);
+    background-size: 24px 24px;
   }
 
-  .home-page--auth-immersive .glass-card {
-    background: rgb(255 255 255 / 92%);
-    backdrop-filter: blur(12px);
+  .home-page--auth-plain .glass-card {
+    background: #fff;
   }
 
   .home-hero-band {

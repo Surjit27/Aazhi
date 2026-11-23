@@ -20,8 +20,8 @@ export default function HomeSiteHeader({ authSlot = null, showSectionNav = true 
   }, [reducedMotion, showSectionNav])
 
   return (
-    <header className="home-site-header home-site-header--transparent sticky top-0 z-30 w-full relative">
-      <div className="home-site-header__grid home-content-shell px-4 py-4 md:px-8 md:py-5">
+    <header className="home-site-header home-site-header--transparent sticky top-0 z-40 w-full">
+      <div className="home-site-header__grid home-content-shell px-4 py-3.5 md:px-8 md:py-5">
         <Link
           to="/"
           className="home-site-header__brand justify-self-start"
@@ -31,10 +31,7 @@ export default function HomeSiteHeader({ authSlot = null, showSectionNav = true 
         </Link>
 
         {showSectionNav ? (
-          <nav
-            className="home-site-header__center hidden items-center justify-center gap-1 md:flex"
-            aria-label="Page sections"
-          >
+          <nav className="home-site-header__center" aria-label="Page sections">
             {SECTION_LINKS.map(({ href, label }, index) => (
               <a
                 key={href}
