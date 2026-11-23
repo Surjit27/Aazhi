@@ -2,7 +2,7 @@ import Hyperspeed from '../hyperspeed/Hyperspeed.jsx'
 import { HYPERSPEED_LIGHT } from '../hyperspeed/hyperspeedPresets.js'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 
-/** Full-viewport traveling light streaks (three.js) behind home.localhost pages. */
+/** Full-viewport traveling light streaks (three.js) on the marketing home hero only. */
 export default function HomeHyperspeedBackdrop({ interactive = false }) {
   const reducedMotion = usePrefersReducedMotion()
   if (reducedMotion) return null
