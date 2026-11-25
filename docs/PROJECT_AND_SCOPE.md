@@ -101,6 +101,28 @@ Start the Node API first (`backend/docker compose up` or `npm run dev` in `backe
 2. New client-only business tables → Node `clientSchema` SQL migrations, not Prisma multi-tenant physical tables per client.
 3. Keep **OpenAPI** at `http://localhost:4100/openapi.json` in mind when extending index/decode payloads.
 
+## Documentation map
+
+| Document | Where |
+|----------|--------|
+| **Project & scope** (this file) | `docs/PROJECT_AND_SCOPE.md` in each of the three repos |
+| **Postgres / Mongo split, job handoff** | `Python-backend/docs/SCHEMA_ARCHITECTURE.md` |
+| **Runbooks** | Each repo’s `README.md` |
+
+When system scope changes, update the matching sections in **all three** `PROJECT_AND_SCOPE.md` copies and bump the *Last updated* line below.
+
+## Local Git identity (Aazhi clones only)
+
+The three repos are often siblings under one folder (for example `Personal projects/Aazhi/`). Use **repo-local** Git config in each clone so other folders on the machine keep their own `user.name` / `user.email`:
+
+```bash
+cd Frontend   # repeat in backend/ and Python-backend/
+git config user.name "Surjit27"
+git config user.email "billionfolds@gmail.com"
+```
+
+This does **not** modify global Git configuration.
+
 ---
 
-*Last updated: 2026-11-24 — keep in sync with sibling copies in `backend/docs/` and `Python-backend/docs/` when system scope changes.*
+*Last updated: 2026-11-25 — keep in sync with sibling copies in `backend/docs/` and `Python-backend/docs/` when system scope changes.*
