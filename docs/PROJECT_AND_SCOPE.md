@@ -108,6 +108,7 @@ Start the Node API first (`backend/docker compose up` or `npm run dev` in `backe
 | **Project & scope** (this file) | `docs/PROJECT_AND_SCOPE.md` in each of the three repos |
 | **Postgres / Mongo split, job handoff** | `Python-backend/docs/SCHEMA_ARCHITECTURE.md` |
 | **Runbooks** | Each repo’s `README.md` |
+| **Local dev issues** | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) |
 
 When system scope changes, update the matching sections in **all three** `PROJECT_AND_SCOPE.md` copies and bump the *Last updated* line below.
 
@@ -125,4 +126,4 @@ This does **not** modify global Git configuration.
 
 ---
 
-*Last updated: 2026-11-25 — keep in sync with sibling copies in `backend/docs/` and `Python-backend/docs/` when system scope changes.*
+*Last updated: 2026-11-26 — keep in sync with sibling copies in `backend/docs/` and `Python-backend/docs/` when system scope changes.*
