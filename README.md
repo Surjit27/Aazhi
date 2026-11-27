@@ -3,7 +3,8 @@
 React + Vite UI for **Deepe**: multi-hostname portals (**home**, **client**, **admin**) over a single build. Talks to the [Node API](https://github.com/Surjit27/Aazhi-js-backend); AI index/decode is orchestrated by Node via [Python-backend](https://github.com/Surjit27/Deepe-agent-backend).
 
 **Project scope and three-repo layout:** [docs/PROJECT_AND_SCOPE.md](docs/PROJECT_AND_SCOPE.md)  
-**Local dev issues:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+**Local dev issues:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)  
+**GitHub integration branch:** `main` (commits here count on your contribution graph).
 
 ## Local dev
 
