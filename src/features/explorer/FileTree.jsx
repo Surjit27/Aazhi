@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { ChevronDown, ChevronRight, FileCode, Folder } from 'lucide-react'
 import { folderPaths } from '../../utils/fileTree.js'
 
@@ -8,7 +8,7 @@ const GIT_TONE = {
   U: 'text-primary-700',
 }
 
-function TreeNode({ node, depth, selectedPath, onSelect, gitStatus, expanded, toggle }) {
+const TreeNode = memo(function TreeNode({ node, depth, selectedPath, onSelect, gitStatus, expanded, toggle }) {
   const pad = { paddingLeft: 8 + depth * 12 }
 
   if (node.type === 'folder') {
@@ -56,17 +56,18 @@ function TreeNode({ node, depth, selectedPath, onSelect, gitStatus, expanded, to
       {status && <span className={`font-mono text-[11px] font-semibold ${GIT_TONE[status]}`}>{status}</span>}
     </button>
   )
-}
+})
 
 export default function FileTree({ tree, paths, selectedPath, onSelect, gitStatus }) {
   const [expanded, setExpanded] = useState(() => folderPaths(paths))
-  const toggle = (path) =>
+  const toggle = useCallback((path) => {
     setExpanded((prev) => {
       const next = new Set(prev)
       if (next.has(path)) next.delete(path)
       else next.add(path)
       return next
     })
+  }, [])
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">

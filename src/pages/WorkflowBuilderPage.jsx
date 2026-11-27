@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import '@xyflow/react/dist/style.css'
 import { ReactFlowProvider } from '@xyflow/react'
 import { useOutletContext } from 'react-router-dom'
 import { useWorkflowStore } from '../stores/workflowStore.js'

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar.jsx'
 import TopBar from './TopBar.jsx'
 import Toaster from '../ui/Toaster.jsx'
+import RouteLoadingFallback from '../ui/RouteLoadingFallback.jsx'
 import { getPortal, isClientBlockedPath, PORTAL } from '../../lib/portal.js'
 
 export default function AppLayout() {
@@ -22,7 +23,9 @@ export default function AppLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar onToggleNav={() => setMobileNavOpen((o) => !o)} />
         <main className="bg-app-canvas flex min-h-0 flex-1 flex-col">
-          <Outlet />
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
       <Toaster />

@@ -1,4 +1,13 @@
+import { useEffect, useState } from 'react'
 import Editor from '@monaco-editor/react'
+
+let monacoBootstrap = null
+function ensureMonacoConfigured() {
+  if (!monacoBootstrap) {
+    monacoBootstrap = import('../../lib/monaco.js')
+  }
+  return monacoBootstrap
+}
 
 export default function CodeEditor({
   value,
@@ -10,6 +19,22 @@ export default function CodeEditor({
   onMount,
   options,
 }) {
+  const [monacoReady, setMonacoReady] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    ensureMonacoConfigured().then(() => {
+      if (!cancelled) setMonacoReady(true)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (!monacoReady) {
+    return <div className="p-4 text-xs text-ink-muted">Loading editor...</div>
+  }
+
   return (
     <Editor
       height={height}
