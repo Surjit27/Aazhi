@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Activity, ScanSearch, Workflow } from 'lucide-react'
+import { Activity, Flag, ScanSearch, Shield, Users } from 'lucide-react'
+import { useDocumentVisible } from '../../hooks/useDocumentVisible.js'
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 
-const SLIDES = [
+const SLIDES_CLIENT = [
   {
     id: 'reverse',
     icon: ScanSearch,
@@ -11,17 +13,6 @@ const SLIDES = [
       'Index backends from Git into isolated workspaces',
       'Map routes, explorers, and microarchitecture surfaces',
       'Ground every workflow in how services actually run',
-    ],
-  },
-  {
-    id: 'workflow',
-    icon: Workflow,
-    eyebrow: 'Visual automation',
-    title: 'Design flows on a live canvas',
-    bullets: [
-      'Wire graph steps to registered backends',
-      'Attach schedules, webhooks, and manual triggers',
-      'Reuse the same workspace chrome as the rest of deepe',
     ],
   },
   {
@@ -37,41 +28,87 @@ const SLIDES = [
   },
 ]
 
-export default function HomeProductRail({ className = '' }) {
+const SLIDES_ADMIN = [
+  {
+    id: 'platform',
+    icon: Shield,
+    eyebrow: 'Admin console',
+    title: 'Operate the deepe platform',
+    bullets: [
+      'Overview health across client tenants',
+      'Roles, impersonation, and access boundaries',
+      'Separate sessions on admin.localhost',
+    ],
+  },
+  {
+    id: 'users',
+    icon: Users,
+    eyebrow: 'Tenant management',
+    title: 'Onboard and support client teams',
+    bullets: [
+      'Client and admin user directories',
+      'Impersonation with isolated sessions',
+      'History for users, email, and jobs',
+    ],
+  },
+  {
+    id: 'ops',
+    icon: Flag,
+    eyebrow: 'Operations',
+    title: 'Email, jobs, and audit history',
+    bullets: [
+      'SendGrid configuration for transactional mail',
+      'BullMQ-backed job triggers and run history',
+      'Audit trails across users and impersonation',
+    ],
+  },
+]
+
+export default function HomeProductRail({ portal = 'client', className = '' }) {
+  const slides = portal === 'admin' ? SLIDES_ADMIN : SLIDES_CLIENT
   const [index, setIndex] = useState(0)
-  const slide = SLIDES[index]
+  const slide = slides[index]
   const Icon = slide.icon
+  const docVisible = useDocumentVisible()
+  const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
-    const id = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), 7000)
+    setIndex(0)
+  }, [portal])
+
+  useEffect(() => {
+    if (!docVisible || reducedMotion) return undefined
+    const id = setInterval(() => setIndex((i) => (i + 1) % slides.length), 7000)
     return () => clearInterval(id)
-  }, [])
+  }, [slides.length, docVisible, reducedMotion])
 
   return (
-    <div className={`home-product-rail glass-inset flex h-full flex-col border-t-[3px] border-t-primary-500 p-6 md:p-8 ${className}`}>
-      <div className="home-product-slide flex flex-1 flex-col" key={slide.id}>
-        <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
+    <div
+      className={`home-feature-spotlight glass-card flex h-full min-h-[18rem] flex-col border border-line/90 bg-white p-8 shadow-pop md:min-h-[20rem] md:p-10 ${className}`}
+    >
+      <div className="home-product-slide home-product-slide--active flex flex-1 flex-col" key={slide.id}>
+        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-primary-100 bg-primary-50 text-primary-600">
           <Icon size={22} />
         </div>
         <p className="home-section-eyebrow text-primary-600">{slide.eyebrow}</p>
-        <h2 className="mt-2 text-lg font-semibold leading-snug text-ink">{slide.title}</h2>
-        <ul className="mt-4 flex flex-col gap-2.5">
+        <h2 className="mt-2 text-lg font-semibold leading-snug text-ink md:text-xl">{slide.title}</h2>
+        <ul className="mt-5 flex flex-1 flex-col gap-3">
           {slide.bullets.map((line) => (
-            <li key={line} className="flex gap-2 text-[13px] leading-snug text-ink-muted">
+            <li key={line} className="flex gap-2.5 text-sm leading-snug text-ink-muted md:text-[15px]">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500" />
               {line}
             </li>
           ))}
         </ul>
       </div>
-      <div className="mt-6 flex gap-2">
-        {SLIDES.map((s, i) => (
+      <div className="mt-6 flex gap-2 border-t border-line/80 pt-5">
+        {slides.map((s, i) => (
           <button
             key={s.id}
             type="button"
             aria-label={`Show ${s.eyebrow}`}
             onClick={() => setIndex(i)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
+            className={`h-1.5 rounded-full transition-[width,background-color] duration-300 ${
               i === index ? 'w-8 bg-primary-500' : 'w-2 bg-line hover:bg-primary-200'
             }`}
           />

@@ -1,4 +1,5 @@
 import { getPortal, PORTAL } from './portal.js'
+import { TOKEN_STORAGE_KEYS } from './tokenStorage.js'
 
 export function apiAppSurface() {
   const portal = getPortal()
@@ -10,10 +11,8 @@ export function apiAppSurface() {
 /** Empty = same-origin `/api` via Vite proxy (home / client / admin *.localhost). */
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
-const LEGACY_KEY = 'aazhi_token'
-
 function storageKey() {
-  return getPortal() === 'admin' ? 'aazhi_token_admin' : 'aazhi_token_client'
+  return getPortal() === PORTAL.ADMIN ? TOKEN_STORAGE_KEYS.ADMIN : TOKEN_STORAGE_KEYS.CLIENT
 }
 
 /** Admin and client keep different tokens. Impersonation stays in this tab only. */
@@ -23,10 +22,10 @@ export function getStoredToken() {
   if (isolated) return isolated
   const saved = localStorage.getItem(key)
   if (saved) return saved
-  const legacy = localStorage.getItem(LEGACY_KEY)
+  const legacy = localStorage.getItem(TOKEN_STORAGE_KEYS.LEGACY)
   if (!legacy) return null
   localStorage.setItem(key, legacy)
-  localStorage.removeItem(LEGACY_KEY)
+  localStorage.removeItem(TOKEN_STORAGE_KEYS.LEGACY)
   return legacy
 }
 
@@ -39,7 +38,7 @@ export function setStoredToken(token, { isolated = false } = {}) {
   }
   if (token) localStorage.setItem(key, token)
   else localStorage.removeItem(key)
-  localStorage.removeItem(LEGACY_KEY)
+  localStorage.removeItem(TOKEN_STORAGE_KEYS.LEGACY)
 }
 
 /** Clears the session this tab is using. An impersonation tab does not sign out the real client. */
@@ -50,7 +49,7 @@ export function clearStoredToken() {
     return
   }
   localStorage.removeItem(key)
-  localStorage.removeItem(LEGACY_KEY)
+  localStorage.removeItem(TOKEN_STORAGE_KEYS.LEGACY)
 }
 
 export async function apiFetch(path, { method = 'GET', body, auth = true } = {}) {
@@ -69,7 +68,16 @@ export async function apiFetch(path, { method = 'GET', body, auth = true } = {})
   })
 
   const text = await res.text()
-  const data = text ? JSON.parse(text) : null
+  let data = null
+  if (text) {
+    try {
+      data = JSON.parse(text)
+    } catch {
+      const err = new Error('Server returned invalid JSON')
+      err.status = res.status
+      throw err
+    }
+  }
 
   if (!res.ok) {
     const err = new Error(data?.error ?? res.statusText)

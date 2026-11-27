@@ -8,6 +8,7 @@ import { PageHeader, Panel } from '../components/ui/Panel.jsx'
 import StatCard from '../components/ui/StatCard.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import { useAuthStore } from '../stores/authStore.js'
+import { brandBreadcrumbs } from '../lib/breadcrumbs.js'
 
 const ACTIVITY = [
   { label: 'Mon', value: 4 },
@@ -50,7 +51,7 @@ export default function ClientPortalPage() {
       <PageHeader
         title="Account"
         description="Your client workspace on client.localhost."
-        breadcrumbs={['deepe', 'Workspace', 'Account']}
+        breadcrumbs={brandBreadcrumbs('Workspace', 'Account')}
       />
 
       <div className="flex flex-col gap-6 px-6 pb-10">

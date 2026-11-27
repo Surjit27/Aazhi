@@ -3,6 +3,7 @@ import { Activity, FolderKanban, Layers, Workflow } from 'lucide-react'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import StatCard from '../../components/ui/StatCard.jsx'
 import { MOCK_CONNECTED_BACKENDS, MOCK_PROJECTS } from '../../data/deepBackend.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 export default function DashboardPage() {
   return (
@@ -10,7 +11,7 @@ export default function DashboardPage() {
       <PageHeader
         title="Dashboard"
         description="Deep Backend workspace overview — discovery, flows, and execution at a glance."
-        breadcrumbs={['deepe', 'Dashboard']}
+        breadcrumbs={brandBreadcrumbs('Dashboard')}
       />
       <div className="flex flex-col gap-6 px-6 pb-10">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
@@ -26,8 +27,8 @@ export default function DashboardPage() {
               <p className="text-xs text-ink-muted">Connect a repo and run Architecture Discovery.</p>
             </Link>
             <Link to="/deep/flow-studio" className="glass-inset rounded-lg p-4 hover:border-primary-100">
-              <p className="text-sm font-semibold text-ink">Flow Studio</p>
-              <p className="text-xs text-ink-muted">Compose Execution Flows from discovered components.</p>
+              <p className="text-sm font-semibold text-ink">Flow playground</p>
+              <p className="text-xs text-ink-muted">2D canvas for repos, files, dependencies, and syntax (link repos in Explorer).</p>
             </Link>
           </div>
         </Panel>

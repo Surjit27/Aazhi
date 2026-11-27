@@ -1,0 +1,87 @@
+@layer components {
+  .home-marketing-auth--compact {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 768px) {
+    .home-marketing-auth--compact {
+      gap: 0.75rem;
+    }
+  }
+
+  .home-marketing-auth--hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .home-marketing-auth__signin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(226, 230, 238, 0.95);
+    background: rgba(255, 255, 255, 0.72);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-decoration: none;
+    box-shadow: 0 2px 12px rgba(22, 35, 58, 0.06);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  }
+
+  .home-marketing-auth__signin:hover {
+    border-color: var(--color-primary-100);
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(79, 134, 247, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .home-marketing-auth__signin--lg {
+    padding: 0.65rem 1.35rem;
+    font-size: 0.9375rem;
+  }
+
+  .home-marketing-auth__signup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+    padding: 0.5rem 1.1rem 0.5rem 1.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-primary-600);
+    background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-700) 100%);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(79, 134, 247, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
+  }
+
+  .home-marketing-auth__signup:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(79, 134, 247, 0.42);
+    filter: brightness(1.03);
+  }
+
+  .home-marketing-auth__signup--lg {
+    padding: 0.7rem 1.35rem 0.7rem 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .home-marketing-auth__arrow {
+    transition: transform 0.25s ease;
+  }
+
+  .home-marketing-auth__signup:hover .home-marketing-auth__arrow {
+    transform: translateX(3px);
+  }
+}

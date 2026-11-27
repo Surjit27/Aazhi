@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LayoutGrid, Plus, Trash2 } from 'lucide-react'
 import Button from '../../components/ui/Button.jsx'
@@ -6,10 +6,13 @@ import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import { Field, Input, Textarea } from '../../components/ui/FormControls.jsx'
-import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { useClientTable } from '../../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { usePagerStore } from '../../stores/pagerStore.js'
 import { formatDateTime } from '../../utils/format.js'
 import PagerProjectPage from './PagerProjectPage.jsx'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const STATUS_TONE = { live: 'success', saved: 'primary', draft: 'neutral' }
 
@@ -23,6 +26,22 @@ export default function PagerPage() {
 
   const [createOpen, setCreateOpen] = useState(false)
   const [form, setForm] = useState({ name: '', description: '' })
+
+  const accessors = useMemo(
+    () => ({
+      name: (p) => p.name,
+      status: (p) => p.status,
+      nodes: (p) => p.nodes?.length ?? 0,
+      host: (p) => (p.tempHost ? 1 : 0),
+      updatedAt: (p) => p.updatedAt,
+    }),
+    [],
+  )
+  const table = useClientTable(projects, {
+    pageSize: 15,
+    accessors,
+    defaultSort: { key: 'updatedAt', direction: 'desc' },
+  })
 
   if (projectId) {
     const exists = projects.some((p) => p.id === projectId)
@@ -54,7 +73,7 @@ export default function PagerPage() {
       <PageHeader
         title="Pager"
         description="Pager projects hold hostable event workflows — open one to design on the canvas with AI."
-        breadcrumbs={['deepe', 'Deep Backend', 'Pager']}
+        breadcrumbs={brandBreadcrumbs('Deep Backend', 'Pager')}
         actions={
           <Button variant="primary" onClick={() => setCreateOpen(true)}>
             <Plus size={16} /> New Pager project
@@ -68,7 +87,7 @@ export default function PagerPage() {
           description="Each project is a saved workflow you can host temporarily and run for event simulation."
           bodyClassName="p-0"
         >
-          {projects.length === 0 ? (
+          {table.total === 0 ? (
             <div className="flex flex-col items-center gap-3 p-10 text-center">
               <LayoutGrid size={32} className="text-ink-subtle" />
               <p className="max-w-md text-sm text-ink-muted">Create a Pager project, then build nodes, AI steps, and a temp host URL inside.</p>
@@ -81,16 +100,26 @@ export default function PagerPage() {
               <table className="w-full min-w-[720px] border-collapse">
                 <thead className="bg-surface">
                   <tr className="border-b border-line">
-                    <th className={thClass}>Project</th>
-                    <th className={thClass}>Status</th>
-                    <th className={thClass}>Nodes</th>
-                    <th className={thClass}>Host</th>
-                    <th className={thClass}>Updated</th>
-                    <th className={thClass} />
+                    <SortableLegacyTh sortKey="name" thProps={table.thProps}>
+                      Project
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="status" thProps={table.thProps}>
+                      Status
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="nodes" thProps={table.thProps}>
+                      Nodes
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="host" thProps={table.thProps}>
+                      Host
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="updatedAt" thProps={table.thProps}>
+                      Updated
+                    </SortableLegacyTh>
+                    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
-                  {projects.map((p) => (
+                  {table.rows.map((p) => (
                     <tr key={p.id} className="hover:bg-surface/60">
                       <td className={tdClass}>
                         <Link to={`/deep/pager/${p.id}`} className="text-sm font-semibold text-primary-700 hover:underline">
@@ -126,6 +155,7 @@ export default function PagerPage() {
                   ))}
                 </tbody>
               </table>
+              <LegacyTableFooter table={table} itemLabel="project" />
             </div>
           )}
         </Panel>

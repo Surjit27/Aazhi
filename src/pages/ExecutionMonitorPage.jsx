@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import { useClientTable } from '../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../features/tables/legacyTable.jsx'
 import { Search } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { EXECUTIONS, EXECUTION_SOURCES } from '../data/executions.js'
@@ -24,7 +26,7 @@ export default function ExecutionMonitorPage() {
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(null)
 
-  const rows = useMemo(
+  const filtered = useMemo(
     () =>
       EXECUTIONS.filter(
         (e) =>
@@ -34,6 +36,25 @@ export default function ExecutionMonitorPage() {
       ),
     [statusFilter, source, query],
   )
+
+  const accessors = useMemo(
+    () => ({
+      time: (e) => e.startedAt,
+      path: (e) => e.path,
+      source: (e) => e.source,
+      code: (e) => e.statusCode,
+      duration: (e) => e.durationMs,
+      status: (e) => e.status,
+    }),
+    [],
+  )
+
+  const table = useClientTable(filtered, {
+    pageSize: 15,
+    accessors,
+    defaultSort: { key: 'time', direction: 'desc' },
+    resetKey: `${statusFilter}-${source}-${query}`,
+  })
 
   const failures = EXECUTIONS.filter((e) => e.status === 'failed').length
   const avg = Math.round(EXECUTIONS.reduce((sum, e) => sum + e.durationMs, 0) / EXECUTIONS.length)
@@ -66,7 +87,7 @@ export default function ExecutionMonitorPage() {
 
         <Panel
           title="Executions"
-          description={`${rows.length} shown`}
+          description={`${table.total} shown`}
           actions={
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
@@ -84,23 +105,35 @@ export default function ExecutionMonitorPage() {
           <div className="border-b border-line px-4 py-2">
             <Tabs tabs={STATUS_TABS} value={statusFilter} onChange={setStatusFilter} />
           </div>
-          {rows.length === 0 ? (
+          {table.total === 0 ? (
             <EmptyState title="No executions match" description="Try a different status, source or search." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[720px] text-left">
                 <thead className="border-b border-line bg-surface">
                   <tr>
-                    <th className={thClass}>Time</th>
-                    <th className={thClass}>Route</th>
-                    <th className={thClass}>Source</th>
-                    <th className={thClass}>Code</th>
-                    <th className={thClass}>Duration</th>
-                    <th className={thClass}>Status</th>
+                    <SortableLegacyTh sortKey="time" thProps={table.thProps}>
+                      Time
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="path" thProps={table.thProps}>
+                      Route
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="source" thProps={table.thProps}>
+                      Source
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="code" thProps={table.thProps}>
+                      Code
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="duration" thProps={table.thProps}>
+                      Duration
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="status" thProps={table.thProps}>
+                      Status
+                    </SortableLegacyTh>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
-                  {rows.map((e) => (
+                  {table.rows.map((e) => (
                     <tr key={e.id} onClick={() => setSelectedId(e.id)} className="cursor-pointer transition-colors hover:bg-primary-50/50">
                       <td className={`${tdClass} tabular-nums`}>{formatTime(e.startedAt)}</td>
                       <td className={tdClass}>
@@ -114,6 +147,7 @@ export default function ExecutionMonitorPage() {
                   ))}
                 </tbody>
               </table>
+              <LegacyTableFooter table={table} itemLabel="execution" />
             </div>
           )}
         </Panel>

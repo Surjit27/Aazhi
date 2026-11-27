@@ -1,7 +1,10 @@
+import { useMemo } from 'react'
 import { ArrowRight, Network, Shield } from 'lucide-react'
 import Badge, { MethodBadge } from '../../components/ui/Badge.jsx'
 import EmptyState from '../../components/ui/EmptyState.jsx'
 import { useBackendExplorerCatalog } from '../../context/BackendExplorerContext.jsx'
+import { useClientTable } from '../../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../tables/legacyTable.jsx'
 
 const KIND_TONE = {
   controller: 'primary',
@@ -12,7 +15,9 @@ const KIND_TONE = {
   utility: 'neutral',
 }
 
-export { thClass, tdClass } from '../../components/ui/DataTable.jsx'
+import { thClass, tdClass } from '../../components/ui/DataTable.jsx'
+
+export { thClass, tdClass }
 
 export function dependentsOf(name, backendFunctions) {
   return backendFunctions.filter((f) => f.deps.includes(name))
@@ -20,87 +25,151 @@ export function dependentsOf(name, backendFunctions) {
 
 export function FunctionsTable({ selectedName, onSelect }) {
   const { backendFunctions, lineOf } = useBackendExplorerCatalog()
+
+  const accessors = useMemo(
+    () => ({
+      name: (fn) => fn.name,
+      kind: (fn) => fn.kind,
+      location: (fn) => `${fn.file}:${lineOf(fn.file, fn.signature)}`,
+      calls: (fn) => fn.deps.length,
+      calledBy: (fn) => dependentsOf(fn.name, backendFunctions).length,
+    }),
+    [backendFunctions, lineOf],
+  )
+
+  const table = useClientTable(backendFunctions, {
+    pageSize: 15,
+    accessors,
+    defaultSort: { key: 'name', direction: 'asc' },
+  })
+
   return (
-    <table className="w-full border-collapse">
-      <thead className="sticky top-0 bg-surface">
-        <tr className="border-b border-line">
-          <th className={thClass}>Function</th>
-          <th className={thClass}>Kind</th>
-          <th className={thClass}>Location</th>
-          <th className={`${thClass} text-right`}>Calls</th>
-          <th className={`${thClass} text-right`}>Called by</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-line">
-        {backendFunctions.map((fn) => {
-          const active = fn.name === selectedName
-          return (
-            <tr
-              key={fn.name}
-              onClick={() => onSelect(fn.name)}
-              className={`cursor-pointer transition-colors ${active ? 'bg-primary-50' : 'hover:bg-surface'}`}
-            >
-              <td className={`${tdClass} font-mono font-medium`}>{fn.name}</td>
-              <td className={tdClass}>
-                <Badge tone={KIND_TONE[fn.kind]}>{fn.kind}</Badge>
-              </td>
-              <td className={`${tdClass} font-mono text-xs text-ink-muted`}>
-                {fn.file}:{lineOf(fn.file, fn.signature)}
-              </td>
-              <td className={`${tdClass} text-right tabular-nums`}>{fn.deps.length}</td>
-              <td className={`${tdClass} text-right tabular-nums`}>{dependentsOf(fn.name, backendFunctions).length}</td>
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
+    <div>
+      <table className="w-full border-collapse">
+        <thead className="sticky top-0 bg-surface">
+          <tr className="border-b border-line">
+            <SortableLegacyTh sortKey="name" thProps={table.thProps}>
+              Function
+            </SortableLegacyTh>
+            <SortableLegacyTh sortKey="kind" thProps={table.thProps}>
+              Kind
+            </SortableLegacyTh>
+            <SortableLegacyTh sortKey="location" thProps={table.thProps}>
+              Location
+            </SortableLegacyTh>
+            <SortableLegacyTh sortKey="calls" thProps={table.thProps} align="right">
+              Calls
+            </SortableLegacyTh>
+            <SortableLegacyTh sortKey="calledBy" thProps={table.thProps} align="right">
+              Called by
+            </SortableLegacyTh>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-line">
+          {table.rows.map((fn) => {
+            const active = fn.name === selectedName
+            return (
+              <tr
+                key={fn.name}
+                onClick={() => onSelect(fn.name)}
+                className={`cursor-pointer transition-colors ${active ? 'bg-primary-50' : 'hover:bg-surface'}`}
+              >
+                <td className={`${tdClass} font-mono font-medium`}>{fn.name}</td>
+                <td className={tdClass}>
+                  <Badge tone={KIND_TONE[fn.kind]}>{fn.kind}</Badge>
+                </td>
+                <td className={`${tdClass} font-mono text-xs text-ink-muted`}>
+                  {fn.file}:{lineOf(fn.file, fn.signature)}
+                </td>
+                <td className={`${tdClass} text-right tabular-nums`}>{fn.deps.length}</td>
+                <td className={`${tdClass} text-right tabular-nums`}>{dependentsOf(fn.name, backendFunctions).length}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+      <LegacyTableFooter table={table} itemLabel="function" />
+    </div>
   )
 }
 
 export function RoutesTable({ onOpenHandler }) {
   const { backendRoutes, backendFunctions } = useBackendExplorerCatalog()
+
+  const accessors = useMemo(
+    () => ({
+      method: (r) => r.method,
+      path: (r) => r.path,
+      handler: (r) => r.handler,
+      auth: (r) => (r.auth ? 1 : 0),
+      source: (r) => r.file,
+    }),
+    [],
+  )
+
+  const table = useClientTable(backendRoutes, {
+    pageSize: 15,
+    accessors,
+    defaultSort: { key: 'path', direction: 'asc' },
+  })
+
   return (
-    <table className="w-full border-collapse">
-      <thead className="sticky top-0 bg-surface">
-        <tr className="border-b border-line">
-          <th className={thClass}>Method</th>
-          <th className={thClass}>Path</th>
-          <th className={thClass}>Handler</th>
-          <th className={thClass}>Auth</th>
-          <th className={thClass}>Source</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-line">
-        {backendRoutes.map((r) => (
-          <tr key={`${r.method}-${r.path}`} className="hover:bg-surface">
-            <td className={tdClass}>
-              <MethodBadge method={r.method} />
-            </td>
-            <td className={`${tdClass} font-mono text-xs`}>{r.path}</td>
-            <td className={tdClass}>
-              {backendFunctions.some((f) => f.name === r.handler) ? (
-                <button
-                  onClick={() => onOpenHandler(r.handler)}
-                  className="cursor-pointer font-mono text-xs font-medium text-primary-700 hover:underline"
-                >
-                  {r.handler}
-                </button>
-              ) : (
-                <span className="font-mono text-xs text-ink-muted">{r.handler}</span>
-              )}
-            </td>
-            <td className={tdClass}>
-              {r.auth ? (
-                <Badge tone="primary"><Shield size={11} /> Bearer</Badge>
-              ) : (
-                <Badge>Public</Badge>
-              )}
-            </td>
-            <td className={`${tdClass} font-mono text-xs text-ink-muted`}>{r.file}</td>
+    <div>
+      <table className="w-full border-collapse">
+        <thead className="sticky top-0 bg-surface">
+          <tr className="border-b border-line">
+            <SortableLegacyTh sortKey="method" thProps={table.thProps}>
+              Method
+            </SortableLegacyTh>
+            <SortableLegacyTh sortKey="path" thProps={table.thProps}>
+              Path
+            </SortableLegacyTh>
+            <SortableLegacyTh sortKey="handler" thProps={table.thProps}>
+              Handler
+            </SortableLegacyTh>
+            <SortableLegacyTh sortKey="auth" thProps={table.thProps}>
+              Auth
+            </SortableLegacyTh>
+            <SortableLegacyTh sortKey="source" thProps={table.thProps}>
+              Source
+            </SortableLegacyTh>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody className="divide-y divide-line">
+          {table.rows.map((r) => (
+            <tr key={`${r.method}-${r.path}`} className="hover:bg-surface">
+              <td className={tdClass}>
+                <MethodBadge method={r.method} />
+              </td>
+              <td className={`${tdClass} font-mono text-xs`}>{r.path}</td>
+              <td className={tdClass}>
+                {backendFunctions.some((f) => f.name === r.handler) ? (
+                  <button
+                    onClick={() => onOpenHandler(r.handler)}
+                    className="cursor-pointer font-mono text-xs font-medium text-primary-700 hover:underline"
+                  >
+                    {r.handler}
+                  </button>
+                ) : (
+                  <span className="font-mono text-xs text-ink-muted">{r.handler}</span>
+                )}
+              </td>
+              <td className={tdClass}>
+                {r.auth ? (
+                  <Badge tone="primary">
+                    <Shield size={11} /> Bearer
+                  </Badge>
+                ) : (
+                  <Badge>Public</Badge>
+                )}
+              </td>
+              <td className={`${tdClass} font-mono text-xs text-ink-muted`}>{r.file}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <LegacyTableFooter table={table} itemLabel="route" />
+    </div>
   )
 }
 
@@ -205,7 +274,9 @@ export function ParametersPanel({ fn }) {
               ))}
               {fn.params.length === 0 && (
                 <tr>
-                  <td className={`${tdClass} text-xs text-ink-subtle`} colSpan={3}>No parameters</td>
+                  <td className={`${tdClass} text-xs text-ink-subtle`} colSpan={3}>
+                    No parameters
+                  </td>
                 </tr>
               )}
             </tbody>

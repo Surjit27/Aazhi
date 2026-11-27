@@ -1,12 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { Field, Input, Select } from '../../components/ui/FormControls.jsx'
-import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { useClientTable } from '../../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { apiFetch } from '../../lib/api.js'
 import { adminAppOrigin, clientAppOrigin, PORTAL } from '../../lib/portal.js'
+import { summarizePermissions } from '../../lib/rolePermissions.js'
+import RolePermissionsModal from '../../components/admin/RolePermissionsModal.jsx'
 import { useAppStore } from '../../stores/appStore.js'
 
 const EMPTY = { key: '', label: '', portal: PORTAL.CLIENT }
@@ -15,6 +19,7 @@ export default function AdminRolesPage() {
   const pushToast = useAppStore((s) => s.pushToast)
   const [roles, setRoles] = useState([])
   const [open, setOpen] = useState(false)
+  const [permRole, setPermRole] = useState(null)
   const [form, setForm] = useState(EMPTY)
 
   const load = () =>
@@ -25,6 +30,16 @@ export default function AdminRolesPage() {
   useEffect(() => {
     load()
   }, [pushToast])
+
+  const accessors = useMemo(
+    () => ({
+      label: (r) => r.label,
+      key: (r) => r.key,
+      portal: (r) => r.portal,
+    }),
+    [],
+  )
+  const table = useClientTable(roles, { pageSize: 15, accessors, defaultSort: { key: 'label', direction: 'asc' } })
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -43,6 +58,7 @@ export default function AdminRolesPage() {
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="Roles"
+        description="Portal roles and per-page permissions (Settings, Feature flags, history, and more)."
         actions={
           <Button variant="primary" onClick={() => setOpen(true)}>
             Create role
@@ -56,14 +72,25 @@ export default function AdminRolesPage() {
             <table className="w-full min-w-[720px] border-collapse">
               <thead className="bg-surface">
                 <tr className="border-b border-line">
-                  <th className={thClass}>Role</th>
-                  <th className={thClass}>Key</th>
-                  <th className={thClass}>Portal</th>
-                  <th className={thClass}>Sign-in URL</th>
+                  <SortableLegacyTh sortKey="label" thProps={table.thProps}>
+                    Role
+                  </SortableLegacyTh>
+                  <SortableLegacyTh sortKey="key" thProps={table.thProps}>
+                    Key
+                  </SortableLegacyTh>
+                  <SortableLegacyTh sortKey="portal" thProps={table.thProps}>
+                    Portal
+                  </SortableLegacyTh>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+                    Page permissions
+                  </th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+                    Sign-in URL
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {roles.map((role) => {
+                {table.rows.map((role) => {
                   const origin = role.portal === PORTAL.ADMIN ? adminAppOrigin() : clientAppOrigin()
                   return (
                     <tr key={role.id} className="hover:bg-surface/80">
@@ -72,6 +99,12 @@ export default function AdminRolesPage() {
                       </td>
                       <td className={`${tdClass} font-mono text-xs`}>{role.key}</td>
                       <td className={`${tdClass} font-mono text-xs`}>{role.portal}</td>
+                      <td className={tdClass}>
+                        <p className="text-xs text-ink-muted">{summarizePermissions(role.portal, role.permissions)}</p>
+                        <Button size="sm" variant="secondary" className="mt-1" onClick={() => setPermRole(role)}>
+                          Edit permissions
+                        </Button>
+                      </td>
                       <td className={`${tdClass} font-mono text-xs`}>
                         <a href={`${origin}/login`} className="text-primary-700 hover:underline">
                           {origin}/login
@@ -80,18 +113,31 @@ export default function AdminRolesPage() {
                     </tr>
                   )
                 })}
-                {roles.length === 0 && (
+                {table.total === 0 && (
                   <tr>
-                    <td colSpan={4} className={`${tdClass} py-8 text-center text-xs text-ink-muted`}>
+                    <td colSpan={5} className={`${tdClass} py-8 text-center text-xs text-ink-muted`}>
                       No roles yet.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+            <LegacyTableFooter table={table} itemLabel="role" />
           </div>
         </Panel>
       </div>
+
+      <RolePermissionsModal
+        role={permRole}
+        portal={permRole?.portal ?? PORTAL.ADMIN}
+        catalogPath={
+          permRole ? `/api/auth/roles/permissions/catalog?portal=${encodeURIComponent(permRole.portal)}` : ''
+        }
+        patchPath={permRole ? `/api/auth/roles/${encodeURIComponent(permRole.key)}/permissions` : ''}
+        open={Boolean(permRole)}
+        onClose={() => setPermRole(null)}
+        onSaved={() => load()}
+      />
 
       <Modal
         open={open}

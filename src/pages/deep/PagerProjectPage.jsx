@@ -20,6 +20,7 @@ import { PAGER_NODE_PALETTE, PAGER_TEMPLATES } from '../../data/pager.js'
 import { usePagerStore } from '../../stores/pagerStore.js'
 import { DRAG_KIND_TYPE } from '../../features/workflow/nodeKinds.js'
 import { formatDateTime } from '../../utils/format.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const nodeTypes = { pagerNode: PagerNode }
 const PALETTE_MAP = Object.fromEntries(PAGER_NODE_PALETTE.map((p) => [p.kind, p]))
@@ -89,7 +90,7 @@ export default function PagerProjectPage({ projectId }) {
       <PageHeader
         title={project.name}
         description={project.description || 'Build hostable event workflows on the canvas.'}
-        breadcrumbs={['deepe', 'Deep Backend', 'Pager', project.name]}
+        breadcrumbs={brandBreadcrumbs('Deep Backend', 'Pager')}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Link to="/deep/pager">

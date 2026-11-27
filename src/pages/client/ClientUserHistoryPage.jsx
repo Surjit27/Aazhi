@@ -2,16 +2,17 @@ import { PageHeader, Panel } from '../../components/ui/Panel.jsx'
 import Button from '../../components/ui/Button.jsx'
 import HistoryEventTable from '../../features/admin/HistoryEventTable.jsx'
 import { useHistoryEvents } from '../../features/admin/useHistoryEvents.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 export default function ClientUserHistoryPage() {
-  const { events, loading, error, reload } = useHistoryEvents('/api/client/history/users')
+  const { events, loading, error, reload, pagination, sort, total } = useHistoryEvents('/api/client/history/users')
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <PageHeader
         title="User history"
         description="Activity stored in your client schema only."
-        breadcrumbs={['deepe', 'History', 'Users']}
+        breadcrumbs={brandBreadcrumbs('History', 'Users')}
         actions={
           <Button type="button" onClick={reload} disabled={loading}>
             Refresh
@@ -24,6 +25,9 @@ export default function ClientUserHistoryPage() {
             events={events}
             loading={loading}
             error={error}
+            total={total}
+            pagination={pagination}
+            sort={sort}
             emptyMessage="No user activity in your workspace yet."
           />
         </Panel>

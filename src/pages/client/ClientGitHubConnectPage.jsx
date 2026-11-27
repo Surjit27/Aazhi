@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { GitBranch, KeyRound, Settings2, Trash2 } from 'lucide-react'
 import { apiFetch } from '../../lib/api.js'
@@ -7,9 +7,13 @@ import Button from '../../components/ui/Button.jsx'
 import Badge from '../../components/ui/Badge.jsx'
 import Modal from '../../components/ui/Modal.jsx'
 import { Field, Input } from '../../components/ui/FormControls.jsx'
-import { thClass, tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { tdClass } from '../../features/explorer/ExplorerInsights.jsx'
+import { useClientTable } from '../../hooks/useClientTable.js'
+import { LegacyTableFooter, SortableLegacyTh } from '../../features/tables/legacyTable.jsx'
 import { useAppStore } from '../../stores/appStore.js'
+import { isSuperAdminUser } from '../../lib/accessRoles.js'
 import { useAuthStore } from '../../stores/authStore.js'
+import { brandBreadcrumbs } from '../../lib/breadcrumbs.js'
 
 const EMPTY_PAT = { accountEmail: '', label: '', token: '' }
 
@@ -23,7 +27,7 @@ const ACCESS_TONE = { admin: 'primary', write: 'success', read: 'neutral', none:
 export default function ClientGitHubConnectPage() {
   const pushToast = useAppStore((s) => s.pushToast)
   const me = useAuthStore((s) => s.user)
-  const isSuperAdmin = me?.accessRoleKey === 'super_admin' || !me?.accessRoleKey
+  const isSuperAdmin = isSuperAdminUser(me)
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [status, setStatus] = useState(null)
@@ -37,6 +41,21 @@ export default function ClientGitHubConnectPage() {
   const [repoPayload, setRepoPayload] = useState(null)
   const [repoLoading, setRepoLoading] = useState(false)
   const [privateOnly, setPrivateOnly] = useState(false)
+
+  const credAccessors = useMemo(
+    () => ({
+      account: (c) => c.accountEmail,
+      method: (c) => c.authMethod,
+      github: (c) => c.lastGithubLogin,
+      scopes: (c) => c.scopes,
+    }),
+    [],
+  )
+  const credentialsTable = useClientTable(credentials, {
+    pageSize: 15,
+    accessors: credAccessors,
+    defaultSort: { key: 'account', direction: 'asc' },
+  })
 
   const loadCredentials = useCallback(() => {
     return apiFetch('/api/client/git/credentials')
@@ -178,7 +197,7 @@ export default function ClientGitHubConnectPage() {
       <PageHeader
         title="GitHub connections"
         description="Multiple GitHub accounts for microservices — OAuth and PAT can coexist; one row per account email."
-        breadcrumbs={['deepe', 'Deep Backend', 'GitHub']}
+        breadcrumbs={brandBreadcrumbs('Deep Backend', 'GitHub')}
         actions={
           isSuperAdmin ? (
             <Button variant="primary" onClick={() => setConfigureOpen(true)}>
@@ -190,7 +209,7 @@ export default function ClientGitHubConnectPage() {
 
       <div className="flex flex-col gap-6 px-6 pb-10">
         <Panel title="Connected accounts" description="Each row is a GitHub identity (tenant git_credentials). Use the key to inspect repos.">
-          {credentials.length === 0 ? (
+          {credentialsTable.total === 0 ? (
             <p className="p-5 text-sm text-ink-muted">
               No accounts yet. {isSuperAdmin ? 'Click Configure Git to add OAuth or a PAT.' : 'Ask a Super admin to configure Git.'}
             </p>
@@ -199,16 +218,26 @@ export default function ClientGitHubConnectPage() {
               <table className="w-full min-w-[720px] border-collapse">
                 <thead className="bg-surface">
                   <tr className="border-b border-line">
-                    <th className={thClass}>Account</th>
-                    <th className={thClass}>Method</th>
-                    <th className={thClass}>GitHub</th>
-                    <th className={thClass}>Scopes</th>
-                    <th className={thClass}>Repos</th>
-                    <th className={thClass} />
+                    <SortableLegacyTh sortKey="account" thProps={credentialsTable.thProps}>
+                      Account
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="method" thProps={credentialsTable.thProps}>
+                      Method
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="github" thProps={credentialsTable.thProps}>
+                      GitHub
+                    </SortableLegacyTh>
+                    <SortableLegacyTh sortKey="scopes" thProps={credentialsTable.thProps}>
+                      Scopes
+                    </SortableLegacyTh>
+                    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+                      Repos
+                    </th>
+                    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-muted" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
-                  {credentials.map((c) => (
+                  {credentialsTable.rows.map((c) => (
                     <tr key={c.id}>
                       <td className={tdClass}>
                         <p className="font-medium text-ink">{c.label || c.accountEmail}</p>
@@ -237,6 +266,7 @@ export default function ClientGitHubConnectPage() {
                   ))}
                 </tbody>
               </table>
+              <LegacyTableFooter table={credentialsTable} itemLabel="account" />
             </div>
           )}
         </Panel>

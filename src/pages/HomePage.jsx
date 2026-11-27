@@ -1,9 +1,19 @@
-import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import HomeAutomationPipeline from '../components/home/HomeAutomationPipeline.jsx'
 import HomePageShell from '../components/home/HomePageShell.jsx'
+import HomePortalStrip from '../components/home/HomePortalStrip.jsx'
 import HomeProductRail from '../components/home/HomeProductRail.jsx'
-import Button from '../components/ui/Button.jsx'
-import { BRAND_NAME, BrandLockup } from '../components/ui/Brand.jsx'
+import { HomeHeaderAuth, HomeHeroAuth } from '../components/home/HomeMarketingAuth.jsx'
+import HomeSiteFooter from '../components/home/HomeSiteFooter.jsx'
+import HomeSiteHeader from '../components/home/HomeSiteHeader.jsx'
+import HomeHyperspeedBackdrop from '../components/home/HomeHyperspeedBackdrop.jsx'
+import { BRAND_NAME } from '../components/ui/Brand.jsx'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion.js'
+
+const HOME_HERO_COPY = {
+  eyebrow: 'Live · In motion',
+  title: 'Scan what runs. Automate at the same speed.',
+  lead: `${BRAND_NAME} maps live backends, sketches visual workflows, fires triggers, and tracks every run in real time — one workspace that moves with production, not a frozen diagram.`,
+}
 
 const CHALLENGES = [
   {
@@ -11,7 +21,7 @@ const CHALLENGES = [
     title: 'The documentation gap',
     points: [
       'Architecture diagrams drift from running services',
-      'Reverse engineering happens in one-off scripts',
+      'Reverse engineering lives in one-off scripts',
       'Automation is designed without a live system map',
     ],
   },
@@ -44,66 +54,65 @@ const JOURNEY = [
 ]
 
 export default function HomePage() {
-  return (
-    <HomePageShell>
-      <header className="glass-bar sticky top-0 z-20 border-b border-line/80 px-4 py-3 md:px-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <BrandLockup className="h-9" iconSize={36} />
-          <nav className="flex items-center gap-3">
-            <Link to="/login" className="text-sm font-medium text-ink-muted hover:text-ink">
-              Sign in
-            </Link>
-            <Link to="/signup">
-              <Button variant="primary">Sign up for free</Button>
-            </Link>
-          </nav>
-        </div>
-      </header>
+  const reducedMotion = usePrefersReducedMotion()
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 md:px-8">
-        {/* Hero — Postman-style lead + proof panel */}
-        <section className="grid items-center gap-10 border-b border-line py-14 md:py-20 lg:grid-cols-2 lg:gap-16">
-          <div className="space-y-6">
-            <p className="home-section-eyebrow home-reveal text-primary-600">Reverse engineering · Automation</p>
-            <h1 className="home-reveal text-3xl font-semibold tracking-tight text-ink md:text-[2.5rem] md:leading-[1.12]" style={{ animationDelay: '80ms' }}>
-              Close the gap between live APIs and automated workflows — before drift widens it.
-            </h1>
-            <p className="home-reveal max-w-xl text-base leading-relaxed text-ink-muted" style={{ animationDelay: '140ms' }}>
-              {BRAND_NAME} runs reverse engineering, visual workflow design, triggers, and execution monitoring in one
-              client workspace — the same glass shell your team already uses inside the product.
-            </p>
-            <div className="home-reveal flex flex-wrap gap-3" style={{ animationDelay: '200ms' }}>
-              <Link to="/signup">
-                <Button variant="primary">
-                  Sign up for free
-                  <ArrowRight size={16} />
-                </Button>
-              </Link>
-              <Link to="/login">
-                <Button variant="secondary">Sign in</Button>
-              </Link>
-            </div>
+  return (
+    <HomePageShell className="home-page--immersive home-page--marketing">
+      <HomeSiteHeader authSlot={<HomeHeaderAuth />} />
+
+      <section className="home-hero-band home-hero-band--immersive relative flex flex-col" aria-labelledby="home-hero-title">
+        {!reducedMotion ? (
+          <div className="home-hero-hyperspeed" aria-hidden>
+            <HomeHyperspeedBackdrop interactive />
           </div>
-          <div className="home-reveal lg:min-h-[360px]" style={{ animationDelay: '160ms' }}>
-            <HomeProductRail className="min-h-[320px] shadow-card" />
+        ) : null}
+        <div className="home-hero-band-fade" aria-hidden />
+        <div className="home-hero-overlay home-hero-overlay--on-speed relative z-[2] flex min-h-[min(68vh,760px)] w-full flex-col">
+          <div className="home-hero-pitch home-content-shell relative z-[3] flex flex-1 flex-col items-center justify-center px-4 pb-16 pt-2 text-center md:px-8 md:pb-20">
+            <p className="home-hero-pitch__eyebrow home-section-eyebrow text-primary-600">{HOME_HERO_COPY.eyebrow}</p>
+            {!reducedMotion ? (
+              <p className="mt-2 text-[11px] font-medium text-ink-subtle md:text-xs">Click the road to toggle 2× speed</p>
+            ) : null}
+            <h1
+              id="home-hero-title"
+              className="home-hero-pitch__title home-reveal mt-4 max-w-3xl text-3xl font-semibold tracking-tight text-ink md:text-[2.5rem] md:leading-[1.12]"
+            >
+              {HOME_HERO_COPY.title}
+            </h1>
+            <p className="home-hero-pitch__lead home-reveal mt-4 max-w-lg text-base leading-relaxed text-ink-muted md:max-w-xl md:text-[17px]">
+              {HOME_HERO_COPY.lead}
+            </p>
+            <HomeHeroAuth className="home-hero-pitch__actions home-reveal mt-9" />
+          </div>
+        </div>
+      </section>
+
+      <main className="home-content-shell flex-1 px-4 md:px-8">
+        <section id="features" className="grid scroll-mt-28 items-center gap-10 border-b border-line py-14 md:py-20 lg:grid-cols-2 lg:gap-14">
+          <div className="space-y-6">
+            <p className="home-section-eyebrow home-reveal text-primary-600">Client workspace</p>
+            <h2 className="home-reveal text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+              Close the gap between live APIs and automated workflows.
+            </h2>
+            <p className="home-reveal max-w-xl text-base leading-relaxed text-ink-muted">
+              Index repositories, explore routes and services, design flows on a canvas, and monitor executions without
+              leaving the same UI your team uses after sign-in.
+            </p>
+            <a href="#platform" className="home-reveal text-sm font-medium text-primary-600 hover:text-primary-700">
+              See the automation pipeline →
+            </a>
+          </div>
+          <div className="home-reveal home-hero-rail-slot flex lg:min-h-[360px]">
+            <HomeProductRail className="home-auth-rail-float w-full min-h-[320px]" portal="client" />
           </div>
         </section>
 
-        {/* Challenges grid */}
         <section className="border-b border-line py-14 md:py-18">
           <p className="home-section-eyebrow text-ink-subtle">Three challenges</p>
           <h2 className="home-reveal mt-3 max-w-2xl text-2xl font-semibold text-ink">Where automation programs hit a ceiling</h2>
-          <p className="home-reveal mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">
-            Teams document intent in wikis, then wire triggers by hand. {BRAND_NAME} keeps discovery, design, and
-            enforcement in the same workflow surface.
-          </p>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {CHALLENGES.map((c, i) => (
-              <article
-                key={c.n}
-                className="home-challenge-card glass-card p-6"
-                style={{ animationDelay: `${100 + i * 70}ms` }}
-              >
+              <article key={c.n} className="home-challenge-card glass-card p-6" style={{ animationDelay: `${100 + i * 70}ms` }}>
                 <p className="text-xs font-semibold text-primary-600">Challenge {c.n}</p>
                 <h3 className="mt-2 text-base font-semibold text-ink">{c.title}</h3>
                 <ul className="mt-4 space-y-2.5">
@@ -119,17 +128,18 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Journey — platform stages */}
-        <section className="py-14 md:py-18">
+        <section id="platform" className="scroll-mt-28 border-b border-line py-14 md:py-18">
+          <HomeAutomationPipeline />
+        </section>
+
+        <HomePortalStrip id="portals" className="scroll-mt-28 border-b border-line py-14 md:py-18" />
+
+        <section className="border-b border-line py-14 md:py-18">
           <p className="home-section-eyebrow text-ink-subtle">The {BRAND_NAME} platform</p>
           <h2 className="home-reveal mt-3 text-2xl font-semibold text-ink">One workspace for every stage of the loop</h2>
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {JOURNEY.map((item, i) => (
-              <div
-                key={item.step}
-                className="home-journey-step glass-inset px-4 py-5"
-                style={{ animationDelay: `${80 + i * 50}ms` }}
-              >
+              <div key={item.step} className="home-journey-step glass-inset px-4 py-5" style={{ animationDelay: `${80 + i * 50}ms` }}>
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-600">{item.step}</p>
                 <p className="mt-2 text-xs leading-relaxed text-ink-muted">{item.detail}</p>
               </div>
@@ -137,25 +147,20 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Closing CTA */}
-        <section className="mb-16">
-          <div className="glass-card flex flex-col items-start gap-4 border-t-[3px] border-t-primary-500 p-8 md:flex-row md:items-center md:justify-between md:p-10">
+        <section className="mb-16 pt-4 md:mb-20">
+          <div className="glass-card flex flex-col items-start gap-6 border-t-[3px] border-t-primary-500 p-8 md:flex-row md:items-center md:justify-between md:p-10">
             <div>
               <h2 className="text-lg font-semibold text-ink">Start on home.localhost. Work on client.localhost.</h2>
               <p className="mt-1 max-w-lg text-sm text-ink-muted">
                 Client accounts only. Sign up here — we hand off your session to the workspace when you are ready.
               </p>
             </div>
-            <Link to="/signup" className="shrink-0">
-              <Button variant="primary">Sign up for free</Button>
-            </Link>
+            <HomeHeroAuth className="shrink-0 justify-start md:justify-end" />
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-line bg-white/50 px-4 py-6 text-center text-[11px] text-ink-subtle backdrop-blur-sm md:px-8">
-        {BRAND_NAME} · home.localhost · client.localhost · admin.localhost
-      </footer>
+      <HomeSiteFooter />
     </HomePageShell>
   )
 }

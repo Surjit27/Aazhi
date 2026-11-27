@@ -1,6 +1,6 @@
 import { lazy } from 'react'
-import { Navigate, Route } from 'react-router-dom'
-import { CalendarClock, Flag, History, Mail, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react'
+import { Navigate, Route, useParams } from 'react-router-dom'
+import { CalendarClock, History, Mail, LayoutDashboard, Settings, Shield, UserCog, Users } from 'lucide-react'
 import {
   CLIENT_NAV,
   CLIENT_ACCESS_NAV,
@@ -12,6 +12,13 @@ import BackendLayout from '../components/layout/BackendLayout.jsx'
 import HomeRedirect from '../components/auth/HomeRedirect.jsx'
 
 const SettingsPage = lazy(() => import('../pages/SettingsPage.jsx'))
+const AdminSettingsLayout = lazy(() => import('../pages/admin/AdminSettingsLayout.jsx'))
+const EmailProvidersPage = lazy(() => import('../pages/admin/EmailProvidersPage.jsx'))
+const EmailProviderDetailPage = lazy(() => import('../pages/admin/EmailProviderDetailPage.jsx'))
+const ApiTokenProvidersPage = lazy(() => import('../pages/admin/ApiTokenProvidersPage.jsx'))
+const ApiTokenProviderDetailPage = lazy(() => import('../pages/admin/ApiTokenProviderDetailPage.jsx'))
+const AdminPersonalSettingsSection = lazy(() => import('../pages/admin/AdminPersonalSettingsSection.jsx'))
+const AdminFeatureFlagsSection = lazy(() => import('../pages/admin/AdminFeatureFlagsSection.jsx'))
 const ClientPortalPage = lazy(() => import('../pages/ClientPortalPage.jsx'))
 const BackendsPage = lazy(() => import('../pages/BackendsPage.jsx'))
 const BackendOverviewPage = lazy(() => import('../pages/BackendOverviewPage.jsx'))
@@ -29,7 +36,6 @@ const AdminUserManagementPage = lazy(() => import('../pages/admin/AdminUserManag
 const UserHistoryPage = lazy(() => import('../pages/admin/UserHistoryPage.jsx'))
 const EmailHistoryPage = lazy(() => import('../pages/admin/EmailHistoryPage.jsx'))
 const JobHistoryPage = lazy(() => import('../pages/admin/JobHistoryPage.jsx'))
-const AdminFeatureFlagsPage = lazy(() => import('../pages/admin/AdminFeatureFlagsPage.jsx'))
 const ClientAccessPage = lazy(() => import('../pages/client/ClientAccessPage.jsx'))
 const ClientAccessRolesPage = lazy(() => import('../pages/client/ClientAccessRolesPage.jsx'))
 const ClientAccessUsersPage = lazy(() => import('../pages/client/ClientAccessUsersPage.jsx'))
@@ -49,12 +55,31 @@ const NotFoundPage = lazy(() => import('../pages/NotFoundPage.jsx'))
 export { CLIENT_NAV, CLIENT_ACCESS_NAV, CLIENT_DEEP_BACKEND_NAV, CLIENT_HISTORY_NAV, CLIENT_PAGES_NAV }
 
 /** Admin portal sidebar (admin.localhost only). */
+function RedirectLegacyEmailProvider() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/settings/email/${id}` : '/settings/email'} replace />
+}
+
+function RedirectLegacyApiToken() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/settings/api/${id}` : '/settings/api'} replace />
+}
+
+function RedirectLegacyIntegrationsEmail() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/settings/email/${id}` : '/settings/email'} replace />
+}
+
+function RedirectLegacyIntegrationsApi() {
+  const { id } = useParams()
+  return <Navigate to={id ? `/settings/api/${id}` : '/settings/api'} replace />
+}
+
 export const ADMIN_NAV = [
   { to: '/overview', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: '/roles', label: 'Roles', icon: Shield },
   { to: '/admin/client-users', label: 'Client user management', icon: Users },
   { to: '/admin/admin-users', label: 'Admin user management', icon: UserCog },
-  { to: '/admin/feature-flags', label: 'Feature flags', icon: Flag },
   { to: '/admin/history/users', label: 'User history', icon: History },
   { to: '/admin/history/emails', label: 'Email history', icon: Mail },
   { to: '/admin/history/jobs', label: 'Job history', icon: CalendarClock },
@@ -69,12 +94,31 @@ export function AdminPortalRoutes() {
       <Route path="roles" element={<AdminRolesPage />} />
       <Route path="admin/client-users" element={<ClientUserManagementPage />} />
       <Route path="admin/admin-users" element={<AdminUserManagementPage />} />
-      <Route path="admin/feature-flags" element={<AdminFeatureFlagsPage />} />
+      <Route path="admin/feature-flags" element={<Navigate to="/settings/feature-flags" replace />} />
       <Route path="admin/history/users" element={<UserHistoryPage />} />
       <Route path="admin/history/emails" element={<EmailHistoryPage />} />
       <Route path="admin/history/jobs" element={<JobHistoryPage />} />
       <Route path="admin/users" element={<Navigate to="/admin/client-users" replace />} />
-      <Route path="settings" element={<SettingsPage />} />
+      <Route path="settings" element={<AdminSettingsLayout />}>
+        <Route index element={<Navigate to="personal" replace />} />
+        <Route path="personal" element={<AdminPersonalSettingsSection />} />
+        <Route path="email" element={<EmailProvidersPage />} />
+        <Route path="email/:id" element={<EmailProviderDetailPage />} />
+        <Route path="api" element={<ApiTokenProvidersPage />} />
+        <Route path="api/:id" element={<ApiTokenProviderDetailPage />} />
+        <Route path="feature-flags" element={<AdminFeatureFlagsSection />} />
+      </Route>
+      <Route path="settings/feature-flag" element={<Navigate to="/settings/feature-flags" replace />} />
+      <Route path="settings/feature-flag/*" element={<Navigate to="/settings/feature-flags" replace />} />
+      <Route path="settings/integrations/email" element={<Navigate to="/settings/email" replace />} />
+      <Route path="settings/integrations/email/:id" element={<RedirectLegacyIntegrationsEmail />} />
+      <Route path="settings/integrations/api" element={<Navigate to="/settings/api" replace />} />
+      <Route path="settings/integrations/api/:id" element={<RedirectLegacyIntegrationsApi />} />
+      <Route path="settings/ai" element={<Navigate to="/settings/api" replace />} />
+      <Route path="settings/email-providers" element={<Navigate to="/settings/email" replace />} />
+      <Route path="settings/email-providers/:id" element={<RedirectLegacyEmailProvider />} />
+      <Route path="settings/api-tokens" element={<Navigate to="/settings/api" replace />} />
+      <Route path="settings/api-tokens/:id" element={<RedirectLegacyApiToken />} />
       <Route path="backends" element={<Navigate to="/overview" replace />} />
       <Route path="backends/*" element={<Navigate to="/overview" replace />} />
       <Route path="mocks" element={<Navigate to="/overview" replace />} />

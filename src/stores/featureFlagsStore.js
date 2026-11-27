@@ -1,14 +1,6 @@
 import { create } from 'zustand'
-import { apiFetch, getStoredToken } from '../lib/api.js'
+import { apiFetch } from '../lib/api.js'
 import { getPortal, PORTAL } from '../lib/portal.js'
-
-function buildByPath(flags) {
-  const byPath = {}
-  for (const flag of flags ?? []) {
-    if (flag.navPath) byPath[flag.navPath] = flag.enabled
-  }
-  return byPath
-}
 
 export const useFeatureFlagsStore = create((set, get) => ({
   loaded: false,
@@ -22,16 +14,13 @@ export const useFeatureFlagsStore = create((set, get) => ({
       set({ loaded: true, flags: [], byPath: {} })
       return
     }
-    const token = getStoredToken()
-    if (!token) {
-      set({ loaded: false, flags: [], byPath: {} })
-      return
-    }
-    if (get().loaded) return
     try {
       const { flags } = await apiFetch('/api/client/feature-flags')
-      const list = flags ?? []
-      set({ loaded: true, flags: list, byPath: buildByPath(list) })
+      const byPath = {}
+      for (const flag of flags ?? []) {
+        if (flag.navPath) byPath[flag.navPath] = flag.enabled
+      }
+      set({ loaded: true, flags, byPath })
     } catch {
       set({ loaded: true, flags: [], byPath: {} })
     }
@@ -40,19 +29,11 @@ export const useFeatureFlagsStore = create((set, get) => ({
   isNavEnabled: (path, flagKey) => {
     const { loaded, byPath, flags } = get()
     if (!loaded) return true
-
+    if (path && byPath[path] !== undefined) return byPath[path]
     if (flagKey) {
       const row = flags.find((f) => f.key === flagKey)
-      if (row) {
-        if (row.navPath && path && row.navPath === path && byPath[row.navPath] !== undefined) {
-          return byPath[row.navPath]
-        }
-        return row.enabled !== false
-      }
+      if (row) return row.enabled
     }
-
-    if (path && byPath[path] !== undefined) return byPath[path]
-
     return true
   },
 

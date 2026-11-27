@@ -19,12 +19,17 @@ export default defineConfig({
     },
   },
   server: {
-    host: true,
+    host: true, // *.localhost in dev
     port: 5173,
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:4000',
         changeOrigin: true,
+      },
+      '/ai-worker': {
+        target: 'http://127.0.0.1:4100',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ai-worker/, ''),
       },
     },
   },
@@ -33,6 +38,11 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:4000',
         changeOrigin: true,
+      },
+      '/ai-worker': {
+        target: 'http://127.0.0.1:4100',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ai-worker/, ''),
       },
     },
   },
