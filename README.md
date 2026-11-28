@@ -4,6 +4,7 @@ React + Vite UI for **Deepe**: multi-hostname portals (**home**, **client**, **a
 
 **Project scope and three-repo layout:** [docs/PROJECT_AND_SCOPE.md](docs/PROJECT_AND_SCOPE.md)  
 **Local dev issues:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)  
+**Local ports:** [docs/LOCAL_PORTS.md](docs/LOCAL_PORTS.md)  
 **GitHub integration branch:** `main` (commits here count on your contribution graph).
 
 ## Local dev
@@ -18,6 +19,8 @@ npm run dev
 | http://home.localhost:5173 | Public marketing, sign-up / sign-in |
 | http://client.localhost:5173 | Client portal (explorer, backends, Deep) |
 | http://admin.localhost:5173 | Admin portal (users, settings, history) |
+
+Production builds: `npm run build` then `npm run preview` (default preview port **4173**—update hosts if you test portals against preview).
 
 Add to `/etc/hosts` if needed:
 
