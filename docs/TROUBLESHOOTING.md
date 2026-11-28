@@ -22,6 +22,22 @@ The app expects **hostname-based portals**, not only `localhost`.
 2. Confirm `VITE_API_URL` (or your env equivalent in `.env`) points at `http://localhost:4000`.
 3. Match **surface** headers: client routes send `X-App-Surface: client`; admin routes use `admin`.
 
+## Feature flags hide sidebar items
+
+Client nav respects flags from `GET /api/client/feature-flags`. If routes disappear:
+
+1. Sign in on **client.localhost** (not home/admin).
+2. In admin, open **Settings → Feature flags** and enable the nav path or flag key.
+3. Hard-refresh the client portal after saving.
+
+## Blank page after route change (lazy chunks)
+
+Routes use `React.lazy`. A failed dynamic import usually means a stale Vite HMR bundle—restart `npm run dev` and hard-refresh. Check the browser console for `Failed to fetch dynamically imported module`.
+
+## Two-factor login loops
+
+If login succeeds but returns to the form, complete **Settings → Security → Two-factor** or use the pending login code screen. Clear `localStorage` auth keys only as a last resort (`deepe.auth.token`).
+
 ## Explorer / index stuck on “pending”
 
 Full index flows need **Redis**, **Postgres**, and the **Python worker** (4100). Without Python, Node may enqueue jobs but never receive `GraphSnapshot` payloads—check Node logs and `Python-backend/docs/TROUBLESHOOTING.md`.
@@ -32,4 +48,4 @@ Full index flows need **Redis**, **Postgres**, and the **Python worker** (4100).
 - `backend/docs/TROUBLESHOOTING.md` — API and Docker
 - `Python-backend/docs/TROUBLESHOOTING.md` — internal worker
 
-*Last updated: 2026-11-26*
+*Last updated: 2026-11-28*
